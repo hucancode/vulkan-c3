@@ -13,8 +13,8 @@ const API_VERSION_1_3 = @make_version(1, 3, 0);
 const API_VERSION_1_4 = @make_version(1, 4, 0);
 
 // Base types
-distinct Flags         = uint;
-distinct Flags64       = ulong;
+def Flags         = uint;
+def Flags64       = ulong;
 distinct DeviceSize    = ulong;
 distinct DeviceAddress = ulong;
 distinct SampleMask    = uint;
