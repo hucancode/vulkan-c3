@@ -1,7 +1,7 @@
-module glfw;
+module glfw @if(env::GLFW_INCLUDE_VULKAN);
 import vk;
 
-extern fn VkProc getInstanceProcAddress(vk::Instance instance, ZString procname)
+extern fn vk::ProcVoidFunction getInstanceProcAddress(vk::Instance instance, ZString procname)
   @extern("glfwGetInstanceProcAddress");
 
 extern fn int getPhysicalDevicePresentationSupport(vk::Instance instance, vk::PhysicalDevice device, uint queuefamily)

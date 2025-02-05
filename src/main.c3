@@ -1,3 +1,4 @@
+module std::core::env;
 const bool GLFW_INCLUDE_VULKAN = true;
 module helloc3vk;
 import std::io;
@@ -107,12 +108,14 @@ fn vk::ExtensionProperties*! getAvailableExtensions() {
     return extensions;
 }
 
-fn int scorePhysicalDevice(vk::PhysicalDevice device) {
+fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
     vk::PhysicalDeviceProperties properties;
     vk::PhysicalDeviceFeatures features;
+    io::printfn("Checking device %d", device);
     vk::getPhysicalDeviceProperties(device, &properties);
+    io::printfn("fetched device properperty %s", (ZString)properties.deviceName[0..]);
     vk::getPhysicalDeviceFeatures(device, &features);
-    int score = 0;
+    uint score = 0;
     if (properties.deviceType == vk::PhysicalDeviceType.DISCRETE_GPU) {
         score += 100_000;
     }
@@ -125,10 +128,18 @@ fn void! createVulkanInstance() {
     vk::loadProcAddressesGlobal(&glfw::getInstanceProcAddress);
     ulong extensionCount;
     ZString* extensions = glfw::getRequiredInstanceExtensions(&extensionCount);
-    vk::InstanceCreateInfo createInfo;
-    createInfo.sType = vk::StructureType.INSTANCE_CREATE_INFO;
-    createInfo.enabledExtensionCount = (uint)extensionCount;
-    createInfo.ppEnabledExtensionNames = extensions;
+    vk::InstanceCreateInfo createInfo = {
+        .sType = vk::StructureType.INSTANCE_CREATE_INFO,
+        .pApplicationInfo = &&vk::ApplicationInfo {
+            .sType = vk::StructureType.APPLICATION_INFO,
+            .pApplicationName = "Hello VK",
+            .applicationVersion = vk::@make_version(1, 0, 0),
+            .pEngineName = "No Engine",
+            .engineVersion = vk::@make_version(1, 0, 0),
+            .apiVersion = vk::@make_version(1, 3, 0),
+        },
+    };
+    io::printfn("Required extensions count: %d", extensionCount);
     vk::check(vk::createInstance(&createInfo, null, &g_instance))!;
     vk::loadProcAddressesInstance(g_instance);
     vk::check(glfw::createWindowSurface(g_instance, g_window, null, &g_surface))!;
@@ -138,18 +149,22 @@ fn void! pickPhysicalDevice() {
     uint count;
     vk::PhysicalDevice* devices;
     vk::check(vk::enumeratePhysicalDevices(g_instance, &count, null))!;
+    io::printfn("Physical devices count: %d", count);
     devices = (vk::PhysicalDevice*)malloc(count * vk::PhysicalDevice.sizeof);
     defer free(devices);
     vk::check(vk::enumeratePhysicalDevices(g_instance, &count, devices))!;
+    io::printfn("Got devices details %d", count);
     g_physicalDevice = devices[0];
-    int bestScore = 0;
+    uint bestScore = 0;
     for (int i = 0; i < count; i++) {
         int score = scorePhysicalDevice(devices[i]);
+        io::printfn("Device %d score: %d", i, score);
         if (score > bestScore) {
             g_physicalDevice = devices[i];
             bestScore = score;
         }
     }
+    io::printfn("Selected physical device: %d with score %d", g_physicalDevice, bestScore);
 }
 
 struct SwapchainSupportDetails {
@@ -158,6 +173,10 @@ struct SwapchainSupportDetails {
     uint formatCount;
     vk::PresentModeKHR* presentModes;
     uint presentModeCount;
+}
+fn void SwapchainSupportDetails.free(SwapchainSupportDetails* self) {
+    free(self.formats);
+    free(self.presentModes);
 }
 
 fn SwapchainSupportDetails! querySwapchainSupport(vk::PhysicalDevice device) {
@@ -177,13 +196,17 @@ struct QueueFamilyIndices {
     uint presentFamily;
 }
 
+ProcGetPhysicalDeviceSurfaceSupportKHR fnFromApp;
 fn QueueFamilyIndices! findQueueFamilies(vk::PhysicalDevice device) {
+    fnFromApp = (ProcGetPhysicalDeviceSurfaceSupportKHR) vk::getInstanceProcAddr(g_instance, "vkGetPhysicalDeviceSurfaceSupportKHR");
     uint count;
     vk::QueueFamilyProperties* queueFamilies;
     vk::getPhysicalDeviceQueueFamilyProperties(device, &count, null);
+    io::printfn("Queue families count: %d", count);
     queueFamilies = (vk::QueueFamilyProperties*)malloc(count * vk::QueueFamilyProperties.sizeof);
     defer free(queueFamilies);
     vk::getPhysicalDeviceQueueFamilyProperties(device, &count, queueFamilies);
+    io::printfn("Got queue families details %d", count);
     QueueFamilyIndices indices;
     bool foundGraphics = false;
     bool foundPresent = false;
@@ -191,15 +214,18 @@ fn QueueFamilyIndices! findQueueFamilies(vk::PhysicalDevice device) {
         if (queueFamilies[i].queueFlags.graphics) {
             indices.graphicsFamily = i;
             foundGraphics = true;
+            io::printfn("Queue family %d support graphics", i);
         }
         uint presentSupport;
+        io::printfn("fnFromApp %d", fnFromApp != null);
         vk::check(vk::getPhysicalDeviceSurfaceSupportKHR(device, i, g_surface, &presentSupport))!;
         if (presentSupport) {
             indices.presentFamily = i;
             foundPresent = true;
+            io::printfn("Queue family %d support present", i);
         }
         if (foundGraphics && foundPresent) {
-            break;
+            return indices;
         }
     }
     return vk::VulkanError.ERROR_UNKNOWN?;
@@ -589,7 +615,7 @@ fn void! recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
         .clearValueCount = 1,
         .pClearValues = &&ClearValue {
             .color = {
-                .float32 = &&float[4] { 0.0, 0.0, 0.0, 1.0 }
+                .float32 = float[4] { 0.0, 0.0, 0.0, 1.0 }
             },
         },
     };

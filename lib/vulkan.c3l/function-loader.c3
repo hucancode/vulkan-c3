@@ -2,6 +2,7 @@
 // Vulkan wrapper generated from "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Headers/master/include/vulkan/vulkan_core.h"
 //
 module vk;
+import std::io;
 
 fn void loadProcAddressesCustom(SetProcAddressFnType setProcAddr) {
 	// Loader Procedures
@@ -1382,6 +1383,7 @@ fn void loadProcAddressesInstance(Instance instance) {
 	getPhysicalDeviceSurfacePresentModes2EXT                             = (ProcGetPhysicalDeviceSurfacePresentModes2EXT) getInstanceProcAddr(instance, "vkGetPhysicalDeviceSurfacePresentModes2EXT");
 	getPhysicalDeviceSurfacePresentModesKHR                              = (ProcGetPhysicalDeviceSurfacePresentModesKHR) getInstanceProcAddr(instance, "vkGetPhysicalDeviceSurfacePresentModesKHR");
 	getPhysicalDeviceSurfaceSupportKHR                                   = (ProcGetPhysicalDeviceSurfaceSupportKHR) getInstanceProcAddr(instance, "vkGetPhysicalDeviceSurfaceSupportKHR");
+	io::printfn("getPhysicalDeviceSurfaceSupportKHR = %d", getPhysicalDeviceSurfaceSupportKHR != null);
 	getPhysicalDeviceToolProperties                                      = (ProcGetPhysicalDeviceToolProperties) getInstanceProcAddr(instance, "vkGetPhysicalDeviceToolProperties");
 	getPhysicalDeviceToolPropertiesEXT                                   = (ProcGetPhysicalDeviceToolPropertiesEXT) getInstanceProcAddr(instance, "vkGetPhysicalDeviceToolPropertiesEXT");
 	getPhysicalDeviceVideoCapabilitiesKHR                                = (ProcGetPhysicalDeviceVideoCapabilitiesKHR) getInstanceProcAddr(instance, "vkGetPhysicalDeviceVideoCapabilitiesKHR");
@@ -1985,11 +1987,16 @@ fn void loadProcAddressesInstance(Instance instance) {
 	writeMicromapsPropertiesEXT                                = (ProcWriteMicromapsPropertiesEXT) getInstanceProcAddr(instance, "vkWriteMicromapsPropertiesEXT");
 }
 
-fn void loadProcAddressesGlobal(void* vkGetInstanceProcAddr) {
+
+fn void loadProcAddressesGlobal(ProcGetInstanceProcAddr vkGetInstanceProcAddr) {
 	getInstanceProcAddr = vkGetInstanceProcAddr;
+	io::printfn("Loading global proc addresses %d\n", getInstanceProcAddr != null);
 
 	allocationFunction                       = (ProcAllocationFunction) getInstanceProcAddr(null, "vkAllocationFunction");
+
+	io::printfn("Loading global proc addresses allocationFunction %d\n", allocationFunction != null);
 	createInstance                           = (ProcCreateInstance) getInstanceProcAddr(null, "vkCreateInstance");
+	io::printfn("Loading global proc addresses createInstance %d\n", createInstance != null);
 	debugUtilsMessengerCallbackEXT           = (ProcDebugUtilsMessengerCallbackEXT) getInstanceProcAddr(null, "vkDebugUtilsMessengerCallbackEXT");
 	deviceMemoryReportCallbackEXT            = (ProcDeviceMemoryReportCallbackEXT) getInstanceProcAddr(null, "vkDeviceMemoryReportCallbackEXT");
 	enumerateInstanceExtensionProperties     = (ProcEnumerateInstanceExtensionProperties) getInstanceProcAddr(null, "vkEnumerateInstanceExtensionProperties");
@@ -2001,5 +2008,3 @@ fn void loadProcAddressesGlobal(void* vkGetInstanceProcAddr) {
 	internalFreeNotification                 = (ProcInternalFreeNotification) getInstanceProcAddr(null, "vkInternalFreeNotification");
 	reallocationFunction                     = (ProcReallocationFunction) getInstanceProcAddr(null, "vkReallocationFunction");
 }
-
-
