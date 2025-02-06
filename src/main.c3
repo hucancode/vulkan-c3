@@ -113,9 +113,9 @@ fn void! createVulkanInstance() {
     ulong extensionCount;
     ZString* extensions = glfw::getRequiredInstanceExtensions(&extensionCount);
     vk::InstanceCreateInfo createInfo = {
-        .sType = vk::StructureType.INSTANCE_CREATE_INFO,
+        .sType = vk::STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
         .pApplicationInfo = &&vk::ApplicationInfo {
-            .sType = vk::StructureType.APPLICATION_INFO,
+            .sType = vk::STRUCTURE_TYPE_APPLICATION_INFO,
             .pApplicationName = "Hello VK",
             .applicationVersion = vk::@make_version(1, 0, 0),
             .pEngineName = "No Engine",
@@ -131,9 +131,9 @@ fn void! createVulkanInstance() {
         extensions[extensionCount - 1] = vk::EXT_DEBUG_UTILS_EXTENSION_NAME;
         createInfo.enabledLayerCount = VALIDATION_LAYERS.len;
         createInfo.ppEnabledLayerNames = &VALIDATION_LAYERS;
-        io::printfn("vk::StructureType.DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT = %d", (int)vk::StructureType.DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT);
+        io::printfn("vk::STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT = %d", (int)vk::STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT);
         vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo = {
-            .sType = vk::StructureType.DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+            .sType = vk::STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
             .messageSeverity = vk::DebugUtilsMessageSeverityFlagsEXT {
                 .error = true,
                 .warning = true,
@@ -187,7 +187,7 @@ fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
     io::printfn("fetched device properperty %s", (ZString)properties.deviceName[0..]);
     vk::getPhysicalDeviceFeatures(device, &features);
     uint score = 0;
-    if (properties.deviceType == vk::PhysicalDeviceType.DISCRETE_GPU) {
+    if (properties.deviceType == vk::PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
         score += 100_000;
     }
     score += properties.limits.maxImageDimension2D;
@@ -286,13 +286,13 @@ fn void! createLogicalDevice() {
 		};
 	};
     vk::DeviceQueueCreateInfo queueCreateInfo = {
-        .sType = vk::StructureType.DEVICE_QUEUE_CREATE_INFO,
+        .sType = vk::STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
         .queueFamilyIndex = indices.graphicsFamily,
         .queueCount = 1,
         .pQueuePriorities = &&1.0f,
     };
     vk::DeviceCreateInfo createInfo = {
-        .sType = vk::StructureType.DEVICE_CREATE_INFO,
+        .sType = vk::STRUCTURE_TYPE_DEVICE_CREATE_INFO,
         .queueCreateInfoCount = 1,
         .pQueueCreateInfos = &queueCreateInfo,
         .enabledExtensionCount = REQUIRED_EXTENSIONS.len,
@@ -307,7 +307,7 @@ fn void! createLogicalDevice() {
 
 fn vk::SurfaceFormatKHR pickSwapSurfaceFormat(vk::SurfaceFormatKHR* formats, int count) {
     for (int i = 0; i < count; i++) {
-        if (formats[i].format == vk::Format.B8G8R8A8_SRGB && formats[i].colorSpace == vk::ColorSpaceKHR.SRGB_NONLINEAR) {
+        if (formats[i].format == vk::FORMAT_B8G8R8A8_SRGB && formats[i].colorSpace == vk::COLOR_SPACE_SRGB_NONLINEAR_KHR) {
             return formats[i];
         }
     }
@@ -316,11 +316,11 @@ fn vk::SurfaceFormatKHR pickSwapSurfaceFormat(vk::SurfaceFormatKHR* formats, int
 
 fn vk::PresentModeKHR pickSwapPresentMode(vk::PresentModeKHR* presentModes, int count) {
     for (int i = 0; i < count; i++) {
-        if (presentModes[i] == vk::PresentModeKHR.MAILBOX) {
+        if (presentModes[i] == vk::PRESENT_MODE_MAILBOX_KHR) {
             return presentModes[i];
         }
     }
-    return vk::PresentModeKHR.FIFO;
+    return vk::PRESENT_MODE_FIFO_KHR;
 }
 
 fn vk::Extent2D pickSwapExtent(vk::SurfaceCapabilitiesKHR capabilities) {
@@ -349,7 +349,7 @@ fn void! createSwapchain() {
     }
     uint[2] indiceArray = {indices.graphicsFamily, indices.presentFamily};
     vk::SwapchainCreateInfoKHR createInfo = {
-        .sType = vk::StructureType.SWAPCHAIN_CREATE_INFO_KHR,
+        .sType = vk::STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
         .surface = g_surface,
         .minImageCount = g_swapChainImageCount,
         .imageFormat = g_swapChainFormat.format,
@@ -357,7 +357,7 @@ fn void! createSwapchain() {
         .imageExtent = g_swapChainExtent,
         .imageArrayLayers = 1,
         .imageUsage = vk::ImageUsageFlags { .color_attachment = true },
-        .imageSharingMode = vk::SharingMode.EXCLUSIVE,
+        .imageSharingMode = vk::SHARING_MODE_EXCLUSIVE,
         .queueFamilyIndexCount = 2,
         .pQueueFamilyIndices = &indiceArray,
         .preTransform = swapChainSupport.capabilities.currentTransform,
@@ -367,7 +367,7 @@ fn void! createSwapchain() {
         .oldSwapchain = (vk::SwapchainKHR)0,
     };
     if (indices.graphicsFamily != indices.presentFamily) {
-        createInfo.imageSharingMode = vk::SharingMode.CONCURRENT;
+        createInfo.imageSharingMode = vk::SHARING_MODE_CONCURRENT;
         createInfo.queueFamilyIndexCount = 2;
         createInfo.pQueueFamilyIndices = &indiceArray;
     }
@@ -379,9 +379,9 @@ fn void! createSwapchain() {
     g_swapChainImageViews = (vk::ImageView*)malloc(g_swapChainImageCount * vk::ImageView.sizeof);
     for (uint i = 0; i < g_swapChainImageCount; i++) {
         vk::ImageViewCreateInfo info = {
-            .sType = vk::StructureType.IMAGE_VIEW_CREATE_INFO,
+            .sType = vk::STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
             .image = g_swapChainImages[i],
-            .viewType = vk::ImageViewType.D2,
+            .viewType = vk::IMAGE_VIEW_TYPE_2D,
             .format = g_swapChainFormat.format,
             .subresourceRange = {
                 .aspectMask = vk::ImageAspectFlags { .color = true },
@@ -396,7 +396,7 @@ fn void! createSwapchain() {
     g_swapChainFramebuffers = (vk::Framebuffer*)malloc(g_swapChainImageCount * vk::Framebuffer.sizeof);
     for (uint i = 0; i < g_swapChainImageCount; i++) {
         vk::FramebufferCreateInfo info = {
-            .sType = vk::StructureType.FRAMEBUFFER_CREATE_INFO,
+            .sType = vk::STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
             .renderPass = g_renderPass,
             .attachmentCount = 1,
             .pAttachments = &g_swapChainImageViews[i],
@@ -422,7 +422,7 @@ fn void destroySwapchain() {
 
 fn vk::ShaderModule! createShaderModule(char[] code) {
     vk::ShaderModuleCreateInfo createInfo = {
-        .sType = vk::StructureType.SHADER_MODULE_CREATE_INFO,
+        .sType = vk::STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
         .codeSize = code.len,
         .pCode = (uint*)code.ptr,
     };
@@ -437,13 +437,13 @@ fn void! loadShader() {
     char[*] fragmentCode = $embed("shaders/frag.spv");
     g_fragmentShader = createShaderModule(&fragmentCode)!;
     g_vertexShaderStageInfo[0] = {
-        .sType = vk::StructureType.PIPELINE_SHADER_STAGE_CREATE_INFO,
+        .sType = vk::STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
         .stage = vk::ShaderStageFlags { .vertex = true },
         .module_ = g_vertexShader,
         .pName = "main",
     };
     g_vertexShaderStageInfo[1] = {
-        .sType = vk::StructureType.PIPELINE_SHADER_STAGE_CREATE_INFO,
+        .sType = vk::STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
         .stage = vk::ShaderStageFlags { .fragment = true },
         .module_ = g_fragmentShader,
         .pName = "main",
@@ -454,19 +454,19 @@ fn void! createRenderPass() {
     vk::AttachmentDescription colorAttachment = {
         .format = g_swapChainFormat.format,
         .samples = vk::SampleCountFlags { .n_1 = true },
-        .loadOp = vk::AttachmentLoadOp.CLEAR,
-        .storeOp = vk::AttachmentStoreOp.STORE,
-        .stencilLoadOp = vk::AttachmentLoadOp.DONT_CARE,
-        .stencilStoreOp = vk::AttachmentStoreOp.DONT_CARE,
-        .initialLayout = vk::ImageLayout.UNDEFINED,
-        .finalLayout = vk::ImageLayout.PRESENT_SRC_KHR,
+        .loadOp = vk::ATTACHMENT_LOAD_OP_CLEAR,
+        .storeOp = vk::ATTACHMENT_STORE_OP_STORE,
+        .stencilLoadOp = vk::ATTACHMENT_LOAD_OP_DONT_CARE,
+        .stencilStoreOp = vk::ATTACHMENT_STORE_OP_DONT_CARE,
+        .initialLayout = vk::IMAGE_LAYOUT_UNDEFINED,
+        .finalLayout = vk::IMAGE_LAYOUT_PRESENT_SRC_KHR,
     };
     vk::AttachmentReference colorAttachmentRef = {
         .attachment = 0,
-        .layout = vk::ImageLayout.COLOR_ATTACHMENT_OPTIMAL,
+        .layout = vk::IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
     };
     vk::SubpassDescription subpass = {
-        .pipelineBindPoint = vk::PipelineBindPoint.GRAPHICS,
+        .pipelineBindPoint = vk::PIPELINE_BIND_POINT_GRAPHICS,
         .colorAttachmentCount = 1,
         .pColorAttachments = &colorAttachmentRef,
     };
@@ -479,7 +479,7 @@ fn void! createRenderPass() {
         .dstAccessMask = vk::AccessFlags {.color_attachment_read=true,.color_attachment_write=true},
     };
     vk::RenderPassCreateInfo createInfo = {
-        .sType = vk::StructureType.RENDER_PASS_CREATE_INFO,
+        .sType = vk::STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
         .attachmentCount = 1,
         .pAttachments = &colorAttachment,
         .subpassCount = 1,
@@ -492,36 +492,36 @@ fn void! createRenderPass() {
 
 fn void! createGraphicsPipeline() {
     vk::PipelineDynamicStateCreateInfo dynamicState = {
-        .sType = vk::StructureType.PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+        .sType = vk::STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
         .dynamicStateCount = 2,
-        .pDynamicStates = &&vk::DynamicState[*] {vk::DynamicState.VIEWPORT, vk::DynamicState.SCISSOR},
+        .pDynamicStates = &&vk::DynamicState[*] {vk::DYNAMIC_STATE_VIEWPORT, vk::DYNAMIC_STATE_SCISSOR},
     };
 
     vk::PipelineVertexInputStateCreateInfo vertexInputInfo = {
-        .sType = vk::StructureType.PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+        .sType = vk::STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
     };
 
     vk::PipelineInputAssemblyStateCreateInfo inputAssembly = {
-        .sType = vk::StructureType.PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
-        .topology = vk::PrimitiveTopology.TRIANGLE_LIST,
+        .sType = vk::STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
+        .topology = vk::PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
     };
 
     vk::PipelineViewportStateCreateInfo viewportState = {
-        .sType = vk::StructureType.PIPELINE_VIEWPORT_STATE_CREATE_INFO,
+        .sType = vk::STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
         .viewportCount = 1,
         .scissorCount = 1,
     };
 
     vk::PipelineRasterizationStateCreateInfo rasterizer = {
-        .sType = vk::StructureType.PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
-        .polygonMode = vk::PolygonMode.FILL,
+        .sType = vk::STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+        .polygonMode = vk::POLYGON_MODE_FILL,
         .cullMode = vk::CullModeFlags { .back = true },
-        .frontFace = vk::FrontFace.CLOCKWISE,
+        .frontFace = vk::FRONT_FACE_CLOCKWISE,
         .lineWidth = 1.0,
     };
 
     vk::PipelineMultisampleStateCreateInfo multisampling = {
-        .sType = vk::StructureType.PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
+        .sType = vk::STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
         .rasterizationSamples = vk::SampleCountFlags { .n_1 = true },
         .minSampleShading = 1.0,
     };
@@ -536,20 +536,20 @@ fn void! createGraphicsPipeline() {
     };
 
     vk::PipelineColorBlendStateCreateInfo colorBlending = {
-        .sType = vk::StructureType.PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
-        .logicOp = vk::LogicOp.COPY,
+        .sType = vk::STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
+        .logicOp = vk::LOGIC_OP_COPY,
         .attachmentCount = 1,
         .pAttachments = &colorBlendAttachment,
     };
 
     vk::PipelineLayoutCreateInfo pipelineLayoutInfo = {
-        .sType = vk::StructureType.PIPELINE_LAYOUT_CREATE_INFO,
+        .sType = vk::STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
     };
 
     vk::check(vk::createPipelineLayout(g_device, &pipelineLayoutInfo, null, &g_pipelineLayout))!;
 
     vk::GraphicsPipelineCreateInfo pipelineInfo = {
-        .sType = vk::StructureType.GRAPHICS_PIPELINE_CREATE_INFO,
+        .sType = vk::STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
         .stageCount = 2,
         .pStages = &g_vertexShaderStageInfo[0],
         .pVertexInputState = &vertexInputInfo,
@@ -569,14 +569,14 @@ fn void! createGraphicsPipeline() {
 fn void! createCommandPool() {
     QueueFamilyIndices queueFamilyIndices = findQueueFamilies(g_physicalDevice)!;
     vk::CommandPoolCreateInfo poolInfo = {
-        .sType = vk::StructureType.COMMAND_POOL_CREATE_INFO,
+        .sType = vk::STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
         .queueFamilyIndex = queueFamilyIndices.graphicsFamily,
     };
     vk::check(vk::createCommandPool(g_device, &poolInfo, null, &g_commandPool))!;
     vk::CommandBufferAllocateInfo allocInfo = {
-        .sType = vk::StructureType.COMMAND_BUFFER_ALLOCATE_INFO,
+        .sType = vk::STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
         .commandPool = g_commandPool,
-        .level = vk::CommandBufferLevel.PRIMARY,
+        .level = vk::COMMAND_BUFFER_LEVEL_PRIMARY,
         .commandBufferCount = g_commandBuffers.len,
     };
     vk::check(vk::allocateCommandBuffers(g_device, &allocInfo, &g_commandBuffers))!;
@@ -584,10 +584,10 @@ fn void! createCommandPool() {
 
 fn void! createSemaphores() {
     vk::SemaphoreCreateInfo semaphoreInfo = {
-        .sType = vk::StructureType.SEMAPHORE_CREATE_INFO,
+        .sType = vk::STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
     };
     vk::FenceCreateInfo fenceInfo = {
-        .sType = vk::StructureType.FENCE_CREATE_INFO,
+        .sType = vk::STRUCTURE_TYPE_FENCE_CREATE_INFO,
         .flags = vk::FenceCreateFlags { .signaled = true },
     };
     for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
@@ -623,7 +623,7 @@ fn void! render() {
     recordCommandBuffer(g_commandBuffers[g_currentFrame], imageIndex)!;
 
     vk::SubmitInfo submitInfo = {
-        .sType = vk::StructureType.SUBMIT_INFO,
+        .sType = vk::STRUCTURE_TYPE_SUBMIT_INFO,
         .waitSemaphoreCount = 1,
         .pWaitSemaphores = &g_imageAvailableSemaphore[g_currentFrame],
         .pWaitDstStageMask = &&vk::PipelineStageFlags { .color_attachment_output = true },
@@ -634,7 +634,7 @@ fn void! render() {
     };
     vk::check(vk::queueSubmit(g_graphicsQueue, 1, &submitInfo, g_inFlightFences[g_currentFrame]))!;
     vk::PresentInfoKHR presentInfo = {
-        .sType = vk::StructureType.PRESENT_INFO_KHR,
+        .sType = vk::STRUCTURE_TYPE_PRESENT_INFO_KHR,
         .waitSemaphoreCount = 1,
         .pWaitSemaphores = &g_renderFinishedSemaphore[g_currentFrame],
         .swapchainCount = 1,
@@ -654,12 +654,12 @@ fn void! render() {
 
 fn void! recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
     vk::CommandBufferBeginInfo beginInfo = {
-        .sType = vk::StructureType.COMMAND_BUFFER_BEGIN_INFO,
+        .sType = vk::STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
     };
     vk::check(vk::beginCommandBuffer(commandBuffer, &beginInfo))!;
 
     vk::RenderPassBeginInfo renderPassInfo = {
-        .sType = vk::StructureType.RENDER_PASS_BEGIN_INFO,
+        .sType = vk::STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
         .renderPass = g_renderPass,
         .framebuffer = g_swapChainFramebuffers[imageIndex],
         .renderArea = {
@@ -673,9 +673,9 @@ fn void! recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
             },
         },
     };
-    vk::cmdBeginRenderPass(commandBuffer, &renderPassInfo, vk::SubpassContents.INLINE);
+    vk::cmdBeginRenderPass(commandBuffer, &renderPassInfo, vk::SUBPASS_CONTENTS_INLINE);
     defer vk::cmdEndRenderPass(commandBuffer);
-    vk::cmdBindPipeline(commandBuffer, vk::PipelineBindPoint.GRAPHICS, g_graphicsPipeline);
+    vk::cmdBindPipeline(commandBuffer, vk::PIPELINE_BIND_POINT_GRAPHICS, g_graphicsPipeline);
     vk::Viewport viewport = {
         .width = g_swapChainExtent.width,
         .height = g_swapChainExtent.height,
