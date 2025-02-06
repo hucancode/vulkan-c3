@@ -7,13 +7,13 @@ import std::core::cinterop;
 import std::collections::bitset;
 
 // Enums
-enum AccelerationStructureBuildTypeKHR : CInt (CInt value) {
+enum AccelerationStructureBuildTypeKHR : int (inline CInt value) {
 	HOST           = 0,
 	DEVICE         = 1,
 	HOST_OR_DEVICE = 2,
 }
 
-enum AccelerationStructureCompatibilityKHR : CInt (CInt value) {
+enum AccelerationStructureCompatibilityKHR : int (inline CInt value) {
 	COMPATIBLE   = 0,
 	INCOMPATIBLE = 1,
 }
@@ -24,19 +24,19 @@ bitstruct AccelerationStructureCreateFlagsKHR : Flags @overlap {
 	bool motion_nv                            : 2;
 }
 
-enum AccelerationStructureMemoryRequirementsTypeNV : CInt (CInt value) {
+enum AccelerationStructureMemoryRequirementsTypeNV : int (inline CInt value) {
 	OBJECT         = 0,
 	BUILD_SCRATCH  = 1,
 	UPDATE_SCRATCH = 2,
 }
 
-enum AccelerationStructureMotionInstanceTypeNV : CInt (CInt value) {
+enum AccelerationStructureMotionInstanceTypeNV : int (inline CInt value) {
 	STATIC        = 0,
 	MATRIX_MOTION = 1,
 	SRT_MOTION    = 2,
 }
 
-enum AccelerationStructureTypeKHR : CInt (CInt value) {
+enum AccelerationStructureTypeKHR : int (inline CInt value) {
 	TOP_LEVEL       = 0,
 	BOTTOM_LEVEL    = 1,
 	GENERIC         = 2,
@@ -85,13 +85,13 @@ bitstruct AccessFlags : Flags @overlap {
 bitstruct AcquireProfilingLockFlagsKHR : Flags @overlap {
 }
 
-enum AntiLagModeAMD : CInt (CInt value) {
+enum AntiLagModeAMD : int (inline CInt value) {
 	DRIVER_CONTROL = 0,
 	ON             = 1,
 	OFF            = 2,
 }
 
-enum AntiLagStageAMD : CInt (CInt value) {
+enum AntiLagStageAMD : int (inline CInt value) {
 	INPUT   = 0,
 	PRESENT = 1,
 }
@@ -100,20 +100,20 @@ bitstruct AttachmentDescriptionFlags : Flags @overlap {
 	bool may_alias : 0;
 }
 
-enum AttachmentLoadOp : CInt (CInt value) {
+enum AttachmentLoadOp : int (inline CInt value) {
 	LOAD      = 0,
 	CLEAR     = 1,
 	DONT_CARE = 2,
 	NONE      = 1000400000,
 }
 
-enum AttachmentStoreOp : CInt (CInt value) {
+enum AttachmentStoreOp : int (inline CInt value) {
 	STORE     = 0,
 	DONT_CARE = 1,
 	NONE      = 1000301000,
 }
 
-enum BlendFactor : CInt (CInt value) {
+enum BlendFactor : int (inline CInt value) {
 	ZERO                     = 0,
 	ONE                      = 1,
 	SRC_COLOR                = 2,
@@ -135,7 +135,7 @@ enum BlendFactor : CInt (CInt value) {
 	ONE_MINUS_SRC1_ALPHA     = 18,
 }
 
-enum BlendOp : CInt (CInt value) {
+enum BlendOp : int (inline CInt value) {
 	ADD                    = 0,
 	SUBTRACT               = 1,
 	REVERSE_SUBTRACT       = 2,
@@ -189,18 +189,18 @@ enum BlendOp : CInt (CInt value) {
 	BLUE_EXT               = 1000148045,
 }
 
-enum BlendOverlapEXT : CInt (CInt value) {
+enum BlendOverlapEXT : int (inline CInt value) {
 	UNCORRELATED = 0,
 	DISJOINT     = 1,
 	CONJOINT     = 2,
 }
 
-enum BlockMatchWindowCompareModeQCOM : CInt (CInt value) {
+enum BlockMatchWindowCompareModeQCOM : int (inline CInt value) {
 	BLOCK_MATCH_WINDOW_COMPARE_MODE_MIN_QCOM = 0,
 	BLOCK_MATCH_WINDOW_COMPARE_MODE_MAX_QCOM = 1,
 }
 
-enum BorderColor : CInt (CInt value) {
+enum BorderColor : int (inline CInt value) {
 	FLOAT_TRANSPARENT_BLACK = 0,
 	INT_TRANSPARENT_BLACK   = 1,
 	FLOAT_OPAQUE_BLACK      = 2,
@@ -274,7 +274,7 @@ bitstruct BuildAccelerationStructureFlagsKHR : Flags @overlap {
 	bool low_memory_nv                          : 4;
 }
 
-enum BuildAccelerationStructureModeKHR : CInt (CInt value) {
+enum BuildAccelerationStructureModeKHR : int (inline CInt value) {
 	BUILD  = 0,
 	UPDATE = 1,
 }
@@ -285,18 +285,18 @@ bitstruct BuildMicromapFlagsEXT : Flags @overlap {
 	bool allow_compaction  : 2;
 }
 
-enum BuildMicromapModeEXT : CInt (CInt value) {
+enum BuildMicromapModeEXT : int (inline CInt value) {
 	BUILD = 0,
 }
 
-enum ChromaLocation : CInt (CInt value) {
+enum ChromaLocation : int (inline CInt value) {
 	COSITED_EVEN     = 0,
 	MIDPOINT         = 1,
 	COSITED_EVEN_KHR = 0,
 	MIDPOINT_KHR     = 1,
 }
 
-enum CoarseSampleOrderTypeNV : CInt (CInt value) {
+enum CoarseSampleOrderTypeNV : int (inline CInt value) {
 	DEFAULT      = 0,
 	CUSTOM       = 1,
 	PIXEL_MAJOR  = 2,
@@ -310,7 +310,7 @@ bitstruct ColorComponentFlags : Flags @overlap {
 	bool a : 3;
 }
 
-enum ColorSpaceKHR : CInt (CInt value) {
+enum ColorSpaceKHR : int (inline CInt value) {
 	SRGB_NONLINEAR              = 0,
 	DISPLAY_P3_NONLINEAR_EXT    = 1000104001,
 	EXTENDED_SRGB_LINEAR_EXT    = 1000104002,
@@ -331,7 +331,7 @@ enum ColorSpaceKHR : CInt (CInt value) {
 	DCI_P3_LINEAR_EXT           = 1000104003,
 }
 
-enum CommandBufferLevel : CInt (CInt value) {
+enum CommandBufferLevel : int (inline CInt value) {
 	PRIMARY   = 0,
 	SECONDARY = 1,
 }
@@ -356,7 +356,7 @@ bitstruct CommandPoolResetFlags : Flags @overlap {
 	bool release_resources : 0;
 }
 
-enum CompareOp : CInt (CInt value) {
+enum CompareOp : int (inline CInt value) {
 	NEVER            = 0,
 	LESS             = 1,
 	EQUAL            = 2,
@@ -367,7 +367,7 @@ enum CompareOp : CInt (CInt value) {
 	ALWAYS           = 7,
 }
 
-enum ComponentSwizzle : CInt (CInt value) {
+enum ComponentSwizzle : int (inline CInt value) {
 	IDENTITY = 0,
 	ZERO     = 1,
 	ONE      = 2,
@@ -377,7 +377,7 @@ enum ComponentSwizzle : CInt (CInt value) {
 	A        = 6,
 }
 
-enum ComponentTypeKHR : CInt (CInt value) {
+enum ComponentTypeKHR : int (inline CInt value) {
 	FLOAT16    = 0,
 	FLOAT32    = 1,
 	FLOAT64    = 2,
@@ -413,13 +413,13 @@ bitstruct ConditionalRenderingFlagsEXT : Flags @overlap {
 	bool inverted : 0;
 }
 
-enum ConservativeRasterizationModeEXT : CInt (CInt value) {
+enum ConservativeRasterizationModeEXT : int (inline CInt value) {
 	DISABLED      = 0,
 	OVERESTIMATE  = 1,
 	UNDERESTIMATE = 2,
 }
 
-enum CopyAccelerationStructureModeKHR : CInt (CInt value) {
+enum CopyAccelerationStructureModeKHR : int (inline CInt value) {
 	CLONE       = 0,
 	COMPACT     = 1,
 	SERIALIZE   = 2,
@@ -428,26 +428,26 @@ enum CopyAccelerationStructureModeKHR : CInt (CInt value) {
 	COMPACT_NV  = 1,
 }
 
-enum CopyMicromapModeEXT : CInt (CInt value) {
+enum CopyMicromapModeEXT : int (inline CInt value) {
 	CLONE       = 0,
 	SERIALIZE   = 1,
 	DESERIALIZE = 2,
 	COMPACT     = 3,
 }
 
-enum CoverageModulationModeNV : CInt (CInt value) {
+enum CoverageModulationModeNV : int (inline CInt value) {
 	NONE  = 0,
 	RGB   = 1,
 	ALPHA = 2,
 	RGBA  = 3,
 }
 
-enum CoverageReductionModeNV : CInt (CInt value) {
+enum CoverageReductionModeNV : int (inline CInt value) {
 	MERGE    = 0,
 	TRUNCATE = 1,
 }
 
-enum CubicFilterWeightsQCOM : CInt (CInt value) {
+enum CubicFilterWeightsQCOM : int (inline CInt value) {
 	CUBIC_FILTER_WEIGHTS_CATMULL_ROM_QCOM           = 0,
 	CUBIC_FILTER_WEIGHTS_ZERO_TANGENT_CARDINAL_QCOM = 1,
 	CUBIC_FILTER_WEIGHTS_B_SPLINE_QCOM              = 2,
@@ -469,7 +469,7 @@ bitstruct DebugReportFlagsEXT : Flags @overlap {
 	bool debug               : 4;
 }
 
-enum DebugReportObjectTypeEXT : CInt (CInt value) {
+enum DebugReportObjectTypeEXT : int (inline CInt value) {
 	UNKNOWN                        = 0,
 	INSTANCE                       = 1,
 	PHYSICAL_DEVICE                = 2,
@@ -540,13 +540,13 @@ bitstruct DependencyFlags : Flags @overlap {
 	bool device_group_khr  : 2;
 }
 
-enum DepthBiasRepresentationEXT : CInt (CInt value) {
+enum DepthBiasRepresentationEXT : int (inline CInt value) {
 	LEAST_REPRESENTABLE_VALUE_FORMAT      = 0,
 	LEAST_REPRESENTABLE_VALUE_FORCE_UNORM = 1,
 	FLOAT                                 = 2,
 }
 
-enum DepthClampModeEXT : CInt (CInt value) {
+enum DepthClampModeEXT : int (inline CInt value) {
 	VIEWPORT_RANGE     = 0,
 	USER_DEFINED_RANGE = 1,
 }
@@ -585,7 +585,7 @@ bitstruct DescriptorSetLayoutCreateFlags : Flags @overlap {
 	bool host_only_pool_valve            : 2;
 }
 
-enum DescriptorType : CInt (CInt value) {
+enum DescriptorType : int (inline CInt value) {
 	SAMPLER                    = 0,
 	COMBINED_IMAGE_SAMPLER     = 1,
 	SAMPLED_IMAGE              = 2,
@@ -607,7 +607,7 @@ enum DescriptorType : CInt (CInt value) {
 	MUTABLE_VALVE              = 1000351000,
 }
 
-enum DescriptorUpdateTemplateType : CInt (CInt value) {
+enum DescriptorUpdateTemplateType : int (inline CInt value) {
 	DESCRIPTOR_SET       = 0,
 	PUSH_DESCRIPTORS     = 1,
 	PUSH_DESCRIPTORS_KHR = 1,
@@ -618,7 +618,7 @@ bitstruct DeviceAddressBindingFlagsEXT : Flags @overlap {
 	bool internal_object : 0;
 }
 
-enum DeviceAddressBindingTypeEXT : CInt (CInt value) {
+enum DeviceAddressBindingTypeEXT : int (inline CInt value) {
 	BIND   = 0,
 	UNBIND = 1,
 }
@@ -630,11 +630,11 @@ bitstruct DeviceDiagnosticsConfigFlagsNV : Flags @overlap {
 	bool enable_shader_error_reporting : 3;
 }
 
-enum DeviceEventTypeEXT : CInt (CInt value) {
+enum DeviceEventTypeEXT : int (inline CInt value) {
 	DISPLAY_HOTPLUG = 0,
 }
 
-enum DeviceFaultAddressTypeEXT : CInt (CInt value) {
+enum DeviceFaultAddressTypeEXT : int (inline CInt value) {
 	NONE                        = 0,
 	READ_INVALID                = 1,
 	WRITE_INVALID               = 2,
@@ -644,7 +644,7 @@ enum DeviceFaultAddressTypeEXT : CInt (CInt value) {
 	INSTRUCTION_POINTER_FAULT   = 6,
 }
 
-enum DeviceFaultVendorBinaryHeaderVersionEXT : CInt (CInt value) {
+enum DeviceFaultVendorBinaryHeaderVersionEXT : int (inline CInt value) {
 	ONE = 1,
 }
 
@@ -655,7 +655,7 @@ bitstruct DeviceGroupPresentModeFlagsKHR : Flags @overlap {
 	bool local_multi_device : 3;
 }
 
-enum DeviceMemoryReportEventTypeEXT : CInt (CInt value) {
+enum DeviceMemoryReportEventTypeEXT : int (inline CInt value) {
 	ALLOCATE          = 0,
 	FREE              = 1,
 	IMPORT            = 2,
@@ -667,17 +667,17 @@ bitstruct DeviceQueueCreateFlags : Flags @overlap {
 	bool protected : 0;
 }
 
-enum DirectDriverLoadingModeLUNARG : CInt (CInt value) {
+enum DirectDriverLoadingModeLUNARG : int (inline CInt value) {
 	DIRECT_DRIVER_LOADING_MODE_EXCLUSIVE_LUNARG = 0,
 	DIRECT_DRIVER_LOADING_MODE_INCLUSIVE_LUNARG = 1,
 }
 
-enum DiscardRectangleModeEXT : CInt (CInt value) {
+enum DiscardRectangleModeEXT : int (inline CInt value) {
 	INCLUSIVE = 0,
 	EXCLUSIVE = 1,
 }
 
-enum DisplayEventTypeEXT : CInt (CInt value) {
+enum DisplayEventTypeEXT : int (inline CInt value) {
 	FIRST_PIXEL_OUT = 0,
 }
 
@@ -688,20 +688,20 @@ bitstruct DisplayPlaneAlphaFlagsKHR : Flags @overlap {
 	bool per_pixel_premultiplied : 3;
 }
 
-enum DisplayPowerStateEXT : CInt (CInt value) {
+enum DisplayPowerStateEXT : int (inline CInt value) {
 	OFF     = 0,
 	SUSPEND = 1,
 	ON      = 2,
 }
 
-enum DisplaySurfaceStereoTypeNV : CInt (CInt value) {
+enum DisplaySurfaceStereoTypeNV : int (inline CInt value) {
 	NONE               = 0,
 	ONBOARD_DIN        = 1,
 	HDMI_3D            = 2,
 	INBAND_DISPLAYPORT = 3,
 }
 
-enum DriverId : CInt (CInt value) {
+enum DriverId : int (inline CInt value) {
 	AMD_PROPRIETARY               = 1,
 	AMD_OPEN_SOURCE               = 2,
 	MESA_RADV                     = 3,
@@ -743,7 +743,7 @@ enum DriverId : CInt (CInt value) {
 	BROADCOM_PROPRIETARY_KHR      = 12,
 }
 
-enum DynamicState : CInt (CInt value) {
+enum DynamicState : int (inline CInt value) {
 	VIEWPORT                                = 0,
 	SCISSOR                                 = 1,
 	LINE_WIDTH                              = 2,
@@ -945,14 +945,14 @@ bitstruct FenceImportFlags : Flags @overlap {
 	bool temporary_khr : 0;
 }
 
-enum Filter : CInt (CInt value) {
+enum Filter : int (inline CInt value) {
 	NEAREST   = 0,
 	LINEAR    = 1,
 	CUBIC_EXT = 1000015000,
 	CUBIC_IMG = 1000015000,
 }
 
-enum Format : CInt (CInt value) {
+enum Format : int (inline CInt value) {
 	UNDEFINED                                      = 0,
 	R4G4_UNORM_PACK8                               = 1,
 	R4G4B4A4_UNORM_PACK16                          = 2,
@@ -1307,7 +1307,7 @@ bitstruct FormatFeatureFlags : Flags @overlap {
 	bool cosited_chroma_samples_khr                                                  : 23;
 }
 
-enum FragmentShadingRateCombinerOpKHR : CInt (CInt value) {
+enum FragmentShadingRateCombinerOpKHR : int (inline CInt value) {
 	KEEP    = 0,
 	REPLACE = 1,
 	MIN     = 2,
@@ -1315,7 +1315,7 @@ enum FragmentShadingRateCombinerOpKHR : CInt (CInt value) {
 	MUL     = 4,
 }
 
-enum FragmentShadingRateNV : CInt (CInt value) {
+enum FragmentShadingRateNV : int (inline CInt value) {
 	N_1_INVOCATION_PER_PIXEL      = 0,
 	N_1_INVOCATION_PER_1X2_PIXELS = 1,
 	N_1_INVOCATION_PER_2X1_PIXELS = 4,
@@ -1330,7 +1330,7 @@ enum FragmentShadingRateNV : CInt (CInt value) {
 	NO_INVOCATIONS                = 15,
 }
 
-enum FragmentShadingRateTypeNV : CInt (CInt value) {
+enum FragmentShadingRateTypeNV : int (inline CInt value) {
 	FRAGMENT_SIZE = 0,
 	ENUMS         = 1,
 }
@@ -1344,12 +1344,12 @@ bitstruct FramebufferCreateFlags : Flags @overlap {
 	bool imageless_khr : 0;
 }
 
-enum FrontFace : CInt (CInt value) {
+enum FrontFace : int (inline CInt value) {
 	COUNTER_CLOCKWISE = 0,
 	CLOCKWISE         = 1,
 }
 
-enum FullScreenExclusiveEXT : CInt (CInt value) {
+enum FullScreenExclusiveEXT : int (inline CInt value) {
 	DEFAULT                = 0,
 	ALLOWED                = 1,
 	DISALLOWED             = 2,
@@ -1377,7 +1377,7 @@ bitstruct GeometryInstanceFlagsKHR : Flags @overlap {
 	bool force_no_opaque_nv                 : 3;
 }
 
-enum GeometryTypeKHR : CInt (CInt value) {
+enum GeometryTypeKHR : int (inline CInt value) {
 	TRIANGLES    = 0,
 	AABBS        = 1,
 	INSTANCES    = 2,
@@ -1482,7 +1482,7 @@ bitstruct ImageCreateFlags : Flags @overlap {
 	bool alias_khr                                 : 10;
 }
 
-enum ImageLayout : CInt (CInt value) {
+enum ImageLayout : int (inline CInt value) {
 	UNDEFINED                                      = 0,
 	GENERAL                                        = 1,
 	COLOR_ATTACHMENT_OPTIMAL                       = 2,
@@ -1525,13 +1525,13 @@ enum ImageLayout : CInt (CInt value) {
 	ATTACHMENT_OPTIMAL_KHR                         = 1000314001,
 }
 
-enum ImageTiling : CInt (CInt value) {
+enum ImageTiling : int (inline CInt value) {
 	OPTIMAL                 = 0,
 	LINEAR                  = 1,
 	DRM_FORMAT_MODIFIER_EXT = 1000158000,
 }
 
-enum ImageType : CInt (CInt value) {
+enum ImageType : int (inline CInt value) {
 	D1 = 0,
 	D2 = 1,
 	D3 = 2,
@@ -1571,7 +1571,7 @@ bitstruct ImageViewCreateFlags : Flags @overlap {
 	bool fragment_density_map_deferred_ext    : 1;
 }
 
-enum ImageViewType : CInt (CInt value) {
+enum ImageViewType : int (inline CInt value) {
 	D1         = 0,
 	D2         = 1,
 	D3         = 2,
@@ -1581,7 +1581,7 @@ enum ImageViewType : CInt (CInt value) {
 	CUBE_ARRAY = 6,
 }
 
-enum IndexType : CInt (CInt value) {
+enum IndexType : int (inline CInt value) {
 	UINT16    = 0,
 	UINT32    = 1,
 	UINT8     = 1000265000,
@@ -1607,7 +1607,7 @@ bitstruct IndirectCommandsLayoutUsageFlagsNV : Flags @overlap {
 	bool unordered_sequences : 2;
 }
 
-enum IndirectCommandsTokenTypeEXT : CInt (CInt value) {
+enum IndirectCommandsTokenTypeEXT : int (inline CInt value) {
 	EXECUTION_SET            = 0,
 	PUSH_CONSTANT            = 1,
 	SEQUENCE_INDEX           = 2,
@@ -1625,7 +1625,7 @@ enum IndirectCommandsTokenTypeEXT : CInt (CInt value) {
 	TRACE_RAYS2              = 1000386004,
 }
 
-enum IndirectCommandsTokenTypeNV : CInt (CInt value) {
+enum IndirectCommandsTokenTypeNV : int (inline CInt value) {
 	SHADER_GROUP    = 0,
 	STATE_FLAGS     = 1,
 	INDEX_BUFFER    = 2,
@@ -1639,7 +1639,7 @@ enum IndirectCommandsTokenTypeNV : CInt (CInt value) {
 	DISPATCH        = 1000428004,
 }
 
-enum IndirectExecutionSetInfoTypeEXT : CInt (CInt value) {
+enum IndirectExecutionSetInfoTypeEXT : int (inline CInt value) {
 	PIPELINES      = 0,
 	SHADER_OBJECTS = 1,
 }
@@ -1652,11 +1652,11 @@ bitstruct InstanceCreateFlags : Flags @overlap {
 	bool enumerate_portability_khr : 0;
 }
 
-enum InternalAllocationType : CInt (CInt value) {
+enum InternalAllocationType : int (inline CInt value) {
 	EXECUTABLE = 0,
 }
 
-enum LatencyMarkerNV : CInt (CInt value) {
+enum LatencyMarkerNV : int (inline CInt value) {
 	SIMULATION_START               = 0,
 	SIMULATION_END                 = 1,
 	RENDERSUBMIT_START             = 2,
@@ -1671,7 +1671,7 @@ enum LatencyMarkerNV : CInt (CInt value) {
 	OUT_OF_BAND_PRESENT_END        = 11,
 }
 
-enum LayerSettingTypeEXT : CInt (CInt value) {
+enum LayerSettingTypeEXT : int (inline CInt value) {
 	BOOL32  = 0,
 	INT32   = 1,
 	INT64   = 2,
@@ -1682,12 +1682,12 @@ enum LayerSettingTypeEXT : CInt (CInt value) {
 	STRING  = 7,
 }
 
-enum LayeredDriverUnderlyingApiMSFT : CInt (CInt value) {
+enum LayeredDriverUnderlyingApiMSFT : int (inline CInt value) {
 	LAYERED_DRIVER_UNDERLYING_API_NONE_MSFT  = 0,
 	LAYERED_DRIVER_UNDERLYING_API_D3D12_MSFT = 1,
 }
 
-enum LineRasterizationMode : CInt (CInt value) {
+enum LineRasterizationMode : int (inline CInt value) {
 	DEFAULT                = 0,
 	RECTANGULAR            = 1,
 	BRESENHAM              = 2,
@@ -1702,7 +1702,7 @@ enum LineRasterizationMode : CInt (CInt value) {
 	RECTANGULAR_SMOOTH_KHR = 3,
 }
 
-enum LogicOp : CInt (CInt value) {
+enum LogicOp : int (inline CInt value) {
 	CLEAR         = 0,
 	AND           = 1,
 	AND_REVERSE   = 2,
@@ -1740,7 +1740,7 @@ bitstruct MemoryMapFlags : Flags @overlap {
 	bool placed_ext : 0;
 }
 
-enum MemoryOverallocationBehaviorAMD : CInt (CInt value) {
+enum MemoryOverallocationBehaviorAMD : int (inline CInt value) {
 	DEFAULT    = 0,
 	ALLOWED    = 1,
 	DISALLOWED = 2,
@@ -1766,12 +1766,12 @@ bitstruct MicromapCreateFlagsEXT : Flags @overlap {
 	bool device_address_capture_replay : 0;
 }
 
-enum MicromapTypeEXT : CInt (CInt value) {
+enum MicromapTypeEXT : int (inline CInt value) {
 	OPACITY_MICROMAP         = 0,
 	DISPLACEMENT_MICROMAP_NV = 1000397000,
 }
 
-enum ObjectType : CInt (CInt value) {
+enum ObjectType : int (inline CInt value) {
 	UNKNOWN                         = 0,
 	INSTANCE                        = 1,
 	PHYSICAL_DEVICE                 = 2,
@@ -1831,12 +1831,12 @@ enum ObjectType : CInt (CInt value) {
 	PRIVATE_DATA_SLOT_EXT           = 1000295000,
 }
 
-enum OpacityMicromapFormatEXT : CInt (CInt value) {
+enum OpacityMicromapFormatEXT : int (inline CInt value) {
 	N_2_STATE = 1,
 	N_4_STATE = 2,
 }
 
-enum OpacityMicromapSpecialIndexEXT : CInt (CInt value) {
+enum OpacityMicromapSpecialIndexEXT : int (inline CInt value) {
 	FULLY_TRANSPARENT         = -1,
 	FULLY_OPAQUE              = -2,
 	FULLY_UNKNOWN_TRANSPARENT = -3,
@@ -1856,14 +1856,14 @@ bitstruct OpticalFlowGridSizeFlagsNV : Flags @overlap {
 
 
 
-enum OpticalFlowPerformanceLevelNV : CInt (CInt value) {
+enum OpticalFlowPerformanceLevelNV : int (inline CInt value) {
 	UNKNOWN = 0,
 	SLOW    = 1,
 	MEDIUM  = 2,
 	FAST    = 3,
 }
 
-enum OpticalFlowSessionBindingPointNV : CInt (CInt value) {
+enum OpticalFlowSessionBindingPointNV : int (inline CInt value) {
 	UNKNOWN              = 0,
 	INPUT                = 1,
 	REFERENCE            = 2,
@@ -1893,7 +1893,7 @@ bitstruct OpticalFlowUsageFlagsNV : Flags @overlap {
 
 
 
-enum OutOfBandQueueTypeNV : CInt (CInt value) {
+enum OutOfBandQueueTypeNV : int (inline CInt value) {
 	RENDER  = 0,
 	PRESENT = 1,
 }
@@ -1909,7 +1909,7 @@ bitstruct PeerMemoryFeatureFlags : Flags @overlap {
 	bool generic_dst_khr : 3;
 }
 
-enum PerformanceConfigurationTypeINTEL : CInt (CInt value) {
+enum PerformanceConfigurationTypeINTEL : int (inline CInt value) {
 	PERFORMANCE_CONFIGURATION_TYPE_COMMAND_QUEUE_METRICS_DISCOVERY_ACTIVATED_INTEL = 0,
 }
 
@@ -1918,7 +1918,7 @@ bitstruct PerformanceCounterDescriptionFlagsKHR : Flags @overlap {
 	bool concurrently_impacted : 1;
 }
 
-enum PerformanceCounterScopeKHR : CInt (CInt value) {
+enum PerformanceCounterScopeKHR : int (inline CInt value) {
 	COMMAND_BUFFER             = 0,
 	RENDER_PASS                = 1,
 	COMMAND                    = 2,
@@ -1927,7 +1927,7 @@ enum PerformanceCounterScopeKHR : CInt (CInt value) {
 	QUERY_SCOPE_COMMAND        = 2,
 }
 
-enum PerformanceCounterStorageKHR : CInt (CInt value) {
+enum PerformanceCounterStorageKHR : int (inline CInt value) {
 	INT32   = 0,
 	INT64   = 1,
 	UINT32  = 2,
@@ -1936,7 +1936,7 @@ enum PerformanceCounterStorageKHR : CInt (CInt value) {
 	FLOAT64 = 5,
 }
 
-enum PerformanceCounterUnitKHR : CInt (CInt value) {
+enum PerformanceCounterUnitKHR : int (inline CInt value) {
 	GENERIC          = 0,
 	PERCENTAGE       = 1,
 	NANOSECONDS      = 2,
@@ -1950,17 +1950,17 @@ enum PerformanceCounterUnitKHR : CInt (CInt value) {
 	CYCLES           = 10,
 }
 
-enum PerformanceOverrideTypeINTEL : CInt (CInt value) {
+enum PerformanceOverrideTypeINTEL : int (inline CInt value) {
 	PERFORMANCE_OVERRIDE_TYPE_NULL_HARDWARE_INTEL    = 0,
 	PERFORMANCE_OVERRIDE_TYPE_FLUSH_GPU_CACHES_INTEL = 1,
 }
 
-enum PerformanceParameterTypeINTEL : CInt (CInt value) {
+enum PerformanceParameterTypeINTEL : int (inline CInt value) {
 	PERFORMANCE_PARAMETER_TYPE_HW_COUNTERS_SUPPORTED_INTEL    = 0,
 	PERFORMANCE_PARAMETER_TYPE_STREAM_MARKER_VALID_BITS_INTEL = 1,
 }
 
-enum PerformanceValueTypeINTEL : CInt (CInt value) {
+enum PerformanceValueTypeINTEL : int (inline CInt value) {
 	PERFORMANCE_VALUE_TYPE_UINT32_INTEL = 0,
 	PERFORMANCE_VALUE_TYPE_UINT64_INTEL = 1,
 	PERFORMANCE_VALUE_TYPE_FLOAT_INTEL  = 2,
@@ -1968,7 +1968,7 @@ enum PerformanceValueTypeINTEL : CInt (CInt value) {
 	PERFORMANCE_VALUE_TYPE_STRING_INTEL = 4,
 }
 
-enum PhysicalDeviceLayeredApiKHR : CInt (CInt value) {
+enum PhysicalDeviceLayeredApiKHR : int (inline CInt value) {
 	VULKAN   = 0,
 	D3D12    = 1,
 	METAL    = 2,
@@ -1976,7 +1976,7 @@ enum PhysicalDeviceLayeredApiKHR : CInt (CInt value) {
 	OPENGLES = 4,
 }
 
-enum PhysicalDeviceType : CInt (CInt value) {
+enum PhysicalDeviceType : int (inline CInt value) {
 	OTHER          = 0,
 	INTEGRATED_GPU = 1,
 	DISCRETE_GPU   = 2,
@@ -1984,7 +1984,7 @@ enum PhysicalDeviceType : CInt (CInt value) {
 	CPU            = 4,
 }
 
-enum PipelineBindPoint : CInt (CInt value) {
+enum PipelineBindPoint : int (inline CInt value) {
 	GRAPHICS               = 0,
 	COMPUTE                = 1,
 	EXECUTION_GRAPH_AMDX   = 1000134000,
@@ -1998,7 +1998,7 @@ bitstruct PipelineCacheCreateFlags : Flags @overlap {
 	bool externally_synchronized_ext : 0;
 }
 
-enum PipelineCacheHeaderVersion : CInt (CInt value) {
+enum PipelineCacheHeaderVersion : int (inline CInt value) {
 	ONE = 1,
 }
 
@@ -2068,7 +2068,7 @@ bitstruct PipelineDepthStencilStateCreateFlags : Flags @overlap {
 	bool rasterization_order_attachment_stencil_access_arm : 1;
 }
 
-enum PipelineExecutableStatisticFormatKHR : CInt (CInt value) {
+enum PipelineExecutableStatisticFormatKHR : int (inline CInt value) {
 	BOOL32  = 0,
 	INT64   = 1,
 	UINT64  = 2,
@@ -2079,7 +2079,7 @@ bitstruct PipelineLayoutCreateFlags : Flags @overlap {
 	bool independent_sets_ext : 1;
 }
 
-enum PipelineRobustnessBufferBehavior : CInt (CInt value) {
+enum PipelineRobustnessBufferBehavior : int (inline CInt value) {
 	DEVICE_DEFAULT             = 0,
 	DISABLED                   = 1,
 	ROBUST_BUFFER_ACCESS       = 2,
@@ -2090,7 +2090,7 @@ enum PipelineRobustnessBufferBehavior : CInt (CInt value) {
 	ROBUST_BUFFER_ACCESS_2_EXT = 3,
 }
 
-enum PipelineRobustnessImageBehavior : CInt (CInt value) {
+enum PipelineRobustnessImageBehavior : int (inline CInt value) {
 	DEVICE_DEFAULT            = 0,
 	DISABLED                  = 1,
 	ROBUST_IMAGE_ACCESS       = 2,
@@ -2145,14 +2145,14 @@ bitstruct PipelineStageFlags : Flags @overlap {
 
 
 
-enum PointClippingBehavior : CInt (CInt value) {
+enum PointClippingBehavior : int (inline CInt value) {
 	ALL_CLIP_PLANES           = 0,
 	USER_CLIP_PLANES_ONLY     = 1,
 	ALL_CLIP_PLANES_KHR       = 0,
 	USER_CLIP_PLANES_ONLY_KHR = 1,
 }
 
-enum PolygonMode : CInt (CInt value) {
+enum PolygonMode : int (inline CInt value) {
 	FILL              = 0,
 	LINE              = 1,
 	POINT             = 2,
@@ -2165,7 +2165,7 @@ bitstruct PresentGravityFlagsEXT : Flags @overlap {
 	bool centered : 2;
 }
 
-enum PresentModeKHR : CInt (CInt value) {
+enum PresentModeKHR : int (inline CInt value) {
 	IMMEDIATE                 = 0,
 	MAILBOX                   = 1,
 	FIFO                      = 2,
@@ -2181,7 +2181,7 @@ bitstruct PresentScalingFlagsEXT : Flags @overlap {
 	bool stretch              : 2;
 }
 
-enum PrimitiveTopology : CInt (CInt value) {
+enum PrimitiveTopology : int (inline CInt value) {
 	POINT_LIST                    = 0,
 	LINE_LIST                     = 1,
 	LINE_STRIP                    = 2,
@@ -2195,7 +2195,7 @@ enum PrimitiveTopology : CInt (CInt value) {
 	PATCH_LIST                    = 10,
 }
 
-enum ProvokingVertexModeEXT : CInt (CInt value) {
+enum ProvokingVertexModeEXT : int (inline CInt value) {
 	FIRST_VERTEX = 0,
 	LAST_VERTEX  = 1,
 }
@@ -2221,7 +2221,7 @@ bitstruct QueryPipelineStatisticFlags : Flags @overlap {
 	bool cluster_culling_shader_invocations_huawei  : 13;
 }
 
-enum QueryPoolSamplingModeINTEL : CInt (CInt value) {
+enum QueryPoolSamplingModeINTEL : int (inline CInt value) {
 	QUERY_POOL_SAMPLING_MODE_MANUAL_INTEL = 0,
 }
 
@@ -2233,14 +2233,14 @@ bitstruct QueryResultFlags : Flags @overlap {
 	bool with_status_khr   : 4;
 }
 
-enum QueryResultStatusKHR : CInt (CInt value) {
+enum QueryResultStatusKHR : int (inline CInt value) {
 	ERROR                               = -1,
 	NOT_READY                           = 0,
 	COMPLETE                            = 1,
 	INSUFFICIENT_BITSTREAM_BUFFER_RANGE = -1000299000,
 }
 
-enum QueryType : CInt (CInt value) {
+enum QueryType : int (inline CInt value) {
 	OCCLUSION                                                      = 0,
 	PIPELINE_STATISTICS                                            = 1,
 	TIMESTAMP                                                      = 2,
@@ -2271,7 +2271,7 @@ bitstruct QueueFlags : Flags @overlap {
 	bool optical_flow_nv  : 8;
 }
 
-enum QueueGlobalPriority : CInt (CInt value) {
+enum QueueGlobalPriority : int (inline CInt value) {
 	LOW          = 128,
 	MEDIUM       = 256,
 	HIGH         = 512,
@@ -2286,17 +2286,17 @@ enum QueueGlobalPriority : CInt (CInt value) {
 	REALTIME_KHR = 1024,
 }
 
-enum RasterizationOrderAMD : CInt (CInt value) {
+enum RasterizationOrderAMD : int (inline CInt value) {
 	STRICT  = 0,
 	RELAXED = 1,
 }
 
-enum RayTracingInvocationReorderModeNV : CInt (CInt value) {
+enum RayTracingInvocationReorderModeNV : int (inline CInt value) {
 	NONE    = 0,
 	REORDER = 1,
 }
 
-enum RayTracingShaderGroupTypeKHR : CInt (CInt value) {
+enum RayTracingShaderGroupTypeKHR : int (inline CInt value) {
 	GENERAL                 = 0,
 	TRIANGLES_HIT_GROUP     = 1,
 	PROCEDURAL_HIT_GROUP    = 2,
@@ -2335,7 +2335,7 @@ bitstruct ResolveModeFlags : Flags @overlap {
 
 
 
-enum Result : CInt (CInt value) {
+enum Result : int (inline CInt value) {
 	SUCCESS                                            = 0,
 	NOT_READY                                          = 1,
 	TIMEOUT                                            = 2,
@@ -2407,7 +2407,7 @@ bitstruct SampleCountFlags : Flags @overlap {
 	bool n_64 : 6;
 }
 
-enum SamplerAddressMode : CInt (CInt value) {
+enum SamplerAddressMode : int (inline CInt value) {
 	REPEAT                   = 0,
 	MIRRORED_REPEAT          = 1,
 	CLAMP_TO_EDGE            = 2,
@@ -2424,12 +2424,12 @@ bitstruct SamplerCreateFlags : Flags @overlap {
 	bool image_processing_qcom                : 4;
 }
 
-enum SamplerMipmapMode : CInt (CInt value) {
+enum SamplerMipmapMode : int (inline CInt value) {
 	NEAREST = 0,
 	LINEAR  = 1,
 }
 
-enum SamplerReductionMode : CInt (CInt value) {
+enum SamplerReductionMode : int (inline CInt value) {
 	WEIGHTED_AVERAGE                 = 0,
 	MIN                              = 1,
 	MAX                              = 2,
@@ -2439,7 +2439,7 @@ enum SamplerReductionMode : CInt (CInt value) {
 	MAX_EXT                          = 2,
 }
 
-enum SamplerYcbcrModelConversion : CInt (CInt value) {
+enum SamplerYcbcrModelConversion : int (inline CInt value) {
 	RGB_IDENTITY       = 0,
 	YCBCR_IDENTITY     = 1,
 	YCBCR_709          = 2,
@@ -2452,14 +2452,14 @@ enum SamplerYcbcrModelConversion : CInt (CInt value) {
 	YCBCR_2020_KHR     = 4,
 }
 
-enum SamplerYcbcrRange : CInt (CInt value) {
+enum SamplerYcbcrRange : int (inline CInt value) {
 	ITU_FULL       = 0,
 	ITU_NARROW     = 1,
 	ITU_FULL_KHR   = 0,
 	ITU_NARROW_KHR = 1,
 }
 
-enum ScopeKHR : CInt (CInt value) {
+enum ScopeKHR : int (inline CInt value) {
 	DEVICE          = 1,
 	WORKGROUP       = 2,
 	SUBGROUP        = 3,
@@ -2475,7 +2475,7 @@ bitstruct SemaphoreImportFlags : Flags @overlap {
 	bool temporary_khr : 0;
 }
 
-enum SemaphoreType : CInt (CInt value) {
+enum SemaphoreType : int (inline CInt value) {
 	BINARY       = 0,
 	TIMELINE     = 1,
 	BINARY_KHR   = 0,
@@ -2487,7 +2487,7 @@ bitstruct SemaphoreWaitFlags : Flags @overlap {
 	bool any_khr : 0;
 }
 
-enum ShaderCodeTypeEXT : CInt (CInt value) {
+enum ShaderCodeTypeEXT : int (inline CInt value) {
 	BINARY = 0,
 	SPIRV  = 1,
 }
@@ -2506,7 +2506,7 @@ bitstruct ShaderCreateFlagsEXT : Flags @overlap {
 	bool indirect_bindable                : 7;
 }
 
-enum ShaderFloatControlsIndependence : CInt (CInt value) {
+enum ShaderFloatControlsIndependence : int (inline CInt value) {
 	N_32_BIT_ONLY     = 0,
 	ALL               = 1,
 	NONE              = 2,
@@ -2514,14 +2514,14 @@ enum ShaderFloatControlsIndependence : CInt (CInt value) {
 	ALL_KHR           = 1,
 }
 
-enum ShaderGroupShaderKHR : CInt (CInt value) {
+enum ShaderGroupShaderKHR : int (inline CInt value) {
 	GENERAL      = 0,
 	CLOSEST_HIT  = 1,
 	ANY_HIT      = 2,
 	INTERSECTION = 3,
 }
 
-enum ShaderInfoTypeAMD : CInt (CInt value) {
+enum ShaderInfoTypeAMD : int (inline CInt value) {
 	STATISTICS  = 0,
 	BINARY      = 1,
 	DISASSEMBLY = 2,
@@ -2557,7 +2557,7 @@ bitstruct ShaderStageFlags : Flags @overlap {
 
 
 
-enum ShadingRatePaletteEntryNV : CInt (CInt value) {
+enum ShadingRatePaletteEntryNV : int (inline CInt value) {
 	NO_INVOCATIONS                = 0,
 	N_16_INVOCATIONS_PER_PIXEL    = 1,
 	N_8_INVOCATIONS_PER_PIXEL     = 2,
@@ -2572,7 +2572,7 @@ enum ShadingRatePaletteEntryNV : CInt (CInt value) {
 	N_1_INVOCATION_PER_4X4_PIXELS = 11,
 }
 
-enum SharingMode : CInt (CInt value) {
+enum SharingMode : int (inline CInt value) {
 	EXCLUSIVE  = 0,
 	CONCURRENT = 1,
 }
@@ -2594,7 +2594,7 @@ bitstruct StencilFaceFlags : Flags @overlap {
 
 
 
-enum StencilOp : CInt (CInt value) {
+enum StencilOp : int (inline CInt value) {
 	KEEP                = 0,
 	ZERO                = 1,
 	REPLACE             = 2,
@@ -2605,7 +2605,7 @@ enum StencilOp : CInt (CInt value) {
 	DECREMENT_AND_WRAP  = 7,
 }
 
-enum StructureType : CInt (CInt value) {
+enum StructureType : int (inline CInt value) {
 	APPLICATION_INFO                                                    = 0,
 	INSTANCE_CREATE_INFO                                                = 1,
 	DEVICE_QUEUE_CREATE_INFO                                            = 2,
@@ -3831,7 +3831,7 @@ bitstruct SubmitFlags : Flags @overlap {
 	bool protected_khr : 0;
 }
 
-enum SubpassContents : CInt (CInt value) {
+enum SubpassContents : int (inline CInt value) {
 	INLINE                                   = 0,
 	SECONDARY_COMMAND_BUFFERS                = 1,
 	INLINE_AND_SECONDARY_COMMAND_BUFFERS_KHR = 1000451000,
@@ -3852,7 +3852,7 @@ bitstruct SubpassDescriptionFlags : Flags @overlap {
 	bool rasterization_order_attachment_stencil_access_arm : 6;
 }
 
-enum SubpassMergeStatusEXT : CInt (CInt value) {
+enum SubpassMergeStatusEXT : int (inline CInt value) {
 	MERGED                                   = 0,
 	DISALLOWED                               = 1,
 	NOT_MERGED_SIDE_EFFECTS                  = 2,
@@ -3892,7 +3892,7 @@ bitstruct SwapchainCreateFlagsKHR : Flags @overlap {
 	bool deferred_memory_allocation_ext : 3;
 }
 
-enum SystemAllocationScope : CInt (CInt value) {
+enum SystemAllocationScope : int (inline CInt value) {
 	COMMAND  = 0,
 	OBJECT   = 1,
 	CACHE    = 2,
@@ -3900,14 +3900,14 @@ enum SystemAllocationScope : CInt (CInt value) {
 	INSTANCE = 4,
 }
 
-enum TessellationDomainOrigin : CInt (CInt value) {
+enum TessellationDomainOrigin : int (inline CInt value) {
 	UPPER_LEFT     = 0,
 	LOWER_LEFT     = 1,
 	UPPER_LEFT_KHR = 0,
 	LOWER_LEFT_KHR = 1,
 }
 
-enum TimeDomainKHR : CInt (CInt value) {
+enum TimeDomainKHR : int (inline CInt value) {
 	DEVICE                        = 0,
 	CLOCK_MONOTONIC               = 1,
 	CLOCK_MONOTONIC_RAW           = 2,
@@ -3933,16 +3933,16 @@ bitstruct ToolPurposeFlags : Flags @overlap {
 	bool modifying_features_ext  : 4;
 }
 
-enum ValidationCacheHeaderVersionEXT : CInt (CInt value) {
+enum ValidationCacheHeaderVersionEXT : int (inline CInt value) {
 	ONE = 1,
 }
 
-enum ValidationCheckEXT : CInt (CInt value) {
+enum ValidationCheckEXT : int (inline CInt value) {
 	ALL     = 0,
 	SHADERS = 1,
 }
 
-enum ValidationFeatureDisableEXT : CInt (CInt value) {
+enum ValidationFeatureDisableEXT : int (inline CInt value) {
 	ALL                     = 0,
 	SHADERS                 = 1,
 	THREAD_SAFETY           = 2,
@@ -3953,7 +3953,7 @@ enum ValidationFeatureDisableEXT : CInt (CInt value) {
 	SHADER_VALIDATION_CACHE = 7,
 }
 
-enum ValidationFeatureEnableEXT : CInt (CInt value) {
+enum ValidationFeatureEnableEXT : int (inline CInt value) {
 	GPU_ASSISTED                      = 0,
 	GPU_ASSISTED_RESERVE_BINDING_SLOT = 1,
 	BEST_PRACTICES                    = 2,
@@ -3961,7 +3961,7 @@ enum ValidationFeatureEnableEXT : CInt (CInt value) {
 	SYNCHRONIZATION_VALIDATION        = 4,
 }
 
-enum VendorId : CInt (CInt value) {
+enum VendorId : int (inline CInt value) {
 	KHRONOS  = 0X10000,
 	VIV      = 0X10001,
 	VSI      = 0X10002,
@@ -3972,42 +3972,42 @@ enum VendorId : CInt (CInt value) {
 	MOBILEYE = 0X10007,
 }
 
-enum VertexInputRate : CInt (CInt value) {
+enum VertexInputRate : int (inline CInt value) {
 	VERTEX   = 0,
 	INSTANCE = 1,
 }
 
-enum VideoAV1ChromaSamplePosition : CInt (CInt value) {
+enum VideoAV1ChromaSamplePosition : int (inline CInt value) {
 }
 
-enum VideoAV1ColorPrimaries : CInt (CInt value) {
+enum VideoAV1ColorPrimaries : int (inline CInt value) {
 }
 
-enum VideoAV1FrameRestorationType : CInt (CInt value) {
+enum VideoAV1FrameRestorationType : int (inline CInt value) {
 }
 
-enum VideoAV1FrameType : CInt (CInt value) {
+enum VideoAV1FrameType : int (inline CInt value) {
 }
 
-enum VideoAV1InterpolationFilter : CInt (CInt value) {
+enum VideoAV1InterpolationFilter : int (inline CInt value) {
 }
 
-enum VideoAV1Level : CInt (CInt value) {
+enum VideoAV1Level : int (inline CInt value) {
 }
 
-enum VideoAV1MatrixCoefficients : CInt (CInt value) {
+enum VideoAV1MatrixCoefficients : int (inline CInt value) {
 }
 
-enum VideoAV1Profile : CInt (CInt value) {
+enum VideoAV1Profile : int (inline CInt value) {
 }
 
-enum VideoAV1ReferenceName : CInt (CInt value) {
+enum VideoAV1ReferenceName : int (inline CInt value) {
 }
 
-enum VideoAV1TransferCharacteristics : CInt (CInt value) {
+enum VideoAV1TransferCharacteristics : int (inline CInt value) {
 }
 
-enum VideoAV1TxMode : CInt (CInt value) {
+enum VideoAV1TxMode : int (inline CInt value) {
 }
 
 bitstruct VideoCapabilityFlagsKHR : Flags @overlap {
@@ -4054,7 +4054,7 @@ bitstruct VideoDecodeCapabilityFlagsKHR : Flags @overlap {
 	bool dpb_and_output_distinct : 1;
 }
 
-enum VideoDecodeH264FieldOrderCount : CInt (CInt value) {
+enum VideoDecodeH264FieldOrderCount : int (inline CInt value) {
 }
 
 bitstruct VideoDecodeH264PictureLayoutFlagsKHR : Flags @overlap {
@@ -4080,7 +4080,7 @@ bitstruct VideoEncodeAV1CapabilityFlagsKHR : Flags @overlap {
 	bool motion_vector_scaling                  : 4;
 }
 
-enum VideoEncodeAV1PredictionModeKHR : CInt (CInt value) {
+enum VideoEncodeAV1PredictionModeKHR : int (inline CInt value) {
 	INTRA_ONLY              = 0,
 	SINGLE_REFERENCE        = 1,
 	UNIDIRECTIONAL_COMPOUND = 2,
@@ -4094,7 +4094,7 @@ bitstruct VideoEncodeAV1RateControlFlagsKHR : Flags @overlap {
 	bool reference_pattern_dyadic      : 3;
 }
 
-enum VideoEncodeAV1RateControlGroupKHR : CInt (CInt value) {
+enum VideoEncodeAV1RateControlGroupKHR : int (inline CInt value) {
 	INTRA        = 0,
 	PREDICTIVE   = 1,
 	BIPREDICTIVE = 2,
@@ -4249,7 +4249,7 @@ bitstruct VideoEncodeRateControlModeFlagsKHR : Flags @overlap {
 
 
 
-enum VideoEncodeTuningModeKHR : CInt (CInt value) {
+enum VideoEncodeTuningModeKHR : int (inline CInt value) {
 	DEFAULT           = 0,
 	HIGH_QUALITY      = 1,
 	LOW_LATENCY       = 2,
@@ -4266,61 +4266,61 @@ bitstruct VideoEncodeUsageFlagsKHR : Flags @overlap {
 
 
 
-enum VideoH264AspectRatioIdc : CInt (CInt value) {
+enum VideoH264AspectRatioIdc : int (inline CInt value) {
 }
 
-enum VideoH264CabacInitIdc : CInt (CInt value) {
+enum VideoH264CabacInitIdc : int (inline CInt value) {
 }
 
-enum VideoH264ChromaFormatIdc : CInt (CInt value) {
+enum VideoH264ChromaFormatIdc : int (inline CInt value) {
 }
 
-enum VideoH264DisableDeblockingFilterIdc : CInt (CInt value) {
+enum VideoH264DisableDeblockingFilterIdc : int (inline CInt value) {
 }
 
-enum VideoH264LevelIdc : CInt (CInt value) {
+enum VideoH264LevelIdc : int (inline CInt value) {
 }
 
-enum VideoH264MemMgmtControlOp : CInt (CInt value) {
+enum VideoH264MemMgmtControlOp : int (inline CInt value) {
 }
 
-enum VideoH264ModificationOfPicNumsIdc : CInt (CInt value) {
+enum VideoH264ModificationOfPicNumsIdc : int (inline CInt value) {
 }
 
-enum VideoH264NonVclNaluType : CInt (CInt value) {
+enum VideoH264NonVclNaluType : int (inline CInt value) {
 }
 
-enum VideoH264PictureType : CInt (CInt value) {
+enum VideoH264PictureType : int (inline CInt value) {
 }
 
-enum VideoH264PocType : CInt (CInt value) {
+enum VideoH264PocType : int (inline CInt value) {
 }
 
-enum VideoH264ProfileIdc : CInt (CInt value) {
+enum VideoH264ProfileIdc : int (inline CInt value) {
 }
 
-enum VideoH264SliceType : CInt (CInt value) {
+enum VideoH264SliceType : int (inline CInt value) {
 }
 
-enum VideoH264WeightedBipredIdc : CInt (CInt value) {
+enum VideoH264WeightedBipredIdc : int (inline CInt value) {
 }
 
-enum VideoH265AspectRatioIdc : CInt (CInt value) {
+enum VideoH265AspectRatioIdc : int (inline CInt value) {
 }
 
-enum VideoH265ChromaFormatIdc : CInt (CInt value) {
+enum VideoH265ChromaFormatIdc : int (inline CInt value) {
 }
 
-enum VideoH265LevelIdc : CInt (CInt value) {
+enum VideoH265LevelIdc : int (inline CInt value) {
 }
 
-enum VideoH265PictureType : CInt (CInt value) {
+enum VideoH265PictureType : int (inline CInt value) {
 }
 
-enum VideoH265ProfileIdc : CInt (CInt value) {
+enum VideoH265ProfileIdc : int (inline CInt value) {
 }
 
-enum VideoH265SliceType : CInt (CInt value) {
+enum VideoH265SliceType : int (inline CInt value) {
 }
 
 bitstruct VideoSessionCreateFlagsKHR : Flags @overlap {
@@ -4335,7 +4335,7 @@ bitstruct VideoSessionParametersCreateFlagsKHR : Flags @overlap {
 	bool quantization_map_compatible : 0;
 }
 
-enum ViewportCoordinateSwizzleNV : CInt (CInt value) {
+enum ViewportCoordinateSwizzleNV : int (inline CInt value) {
 	POSITIVE_X = 0,
 	NEGATIVE_X = 1,
 	POSITIVE_Y = 2,
@@ -4346,141 +4346,51 @@ enum ViewportCoordinateSwizzleNV : CInt (CInt value) {
 	NEGATIVE_W = 7,
 }
 
-bitstruct AccelerationStructureMotionInfoFlagsNV               : uint {
-	bool dummy: 0;
-}
-bitstruct AccelerationStructureMotionInstanceFlagsNV           : uint {
-	bool dummy: 0;
-}
-bitstruct BufferViewCreateFlags                                : uint {
-	bool dummy: 0;
-}
-bitstruct CommandPoolTrimFlags                                 : uint {
-	bool dummy: 0;
-}
-bitstruct DebugUtilsMessengerCallbackDataFlagsEXT              : uint {
-	bool dummy: 0;
-}
-bitstruct DebugUtilsMessengerCreateFlagsEXT                    : uint {
-	bool dummy: 0;
-}
-bitstruct DescriptorPoolResetFlags                             : uint {
-	bool dummy: 0;
-}
-bitstruct DescriptorUpdateTemplateCreateFlags                  : uint {
-	bool dummy: 0;
-}
-bitstruct DeviceCreateFlags                                    : uint {
-	bool dummy: 0;
-}
-bitstruct DeviceMemoryReportFlagsEXT                           : uint {
-	bool dummy: 0;
-}
-bitstruct DirectDriverLoadingFlagsLUNARG                       : uint {
-	bool dummy: 0;
-}
-bitstruct DisplayModeCreateFlagsKHR                            : uint {
-	bool dummy: 0;
-}
-bitstruct DisplaySurfaceCreateFlagsKHR                         : uint {
-	bool dummy: 0;
-}
-bitstruct HeadlessSurfaceCreateFlagsEXT                        : uint {
-	bool dummy: 0;
-}
-bitstruct IOSSurfaceCreateFlagsMVK                             : uint {
-	bool dummy: 0;
-}
-bitstruct MacOSSurfaceCreateFlagsMVK                           : uint {
-	bool dummy: 0;
-}
-bitstruct MetalSurfaceCreateFlagsEXT                           : uint {
-	bool dummy: 0;
-}
-bitstruct PipelineCoverageModulationStateCreateFlagsNV         : uint {
-	bool dummy: 0;
-}
-bitstruct PipelineCoverageReductionStateCreateFlagsNV          : uint {
-	bool dummy: 0;
-}
-bitstruct PipelineCoverageToColorStateCreateFlagsNV            : uint {
-	bool dummy: 0;
-}
-bitstruct PipelineDiscardRectangleStateCreateFlagsEXT          : uint {
-	bool dummy: 0;
-}
-bitstruct PipelineDynamicStateCreateFlags                      : uint {
-	bool dummy: 0;
-}
-bitstruct PipelineInputAssemblyStateCreateFlags                : uint {
-	bool dummy: 0;
-}
-bitstruct PipelineMultisampleStateCreateFlags                  : uint {
-	bool dummy: 0;
-}
-bitstruct PipelineRasterizationConservativeStateCreateFlagsEXT : uint {
-	bool dummy: 0;
-}
-bitstruct PipelineRasterizationDepthClipStateCreateFlagsEXT    : uint {
-	bool dummy: 0;
-}
-bitstruct PipelineRasterizationStateCreateFlags                : uint {
-	bool dummy: 0;
-}
-bitstruct PipelineRasterizationStateStreamCreateFlagsEXT       : uint {
-	bool dummy: 0;
-}
-bitstruct PipelineTessellationStateCreateFlags                 : uint {
-	bool dummy: 0;
-}
-bitstruct PipelineVertexInputStateCreateFlags                  : uint {
-	bool dummy: 0;
-}
-bitstruct PipelineViewportStateCreateFlags                     : uint {
-	bool dummy: 0;
-}
-bitstruct PipelineViewportSwizzleStateCreateFlagsNV            : uint {
-	bool dummy: 0;
-}
-bitstruct PrivateDataSlotCreateFlags                           : uint {
-	bool dummy: 0;
-}
-bitstruct QueryPoolCreateFlags                                 : uint {
-	bool dummy: 0;
-}
-bitstruct SemaphoreCreateFlags                                 : uint {
-	bool dummy: 0;
-}
-bitstruct ShaderModuleCreateFlags                              : uint {
-	bool dummy: 0;
-}
-bitstruct ValidationCacheCreateFlagsEXT                        : uint {
-	bool dummy: 0;
-}
-bitstruct VideoBeginCodingFlagsKHR                             : uint {
-	bool dummy: 0;
-}
-bitstruct VideoDecodeFlagsKHR                                  : uint {
-	bool dummy: 0;
-}
-bitstruct VideoEncodeRateControlFlagsKHR                       : uint {
-	bool dummy: 0;
-}
-bitstruct VideoEndCodingFlagsKHR                               : uint {
-	bool dummy: 0;
-}
-bitstruct WaylandSurfaceCreateFlagsKHR                         : uint {
-	bool dummy: 0;
-}
-bitstruct Win32SurfaceCreateFlagsKHR                           : uint {
-	bool dummy: 0;
-}
-bitstruct XcbSurfaceCreateFlagsKHR                             : uint {
-	bool dummy: 0;
-}
-bitstruct XlibSurfaceCreateFlagsKHR                            : uint {
-	bool dummy: 0;
-}
+bitstruct AccelerationStructureMotionInfoFlagsNV               : uint {}
+bitstruct AccelerationStructureMotionInstanceFlagsNV           : uint {}
+bitstruct BufferViewCreateFlags                                : uint {}
+bitstruct CommandPoolTrimFlags                                 : uint {}
+bitstruct DebugUtilsMessengerCallbackDataFlagsEXT              : uint {}
+bitstruct DebugUtilsMessengerCreateFlagsEXT                    : uint {}
+bitstruct DescriptorPoolResetFlags                             : uint {}
+bitstruct DescriptorUpdateTemplateCreateFlags                  : uint {}
+bitstruct DeviceCreateFlags                                    : uint {}
+bitstruct DeviceMemoryReportFlagsEXT                           : uint {}
+bitstruct DirectDriverLoadingFlagsLUNARG                       : uint {}
+bitstruct DisplayModeCreateFlagsKHR                            : uint {}
+bitstruct DisplaySurfaceCreateFlagsKHR                         : uint {}
+bitstruct HeadlessSurfaceCreateFlagsEXT                        : uint {}
+bitstruct IOSSurfaceCreateFlagsMVK                             : uint {}
+bitstruct MacOSSurfaceCreateFlagsMVK                           : uint {}
+bitstruct MetalSurfaceCreateFlagsEXT                           : uint {}
+bitstruct PipelineCoverageModulationStateCreateFlagsNV         : uint {}
+bitstruct PipelineCoverageReductionStateCreateFlagsNV          : uint {}
+bitstruct PipelineCoverageToColorStateCreateFlagsNV            : uint {}
+bitstruct PipelineDiscardRectangleStateCreateFlagsEXT          : uint {}
+bitstruct PipelineDynamicStateCreateFlags                      : uint {}
+bitstruct PipelineInputAssemblyStateCreateFlags                : uint {}
+bitstruct PipelineMultisampleStateCreateFlags                  : uint {}
+bitstruct PipelineRasterizationConservativeStateCreateFlagsEXT : uint {}
+bitstruct PipelineRasterizationDepthClipStateCreateFlagsEXT    : uint {}
+bitstruct PipelineRasterizationStateCreateFlags                : uint {}
+bitstruct PipelineRasterizationStateStreamCreateFlagsEXT       : uint {}
+bitstruct PipelineTessellationStateCreateFlags                 : uint {}
+bitstruct PipelineVertexInputStateCreateFlags                  : uint {}
+bitstruct PipelineViewportStateCreateFlags                     : uint {}
+bitstruct PipelineViewportSwizzleStateCreateFlagsNV            : uint {}
+bitstruct PrivateDataSlotCreateFlags                           : uint {}
+bitstruct QueryPoolCreateFlags                                 : uint {}
+bitstruct SemaphoreCreateFlags                                 : uint {}
+bitstruct ShaderModuleCreateFlags                              : uint {}
+bitstruct ValidationCacheCreateFlagsEXT                        : uint {}
+bitstruct VideoBeginCodingFlagsKHR                             : uint {}
+bitstruct VideoDecodeFlagsKHR                                  : uint {}
+bitstruct VideoEncodeRateControlFlagsKHR                       : uint {}
+bitstruct VideoEndCodingFlagsKHR                               : uint {}
+bitstruct WaylandSurfaceCreateFlagsKHR                         : uint {}
+bitstruct Win32SurfaceCreateFlagsKHR                           : uint {}
+bitstruct XcbSurfaceCreateFlagsKHR                             : uint {}
+bitstruct XlibSurfaceCreateFlagsKHR                            : uint {}
 bitstruct AccessFlags2 : Flags64 @overlap {
 	bool indirect_command_read                     : 0;
 	bool index_read                                : 1;
@@ -4791,6 +4701,3 @@ bitstruct PipelineStageFlags2 : Flags64 @overlap {
 	bool cluster_culling_shader_huawei        : 41;
 	bool optical_flow_nv                      : 29;
 }
-
-
-

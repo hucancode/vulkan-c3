@@ -621,5 +621,3 @@ fn int extensionSupported(ZString extension) @extern("glfwExtensionSupported");
 fn GlProc getProcAddress(ZString procname) @extern("glfwGetProcAddress");
 
 fn int vulkanSupported() @extern("glfwVulkanSupported");
-
-fn ZString* getRequiredInstanceExtensions(ulong* count) @extern("glfwGetRequiredInstanceExtensions");

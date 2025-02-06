@@ -1,6 +1,7 @@
 module std::core::env;
 const bool GLFW_INCLUDE_VULKAN = true;
 module helloc3vk;
+import std::core::mem;
 import std::io;
 import glfw;
 import vk;
@@ -8,12 +9,18 @@ import vk;
 const ZString[*] REQUIRED_EXTENSIONS = {
     vk::KHR_SWAPCHAIN_EXTENSION_NAME,
 };
+const ENABLE_VALIDATION_LAYERS = true;
+const ZString[*] VALIDATION_LAYERS @if(ENABLE_VALIDATION_LAYERS) = {
+    "VK_LAYER_KHRONOS_validation",
+};
 
 const MAX_FRAMES_IN_FLIGHT = 2;
 
 glfw::Window* g_window;
 vk::Instance g_instance;
 vk::SurfaceKHR g_surface;
+vk::DebugUtilsMessengerEXT g_debugMessenger;
+
 vk::PhysicalDevice g_physicalDevice;
 vk::Device g_device;
 vk::Queue g_graphicsQueue;
@@ -58,7 +65,6 @@ fn int main(String[] args) {
         vk::destroySurfaceKHR(g_instance, g_surface, null);
         vk::destroyInstance(g_instance, null);
     }
-    io::print("Vulkan instance created\n");
     pickPhysicalDevice()!!;
     io::print("Physical device picked\n");
     createLogicalDevice()!!;
@@ -98,6 +104,71 @@ fn int main(String[] args) {
     vk::deviceWaitIdle(g_device);
     return 0;
 }
+fn uint logCallback(vk::DebugUtilsMessageSeverityFlagsEXT messageSeverity, vk::DebugUtilsMessageTypeFlagsEXT messageType, vk::DebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) @if(ENABLE_VALIDATION_LAYERS) {
+    io::printfn("Validation layer: %s", pCallbackData.pMessage);
+    return 0;
+}
+fn void! createVulkanInstance() {
+    vk::loadProcAddressesGlobal(&glfw::getInstanceProcAddress);
+    ulong extensionCount;
+    ZString* extensions = glfw::getRequiredInstanceExtensions(&extensionCount);
+    vk::InstanceCreateInfo createInfo = {
+        .sType = vk::StructureType.INSTANCE_CREATE_INFO,
+        .pApplicationInfo = &&vk::ApplicationInfo {
+            .sType = vk::StructureType.APPLICATION_INFO,
+            .pApplicationName = "Hello VK",
+            .applicationVersion = vk::@make_version(1, 0, 0),
+            .pEngineName = "No Engine",
+            .engineVersion = vk::@make_version(1, 0, 0),
+            .apiVersion = vk::API_VERSION_1_3,
+        },
+    };
+    $if ENABLE_VALIDATION_LAYERS:
+        extensionCount += 1;
+        ZString* ext2 = (ZString*)malloc(extensionCount * ZString.sizeof);
+        mem::copy(ext2, extensions, (extensionCount - 1) * ZString.sizeof);
+        extensions = ext2;
+        extensions[extensionCount - 1] = vk::EXT_DEBUG_UTILS_EXTENSION_NAME;
+        createInfo.enabledLayerCount = VALIDATION_LAYERS.len;
+        createInfo.ppEnabledLayerNames = &VALIDATION_LAYERS;
+        io::printfn("vk::StructureType.DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT = %d", (int)vk::StructureType.DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT);
+        vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo = {
+            .sType = vk::StructureType.DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+            .messageSeverity = vk::DebugUtilsMessageSeverityFlagsEXT {
+                .error = true,
+                .warning = true,
+                .info = true,
+            },
+            .messageType = vk::DebugUtilsMessageTypeFlagsEXT {
+                .general = true,
+                .validation = true,
+                .performance = true,
+            },
+            .pfnUserCallback = &logCallback,
+        };
+        createInfo.pNext = &debugCreateInfo;
+    $endif
+
+    createInfo.enabledExtensionCount = (uint)extensionCount;
+    createInfo.ppEnabledExtensionNames = extensions;
+    io::printfn("Required extensions count: %d", extensionCount);
+    for (uint i = 0; i < extensionCount; i++) {
+        io::printfn("Required extension: %s", extensions[i]);
+    }
+    vk::check(vk::createInstance(&createInfo, null, &g_instance))!;
+    io::print("Vulkan instance created\n");
+    vk::loadProcAddressesInstance(g_instance);
+    $if ENABLE_VALIDATION_LAYERS:
+        vk::check(vk::createDebugUtilsMessengerEXT(
+            g_instance,
+            &debugCreateInfo,
+            null,
+            &g_debugMessenger
+        ))!;
+    $endif
+    vk::check(glfw::createWindowSurface(g_instance, g_window, null, &g_surface))!;
+    io::print("window surface created\n");
+}
 
 fn vk::ExtensionProperties*! getAvailableExtensions() {
     uint extensionCount;
@@ -122,27 +193,6 @@ fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
     score += properties.limits.maxImageDimension2D;
     // TODO: check fore more conditions
     return score;
-}
-
-fn void! createVulkanInstance() {
-    vk::loadProcAddressesGlobal(&glfw::getInstanceProcAddress);
-    ulong extensionCount;
-    ZString* extensions = glfw::getRequiredInstanceExtensions(&extensionCount);
-    vk::InstanceCreateInfo createInfo = {
-        .sType = vk::StructureType.INSTANCE_CREATE_INFO,
-        .pApplicationInfo = &&vk::ApplicationInfo {
-            .sType = vk::StructureType.APPLICATION_INFO,
-            .pApplicationName = "Hello VK",
-            .applicationVersion = vk::@make_version(1, 0, 0),
-            .pEngineName = "No Engine",
-            .engineVersion = vk::@make_version(1, 0, 0),
-            .apiVersion = vk::@make_version(1, 3, 0),
-        },
-    };
-    io::printfn("Required extensions count: %d", extensionCount);
-    vk::check(vk::createInstance(&createInfo, null, &g_instance))!;
-    vk::loadProcAddressesInstance(g_instance);
-    vk::check(glfw::createWindowSurface(g_instance, g_window, null, &g_surface))!;
 }
 
 fn void! pickPhysicalDevice() {
@@ -196,9 +246,7 @@ struct QueueFamilyIndices {
     uint presentFamily;
 }
 
-ProcGetPhysicalDeviceSurfaceSupportKHR fnFromApp;
 fn QueueFamilyIndices! findQueueFamilies(vk::PhysicalDevice device) {
-    fnFromApp = (ProcGetPhysicalDeviceSurfaceSupportKHR) vk::getInstanceProcAddr(g_instance, "vkGetPhysicalDeviceSurfaceSupportKHR");
     uint count;
     vk::QueueFamilyProperties* queueFamilies;
     vk::getPhysicalDeviceQueueFamilyProperties(device, &count, null);
@@ -206,7 +254,6 @@ fn QueueFamilyIndices! findQueueFamilies(vk::PhysicalDevice device) {
     queueFamilies = (vk::QueueFamilyProperties*)malloc(count * vk::QueueFamilyProperties.sizeof);
     defer free(queueFamilies);
     vk::getPhysicalDeviceQueueFamilyProperties(device, &count, queueFamilies);
-    io::printfn("Got queue families details %d", count);
     QueueFamilyIndices indices;
     bool foundGraphics = false;
     bool foundPresent = false;
@@ -216,10 +263,9 @@ fn QueueFamilyIndices! findQueueFamilies(vk::PhysicalDevice device) {
             foundGraphics = true;
             io::printfn("Queue family %d support graphics", i);
         }
-        uint presentSupport;
-        io::printfn("fnFromApp %d", fnFromApp != null);
-        vk::check(vk::getPhysicalDeviceSurfaceSupportKHR(device, i, g_surface, &presentSupport))!;
-        if (presentSupport) {
+        uint supported;
+        vk::check(vk::getPhysicalDeviceSurfaceSupportKHR(device, i, g_surface, &supported))!;
+        if (supported) {
             indices.presentFamily = i;
             foundPresent = true;
             io::printfn("Queue family %d support present", i);
@@ -233,6 +279,12 @@ fn QueueFamilyIndices! findQueueFamilies(vk::PhysicalDevice device) {
 
 fn void! createLogicalDevice() {
     QueueFamilyIndices indices = findQueueFamilies(g_physicalDevice)!;
+    ZString[] layers;
+    if (ENABLE_VALIDATION_LAYERS) {
+		layers = ZString[*] {
+		  "VK_LAYER_KHRONOS_validation"
+		};
+	};
     vk::DeviceQueueCreateInfo queueCreateInfo = {
         .sType = vk::StructureType.DEVICE_QUEUE_CREATE_INFO,
         .queueFamilyIndex = indices.graphicsFamily,
@@ -245,6 +297,8 @@ fn void! createLogicalDevice() {
         .pQueueCreateInfos = &queueCreateInfo,
         .enabledExtensionCount = REQUIRED_EXTENSIONS.len,
         .ppEnabledExtensionNames = &REQUIRED_EXTENSIONS,
+        .enabledLayerCount = layers.len,
+        .ppEnabledLayerNames = layers.ptr,
     };
     vk::check(vk::createDevice(g_physicalDevice, &createInfo, null, &g_device))!;
     vk::getDeviceQueue(g_device, indices.graphicsFamily, 0, &g_graphicsQueue);
