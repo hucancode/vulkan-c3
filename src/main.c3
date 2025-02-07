@@ -13,6 +13,8 @@ const ENABLE_VALIDATION_LAYERS = true;
 const ZString[*] VALIDATION_LAYERS @if(ENABLE_VALIDATION_LAYERS) = {
     "VK_LAYER_KHRONOS_validation",
 };
+const char[*] VERTEX_CODE = $embed("shaders/vert.spv");
+const char[*] FRAGMENT_CODE = $embed("shaders/frag.spv");
 
 const MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -50,6 +52,8 @@ vk::Fence[MAX_FRAMES_IN_FLIGHT] g_inFlightFences;
 uint g_currentFrame = 0;
 
 fn int main(String[] args) {
+    io::printfn("GLFW %s",glfw::getVersionString());
+    glfw::setErrorCallback(fn void(int error, ZString description) => io::printfn("GLFW error: %s", description));
     if (!glfw::init()) {
         return -1;
     }
@@ -59,20 +63,22 @@ fn int main(String[] args) {
     if (g_window == null) {
         return -1;
     }
+    io::printfn("Window created %x", g_window);
     defer glfw::destroyWindow(g_window);
     createVulkanInstance()!!;
-    defer {
-        vk::destroySurfaceKHR(g_instance, g_surface, null);
-        vk::destroyInstance(g_instance, null);
-    }
+    defer vk::destroyInstance(g_instance, null);
+    io::printfn("Vulkan instance created %x", g_instance);
+    createWindowSurface()!!;
+    defer vk::destroySurfaceKHR(g_instance, g_surface, null);
+    io::printfn("Window surface created %x", g_surface);
     pickPhysicalDevice()!!;
-    io::print("Physical device picked\n");
+    io::printfn("Physical device picked %x", g_physicalDevice);
     createLogicalDevice()!!;
     defer vk::destroyDevice(g_device, null);
-    io::print("Logical device created\n");
+    io::printfn("Logical device created %x", g_device);
     createSwapchain()!!;
     defer destroySwapchain();
-    io::print("Swap chain created\n");
+    io::printfn("Swap chain created %x", g_swapChain);
     loadShader()!!;
     defer {
         vk::destroyShaderModule(g_device, g_vertexShader, null);
@@ -104,14 +110,12 @@ fn int main(String[] args) {
     vk::deviceWaitIdle(g_device);
     return 0;
 }
-fn uint logCallback(vk::DebugUtilsMessageSeverityFlagsEXT messageSeverity, vk::DebugUtilsMessageTypeFlagsEXT messageType, vk::DebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) @if(ENABLE_VALIDATION_LAYERS) {
-    io::printfn("Validation layer: %s", pCallbackData.pMessage);
-    return 0;
-}
+
 fn void! createVulkanInstance() {
     vk::loadProcAddressesGlobal(&glfw::getInstanceProcAddress);
     ulong extensionCount;
     ZString* extensions = glfw::getRequiredInstanceExtensions(&extensionCount);
+    //defer free(extensions);
     vk::InstanceCreateInfo createInfo = {
         .sType = vk::STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
         .pApplicationInfo = &&vk::ApplicationInfo {
@@ -124,14 +128,14 @@ fn void! createVulkanInstance() {
         },
     };
     $if ENABLE_VALIDATION_LAYERS:
+        createInfo.enabledLayerCount = VALIDATION_LAYERS.len;
+        createInfo.ppEnabledLayerNames = &VALIDATION_LAYERS;
         extensionCount += 1;
         ZString* ext2 = (ZString*)malloc(extensionCount * ZString.sizeof);
         mem::copy(ext2, extensions, (extensionCount - 1) * ZString.sizeof);
+        defer free(extensions);
         extensions = ext2;
         extensions[extensionCount - 1] = vk::EXT_DEBUG_UTILS_EXTENSION_NAME;
-        createInfo.enabledLayerCount = VALIDATION_LAYERS.len;
-        createInfo.ppEnabledLayerNames = &VALIDATION_LAYERS;
-        io::printfn("vk::STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT = %d", (int)vk::STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT);
         vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo = {
             .sType = vk::STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
             .messageSeverity = vk::DebugUtilsMessageSeverityFlagsEXT {
@@ -143,20 +147,26 @@ fn void! createVulkanInstance() {
                 .general = true,
                 .validation = true,
                 .performance = true,
+                .device_address_binding = true,
             },
-            .pfnUserCallback = &logCallback,
+            .pfnUserCallback = fn uint(vk::DebugUtilsMessageSeverityFlagsEXT messageSeverity,
+                vk::DebugUtilsMessageTypeFlagsEXT messageType,
+                vk::DebugUtilsMessengerCallbackDataEXT* pCallbackData,
+                void* pUserData) {
+                io::printfn("Validation layer: %s", pCallbackData.pMessage);
+                return 0;
+            },
         };
         createInfo.pNext = &debugCreateInfo;
     $endif
 
     createInfo.enabledExtensionCount = (uint)extensionCount;
     createInfo.ppEnabledExtensionNames = extensions;
-    io::printfn("Required extensions count: %d", extensionCount);
+    io::printfn("Required extensions count: %d", (uint)extensionCount);
     for (uint i = 0; i < extensionCount; i++) {
         io::printfn("Required extension: %s", extensions[i]);
     }
     vk::check(vk::createInstance(&createInfo, null, &g_instance))!;
-    io::print("Vulkan instance created\n");
     vk::loadProcAddressesInstance(g_instance);
     $if ENABLE_VALIDATION_LAYERS:
         vk::check(vk::createDebugUtilsMessengerEXT(
@@ -166,23 +176,24 @@ fn void! createVulkanInstance() {
             &g_debugMessenger
         ))!;
     $endif
-    vk::check(glfw::createWindowSurface(g_instance, g_window, null, &g_surface))!;
-    io::print("window surface created\n");
 }
 
-fn vk::ExtensionProperties*! getAvailableExtensions() {
-    uint extensionCount;
-    vk::ExtensionProperties* extensions;
-    vk::check(vk::enumerateInstanceExtensionProperties(null, &extensionCount, null))!;
-    extensions = (vk::ExtensionProperties*)malloc(extensionCount * vk::ExtensionProperties.sizeof);
-    vk::check(vk::enumerateInstanceExtensionProperties(null, &extensionCount, extensions))!;
-    return extensions;
+fn void! createWindowSurface() {
+    vk::check(glfw::createWindowSurface(g_instance, g_window, null, &g_surface))!;
+}
+
+fn vk::ExtensionProperties[]! getAvailableExtensions() {
+    uint n;
+    vk::check(vk::enumerateInstanceExtensionProperties(null, &n, null))!;
+    vk::ExtensionProperties* ret = (vk::ExtensionProperties*)malloc(n * vk::ExtensionProperties.sizeof);
+    vk::check(vk::enumerateInstanceExtensionProperties(null, &n, ret))!;
+    return ret[:n];
 }
 
 fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
     vk::PhysicalDeviceProperties properties;
     vk::PhysicalDeviceFeatures features;
-    io::printfn("Checking device %d", device);
+    io::printfn("Checking device %x", device);
     vk::getPhysicalDeviceProperties(device, &properties);
     io::printfn("fetched device properperty %s", (ZString)properties.deviceName[0..]);
     vk::getPhysicalDeviceFeatures(device, &features);
@@ -197,24 +208,22 @@ fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
 
 fn void! pickPhysicalDevice() {
     uint count;
-    vk::PhysicalDevice* devices;
     vk::check(vk::enumeratePhysicalDevices(g_instance, &count, null))!;
     io::printfn("Physical devices count: %d", count);
-    devices = (vk::PhysicalDevice*)malloc(count * vk::PhysicalDevice.sizeof);
+    vk::PhysicalDevice* devices = (vk::PhysicalDevice*)malloc(count * vk::PhysicalDevice.sizeof);
     defer free(devices);
     vk::check(vk::enumeratePhysicalDevices(g_instance, &count, devices))!;
-    io::printfn("Got devices details %d", count);
     g_physicalDevice = devices[0];
     uint bestScore = 0;
     for (int i = 0; i < count; i++) {
         int score = scorePhysicalDevice(devices[i]);
-        io::printfn("Device %d score: %d", i, score);
+        io::printfn("Device %x score: %d", i, score);
         if (score > bestScore) {
             g_physicalDevice = devices[i];
             bestScore = score;
         }
     }
-    io::printfn("Selected physical device: %d with score %d", g_physicalDevice, bestScore);
+    io::printfn("Selected physical device: %x with score %d", g_physicalDevice, bestScore);
 }
 
 struct SwapchainSupportDetails {
@@ -248,10 +257,9 @@ struct QueueFamilyIndices {
 
 fn QueueFamilyIndices! findQueueFamilies(vk::PhysicalDevice device) {
     uint count;
-    vk::QueueFamilyProperties* queueFamilies;
     vk::getPhysicalDeviceQueueFamilyProperties(device, &count, null);
     io::printfn("Queue families count: %d", count);
-    queueFamilies = (vk::QueueFamilyProperties*)malloc(count * vk::QueueFamilyProperties.sizeof);
+    vk::QueueFamilyProperties* queueFamilies = (vk::QueueFamilyProperties*)malloc(count * vk::QueueFamilyProperties.sizeof);
     defer free(queueFamilies);
     vk::getPhysicalDeviceQueueFamilyProperties(device, &count, queueFamilies);
     QueueFamilyIndices indices;
@@ -263,8 +271,8 @@ fn QueueFamilyIndices! findQueueFamilies(vk::PhysicalDevice device) {
             foundGraphics = true;
             io::printfn("Queue family %d support graphics", i);
         }
-        uint supported;
-        vk::check(vk::getPhysicalDeviceSurfaceSupportKHR(device, i, g_surface, &supported))!;
+        uint supported = glfw::getPhysicalDevicePresentationSupport(g_instance, device, i);
+        //vk::check(vk::getPhysicalDeviceSurfaceSupportKHR(device, i, g_surface, &supported))!;
         if (supported) {
             indices.presentFamily = i;
             foundPresent = true;
@@ -280,11 +288,11 @@ fn QueueFamilyIndices! findQueueFamilies(vk::PhysicalDevice device) {
 fn void! createLogicalDevice() {
     QueueFamilyIndices indices = findQueueFamilies(g_physicalDevice)!;
     ZString[] layers;
-    if (ENABLE_VALIDATION_LAYERS) {
+    $if ENABLE_VALIDATION_LAYERS:
 		layers = ZString[*] {
 		  "VK_LAYER_KHRONOS_validation"
 		};
-	};
+	$endif
     vk::DeviceQueueCreateInfo queueCreateInfo = {
         .sType = vk::STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
         .queueFamilyIndex = indices.graphicsFamily,
@@ -297,9 +305,11 @@ fn void! createLogicalDevice() {
         .pQueueCreateInfos = &queueCreateInfo,
         .enabledExtensionCount = REQUIRED_EXTENSIONS.len,
         .ppEnabledExtensionNames = &REQUIRED_EXTENSIONS,
-        .enabledLayerCount = layers.len,
-        .ppEnabledLayerNames = layers.ptr,
     };
+    $if ENABLE_VALIDATION_LAYERS:
+        createInfo.enabledLayerCount = layers.len;
+        createInfo.ppEnabledLayerNames = layers.ptr;
+    $endif
     vk::check(vk::createDevice(g_physicalDevice, &createInfo, null, &g_device))!;
     vk::getDeviceQueue(g_device, indices.graphicsFamily, 0, &g_graphicsQueue);
     vk::getDeviceQueue(g_device, indices.presentFamily, 0, &g_presentQueue);
@@ -432,10 +442,8 @@ fn vk::ShaderModule! createShaderModule(char[] code) {
 }
 
 fn void! loadShader() {
-    char[*] vertexCode = $embed("shaders/vert.spv");
-    g_vertexShader = createShaderModule(&vertexCode)!;
-    char[*] fragmentCode = $embed("shaders/frag.spv");
-    g_fragmentShader = createShaderModule(&fragmentCode)!;
+    g_vertexShader = createShaderModule(&VERTEX_CODE)!;
+    g_fragmentShader = createShaderModule(&FRAGMENT_CODE)!;
     g_vertexShaderStageInfo[0] = {
         .sType = vk::STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
         .stage = vk::ShaderStageFlags { .vertex = true },

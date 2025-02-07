@@ -51,8 +51,13 @@ fault VulkanError {
 	ERROR_NOT_ENOUGH_SPACE_KHR                         ,
 }
 
+fault BindingError {
+    ERROR_UNHANDLED,
+}
+
 fn void! check(vk::Result result) {
     switch (result) {
+        case SUCCESS: return;
         case NOT_READY: return VulkanError.NOT_READY?;
         case TIMEOUT: return VulkanError.TIMEOUT?;
         case EVENT_SET: return VulkanError.EVENT_SET?;
@@ -101,6 +106,6 @@ fn void! check(vk::Result result) {
         case INCOMPATIBLE_SHADER_BINARY_EXT: return VulkanError.INCOMPATIBLE_SHADER_BINARY_EXT?;
         case PIPELINE_BINARY_MISSING_KHR: return VulkanError.PIPELINE_BINARY_MISSING_KHR?;
         case ERROR_NOT_ENOUGH_SPACE_KHR: return VulkanError.ERROR_NOT_ENOUGH_SPACE_KHR?;
-        default:
+        default: return BindingError.ERROR_UNHANDLED?;
     }
 }

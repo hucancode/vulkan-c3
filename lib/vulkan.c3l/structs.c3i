@@ -5601,7 +5601,7 @@ struct PhysicalDeviceRayTracingPropertiesNV {
 }
 
 struct TransformMatrixKHR {
-	float[3][4] mat; 
+	float[3][4] matrix; 
 }
 
 struct AabbPositionsKHR {
@@ -7182,7 +7182,7 @@ struct PhysicalDeviceOpacityMicromapPropertiesEXT {
 struct MicromapVersionInfoEXT {
 	StructureType sType; 
 	void*         pNext; 
-	char*         pVersionData; 
+	ZString       pVersionData; 
 }
 
 struct CopyMicromapToMemoryInfoEXT {
@@ -7657,7 +7657,7 @@ struct PipelineShaderStageModuleIdentifierCreateInfoEXT {
 	StructureType sType; 
 	void*         pNext; 
 	uint          identifierSize; 
-	char*         pIdentifier; 
+	ZString       pIdentifier; 
 }
 
 struct ShaderModuleIdentifierEXT {
@@ -8483,7 +8483,7 @@ struct AccelerationStructureDeviceAddressInfoKHR {
 struct AccelerationStructureVersionInfoKHR {
 	StructureType sType; 
 	void*         pNext; 
-	char*         pVersionData; 
+	ZString       pVersionData; 
 }
 
 struct CopyAccelerationStructureToMemoryInfoKHR {

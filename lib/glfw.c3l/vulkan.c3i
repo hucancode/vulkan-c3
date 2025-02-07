@@ -1,6 +1,7 @@
-module glfw @if(env::GLFW_INCLUDE_VULKAN);
+module glfw @if($defined(env::GLFW_INCLUDE_VULKAN) && env::GLFW_INCLUDE_VULKAN);
 import vk;
-import std::collections::list;
+
+extern fn int vulkanSupported() @extern("glfwVulkanSupported");
 
 extern fn vk::ProcVoidFunction getInstanceProcAddress(vk::Instance instance, ZString procname)
   @extern("glfwGetInstanceProcAddress");

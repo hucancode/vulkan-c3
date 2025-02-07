@@ -4543,3 +4543,6 @@ bitstruct PipelineStageFlags2 : Flags64 @overlap {
 	bool cluster_culling_shader_huawei        : 41;
 	bool optical_flow_nv                      : 29;
 }
+
+
+

@@ -20,7 +20,7 @@ distinct DeviceAddress = ulong;
 distinct SampleMask    = uint;
 
 distinct Handle                 = void*;
-distinct NonDispatchableHandle  = uint;
+distinct NonDispatchableHandle  = ulong;
 
 def SetProcAddressFnType = fn void(void*, ZString);
 

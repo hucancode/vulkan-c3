@@ -6,8 +6,8 @@ module glfw;
  *************************************************************************/
 
 const int VERSION_MAJOR     = 3;
-const int VERSION_MINOR     = 3;
-const int VERSION_REVISION  = 10;
+const int VERSION_MINOR     = 4;
+const int VERSION_REVISION  = 0;
 const int TRUE              = 1;
 const int FALSE             = 0;
 
@@ -619,5 +619,3 @@ fn void swapInterval(int interval) @extern("glfwSwapInterval");
 fn int extensionSupported(ZString extension) @extern("glfwExtensionSupported");
 
 fn GlProc getProcAddress(ZString procname) @extern("glfwGetProcAddress");
-
-fn int vulkanSupported() @extern("glfwVulkanSupported");
