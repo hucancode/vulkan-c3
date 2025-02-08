@@ -32,7 +32,7 @@
       "linked-libraries": ["vulkan"]
     },
     "macos-aarch64": {
-      "link-args": [],
+      "link-args": ["-Wl,-rpath,/usr/local/lib"],
       "dependencies": [],
       "linked-libraries": ["vulkan"]
     },

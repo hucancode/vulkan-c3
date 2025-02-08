@@ -4,12 +4,12 @@
     "macos-x64": {
       "link-args": [],
       "dependencies": [],
-      "linked-libraries": []
+      "linked-libraries": ["glfw"]
     },
     "macos-aarch64": {
-      "link-args": [],
+      "link-args": ["-L/opt/homebrew/lib"],
       "dependencies": [],
-      "linked-libraries": []
+      "linked-libraries": ["glfw"]
     },
     "linux-x64": {
       "link-args": [],
