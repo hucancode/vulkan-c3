@@ -84,10 +84,13 @@ fn int main(String[] args) {
         vk::destroyShaderModule(g_device, g_vertexShader, null);
         vk::destroyShaderModule(g_device, g_fragmentShader, null);
     }
-    io::print("Shader module created\n");
+    io::printfn("Shader module created %x %x", g_vertexShader, g_fragmentShader);
     createRenderPass()!!;
     defer vk::destroyRenderPass(g_device, g_renderPass, null);
-    io::print("Render pass created\n");
+    io::printfn("Render pass created %x", g_renderPass);
+    createFrameBuffers()!!;
+    defer destroyFrameBuffers();
+    io::printfn("Frame buffers created %x", g_swapChainFramebuffers);
     createGraphicsPipeline()!!;
     defer {
         vk::destroyPipelineLayout(g_device, g_pipelineLayout, null);
@@ -403,19 +406,6 @@ fn void! createSwapchain() {
         };
         vk::check(vk::createImageView(g_device, &info, null, &g_swapChainImageViews[i]))!;
     }
-    g_swapChainFramebuffers = (vk::Framebuffer*)malloc(g_swapChainImageCount * vk::Framebuffer.sizeof);
-    for (uint i = 0; i < g_swapChainImageCount; i++) {
-        vk::FramebufferCreateInfo info = {
-            .sType = vk::STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-            .renderPass = g_renderPass,
-            .attachmentCount = 1,
-            .pAttachments = &g_swapChainImageViews[i],
-            .width = g_swapChainExtent.width,
-            .height = g_swapChainExtent.height,
-            .layers = 1,
-        };
-        vk::check(vk::createFramebuffer(g_device, &info, null, &g_swapChainFramebuffers[i]))!;
-    }
 }
 
 fn void destroySwapchain() {
@@ -459,52 +449,75 @@ fn void! loadShader() {
 }
 
 fn void! createRenderPass() {
-    vk::AttachmentDescription colorAttachment = {
-        .format = g_swapChainFormat.format,
-        .samples = vk::SampleCountFlags { .n_1 = true },
-        .loadOp = vk::ATTACHMENT_LOAD_OP_CLEAR,
-        .storeOp = vk::ATTACHMENT_STORE_OP_STORE,
-        .stencilLoadOp = vk::ATTACHMENT_LOAD_OP_DONT_CARE,
-        .stencilStoreOp = vk::ATTACHMENT_STORE_OP_DONT_CARE,
-        .initialLayout = vk::IMAGE_LAYOUT_UNDEFINED,
-        .finalLayout = vk::IMAGE_LAYOUT_PRESENT_SRC_KHR,
-    };
-    vk::AttachmentReference colorAttachmentRef = {
-        .attachment = 0,
-        .layout = vk::IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-    };
-    vk::SubpassDescription subpass = {
-        .pipelineBindPoint = vk::PIPELINE_BIND_POINT_GRAPHICS,
-        .colorAttachmentCount = 1,
-        .pColorAttachments = &colorAttachmentRef,
-    };
-    vk::SubpassDependency dependency = {
-        .srcSubpass = vk::SUBPASS_EXTERNAL,
-        .dstSubpass = 0,
-        .srcStageMask = vk::PipelineStageFlags { .color_attachment_output = true },
-        .srcAccessMask = vk::AccessFlags {},
-        .dstStageMask = vk::PipelineStageFlags { .color_attachment_output = true },
-        .dstAccessMask = vk::AccessFlags {.color_attachment_read=true,.color_attachment_write=true},
-    };
     vk::RenderPassCreateInfo createInfo = {
         .sType = vk::STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
         .attachmentCount = 1,
-        .pAttachments = &colorAttachment,
+        .pAttachments = &&vk::AttachmentDescription {
+            .format = g_swapChainFormat.format,
+            .samples = vk::SampleCountFlags { .n_1 = true },
+            .loadOp = vk::ATTACHMENT_LOAD_OP_CLEAR,
+            .storeOp = vk::ATTACHMENT_STORE_OP_STORE,
+            .stencilLoadOp = vk::ATTACHMENT_LOAD_OP_DONT_CARE,
+            .stencilStoreOp = vk::ATTACHMENT_STORE_OP_DONT_CARE,
+            .initialLayout = vk::IMAGE_LAYOUT_UNDEFINED,
+            .finalLayout = vk::IMAGE_LAYOUT_PRESENT_SRC_KHR,
+        },
         .subpassCount = 1,
-        .pSubpasses = &subpass,
-        .dependencyCount = 1,
-        .pDependencies = &dependency,
+        .pSubpasses = &&vk::SubpassDescription {
+            .pipelineBindPoint = vk::PIPELINE_BIND_POINT_GRAPHICS,
+            .colorAttachmentCount = 1,
+            .pColorAttachments = &&vk::AttachmentReference {
+                .attachment = 0,
+                .layout = vk::IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+            },
+        },
+        // .dependencyCount = 1,
+        // .pDependencies = &&vk::SubpassDependency {
+        //     .srcSubpass = vk::SUBPASS_EXTERNAL,
+        //     .dstSubpass = 0,
+        //     .srcStageMask = vk::PipelineStageFlags { .color_attachment_output = true },
+        //     .srcAccessMask = vk::AccessFlags {},
+        //     .dstStageMask = vk::PipelineStageFlags { .color_attachment_output = true },
+        //     .dstAccessMask = vk::AccessFlags { .color_attachment_write = true},
+        // },
     };
     vk::check(vk::createRenderPass(g_device, &createInfo, null, &g_renderPass))!;
 }
 
+fn void! createFrameBuffers() {
+    g_swapChainFramebuffers = (vk::Framebuffer*)malloc(g_swapChainImageCount * vk::Framebuffer.sizeof);
+    for (uint i = 0; i < g_swapChainImageCount; i++) {
+        vk::FramebufferCreateInfo info = {
+            .sType = vk::STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+            .renderPass = g_renderPass,
+            .attachmentCount = 1,
+            .pAttachments = &g_swapChainImageViews[i],
+            .width = g_swapChainExtent.width,
+            .height = g_swapChainExtent.height,
+            .layers = 1,
+        };
+        vk::check(vk::createFramebuffer(g_device, &info, null, &g_swapChainFramebuffers[i]))!;
+    }
+}
+
+fn void destroyFrameBuffers() {
+    for (uint i = 0; i < g_swapChainImageCount; i++) {
+        vk::destroyFramebuffer(g_device, g_swapChainFramebuffers[i], null);
+    }
+    free(g_swapChainFramebuffers);
+}
+
+
 fn void! createGraphicsPipeline() {
+    vk::DynamicState[*] dynamicStates = {
+        vk::DYNAMIC_STATE_VIEWPORT,
+        vk::DYNAMIC_STATE_SCISSOR
+    };
     vk::PipelineDynamicStateCreateInfo dynamicState = {
         .sType = vk::STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
-        .dynamicStateCount = 2,
-        .pDynamicStates = &&vk::DynamicState[*] {vk::DYNAMIC_STATE_VIEWPORT, vk::DYNAMIC_STATE_SCISSOR},
+        .dynamicStateCount = dynamicStates.len,
+        .pDynamicStates = &dynamicStates,
     };
-
     vk::PipelineVertexInputStateCreateInfo vertexInputInfo = {
         .sType = vk::STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
     };
@@ -545,7 +558,6 @@ fn void! createGraphicsPipeline() {
 
     vk::PipelineColorBlendStateCreateInfo colorBlending = {
         .sType = vk::STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
-        .logicOp = vk::LOGIC_OP_COPY,
         .attachmentCount = 1,
         .pAttachments = &colorBlendAttachment,
     };
@@ -559,13 +571,14 @@ fn void! createGraphicsPipeline() {
     vk::GraphicsPipelineCreateInfo pipelineInfo = {
         .sType = vk::STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
         .stageCount = 2,
-        .pStages = &g_vertexShaderStageInfo[0],
+        .pStages = &g_vertexShaderStageInfo,
         .pVertexInputState = &vertexInputInfo,
         .pInputAssemblyState = &inputAssembly,
         .pViewportState = &viewportState,
         .pRasterizationState = &rasterizer,
         .pMultisampleState = &multisampling,
         .pColorBlendState = &colorBlending,
+        .pDynamicState = &dynamicState,
         .layout = g_pipelineLayout,
         .renderPass = g_renderPass,
         .subpass = 0,
@@ -578,6 +591,7 @@ fn void! createCommandPool() {
     QueueFamilyIndices queueFamilyIndices = findQueueFamilies(g_physicalDevice)!;
     vk::CommandPoolCreateInfo poolInfo = {
         .sType = vk::STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+        .flags = vk::CommandPoolCreateFlags { .reset_command_buffer = true },
         .queueFamilyIndex = queueFamilyIndices.graphicsFamily,
     };
     vk::check(vk::createCommandPool(g_device, &poolInfo, null, &g_commandPool))!;
@@ -599,9 +613,9 @@ fn void! createSemaphores() {
         .flags = vk::FenceCreateFlags { .signaled = true },
     };
     for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        vk::check(vk::createSemaphore(g_device, &semaphoreInfo, null, &g_imageAvailableSemaphore))!;
-        vk::check(vk::createSemaphore(g_device, &semaphoreInfo, null, &g_renderFinishedSemaphore))!;
-        vk::check(vk::createFence(g_device, &fenceInfo, null, &g_inFlightFences))!;
+        vk::check(vk::createSemaphore(g_device, &semaphoreInfo, null, &g_imageAvailableSemaphore[i]))!;
+        vk::check(vk::createSemaphore(g_device, &semaphoreInfo, null, &g_renderFinishedSemaphore[i]))!;
+        vk::check(vk::createFence(g_device, &fenceInfo, null, &g_inFlightFences[i]))!;
     }
 }
 
