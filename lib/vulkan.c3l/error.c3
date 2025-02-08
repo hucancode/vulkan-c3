@@ -49,20 +49,15 @@ fault VulkanError {
 	INCOMPATIBLE_SHADER_BINARY_EXT                     ,
 	PIPELINE_BINARY_MISSING_KHR                        ,
 	ERROR_NOT_ENOUGH_SPACE_KHR                         ,
-	ERROR_OUT_OF_POOL_MEMORY_KHR                       ,
-	ERROR_INVALID_EXTERNAL_HANDLE_KHR                  ,
-	ERROR_FRAGMENTATION_EXT                            ,
-	ERROR_NOT_PERMITTED_EXT                            ,
-	ERROR_NOT_PERMITTED_KHR                            ,
-	ERROR_INVALID_DEVICE_ADDRESS_EXT                   ,
-	ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS_KHR           ,
-	PIPELINE_COMPILE_REQUIRED_EXT                      ,
-	ERROR_PIPELINE_COMPILE_REQUIRED_EXT                ,
-	ERROR_INCOMPATIBLE_SHADER_BINARY_EXT               ,
+}
+
+fault BindingError {
+    ERROR_UNHANDLED,
 }
 
 fn void! check(vk::Result result) {
     switch (result) {
+        case SUCCESS: return;
         case NOT_READY: return VulkanError.NOT_READY?;
         case TIMEOUT: return VulkanError.TIMEOUT?;
         case EVENT_SET: return VulkanError.EVENT_SET?;
@@ -111,16 +106,6 @@ fn void! check(vk::Result result) {
         case INCOMPATIBLE_SHADER_BINARY_EXT: return VulkanError.INCOMPATIBLE_SHADER_BINARY_EXT?;
         case PIPELINE_BINARY_MISSING_KHR: return VulkanError.PIPELINE_BINARY_MISSING_KHR?;
         case ERROR_NOT_ENOUGH_SPACE_KHR: return VulkanError.ERROR_NOT_ENOUGH_SPACE_KHR?;
-        case ERROR_OUT_OF_POOL_MEMORY_KHR: return VulkanError.ERROR_OUT_OF_POOL_MEMORY_KHR?;
-        case ERROR_INVALID_EXTERNAL_HANDLE_KHR: return VulkanError.ERROR_INVALID_EXTERNAL_HANDLE_KHR?;
-        case ERROR_FRAGMENTATION_EXT: return VulkanError.ERROR_FRAGMENTATION_EXT?;
-        case ERROR_NOT_PERMITTED_EXT: return VulkanError.ERROR_NOT_PERMITTED_EXT?;
-        case ERROR_NOT_PERMITTED_KHR: return VulkanError.ERROR_NOT_PERMITTED_KHR?;
-        case ERROR_INVALID_DEVICE_ADDRESS_EXT: return VulkanError.ERROR_INVALID_DEVICE_ADDRESS_EXT?;
-        case ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS_KHR: return VulkanError.ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS_KHR?;
-        case PIPELINE_COMPILE_REQUIRED_EXT: return VulkanError.PIPELINE_COMPILE_REQUIRED_EXT?;
-        case ERROR_PIPELINE_COMPILE_REQUIRED_EXT: return VulkanError.ERROR_PIPELINE_COMPILE_REQUIRED_EXT?;
-        case ERROR_INCOMPATIBLE_SHADER_BINARY_EXT: return VulkanError.ERROR_INCOMPATIBLE_SHADER_BINARY_EXT?;
-        default:
+        default: return BindingError.ERROR_UNHANDLED?;
     }
 }

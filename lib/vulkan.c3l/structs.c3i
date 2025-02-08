@@ -140,7 +140,7 @@ struct PipelineCacheHeaderVersionOne {
 	PipelineCacheHeaderVersion headerVersion; 
 	uint                       vendorID; 
 	uint                       deviceID; 
-	char[UUID_SIZE]*           pipelineCacheUUID; 
+	char[UUID_SIZE]            pipelineCacheUUID; 
 }
 
 struct AllocationCallbacks {
@@ -308,9 +308,9 @@ struct PhysicalDeviceLimits {
 	uint             maxFragmentDualSrcAttachments; 
 	uint             maxFragmentCombinedOutputResources; 
 	uint             maxComputeSharedMemorySize; 
-	uint[3]*         maxComputeWorkGroupCount; 
+	uint[3]          maxComputeWorkGroupCount; 
 	uint             maxComputeWorkGroupInvocations; 
-	uint[3]*         maxComputeWorkGroupSize; 
+	uint[3]          maxComputeWorkGroupSize; 
 	uint             subPixelPrecisionBits; 
 	uint             subTexelPrecisionBits; 
 	uint             mipmapPrecisionBits; 
@@ -319,8 +319,8 @@ struct PhysicalDeviceLimits {
 	float            maxSamplerLodBias; 
 	float            maxSamplerAnisotropy; 
 	uint             maxViewports; 
-	uint[2]*         maxViewportDimensions; 
-	float[2]*        viewportBoundsRange; 
+	uint[2]          maxViewportDimensions; 
+	float[2]         viewportBoundsRange; 
 	uint             viewportSubPixelBits; 
 	usz              minMemoryMapAlignment; 
 	DeviceSize       minTexelBufferOffsetAlignment; 
@@ -353,8 +353,8 @@ struct PhysicalDeviceLimits {
 	uint             maxCullDistances; 
 	uint             maxCombinedClipAndCullDistances; 
 	uint             discreteQueuePriorities; 
-	float[2]*        pointSizeRange; 
-	float[2]*        lineWidthRange; 
+	float[2]         pointSizeRange; 
+	float[2]         lineWidthRange; 
 	float            pointSizeGranularity; 
 	float            lineWidthGranularity; 
 	uint             strictLines; 
@@ -365,10 +365,10 @@ struct PhysicalDeviceLimits {
 }
 
 struct PhysicalDeviceMemoryProperties {
-	uint                          memoryTypeCount; 
-	MemoryType[MAX_MEMORY_TYPES]* memoryTypes; 
-	uint                          memoryHeapCount; 
-	MemoryHeap[MAX_MEMORY_HEAPS]* memoryHeaps; 
+	uint                         memoryTypeCount; 
+	MemoryType[MAX_MEMORY_TYPES] memoryTypes; 
+	uint                         memoryHeapCount; 
+	MemoryHeap[MAX_MEMORY_HEAPS] memoryHeaps; 
 }
 
 struct PhysicalDeviceSparseProperties {
@@ -380,15 +380,15 @@ struct PhysicalDeviceSparseProperties {
 }
 
 struct PhysicalDeviceProperties {
-	uint                                  apiVersion; 
-	uint                                  driverVersion; 
-	uint                                  vendorID; 
-	uint                                  deviceID; 
-	PhysicalDeviceType                    deviceType; 
-	ichar[MAX_PHYSICAL_DEVICE_NAME_SIZE]* deviceName; 
-	char[UUID_SIZE]*                      pipelineCacheUUID; 
-	PhysicalDeviceLimits                  limits; 
-	PhysicalDeviceSparseProperties        sparseProperties; 
+	uint                                 apiVersion; 
+	uint                                 driverVersion; 
+	uint                                 vendorID; 
+	uint                                 deviceID; 
+	PhysicalDeviceType                   deviceType; 
+	ichar[MAX_PHYSICAL_DEVICE_NAME_SIZE] deviceName; 
+	char[UUID_SIZE]                      pipelineCacheUUID; 
+	PhysicalDeviceLimits                 limits; 
+	PhysicalDeviceSparseProperties       sparseProperties; 
 }
 
 struct QueueFamilyProperties {
@@ -421,15 +421,15 @@ struct DeviceCreateInfo {
 }
 
 struct ExtensionProperties {
-	ichar[MAX_EXTENSION_NAME_SIZE]* extensionName; 
-	uint                            specVersion; 
+	ichar[MAX_EXTENSION_NAME_SIZE] extensionName; 
+	uint                           specVersion; 
 }
 
 struct LayerProperties {
-	ichar[MAX_EXTENSION_NAME_SIZE]* layerName; 
-	uint                            specVersion; 
-	uint                            implementationVersion; 
-	ichar[MAX_DESCRIPTION_SIZE]*    description; 
+	ichar[MAX_EXTENSION_NAME_SIZE] layerName; 
+	uint                           specVersion; 
+	uint                           implementationVersion; 
+	ichar[MAX_DESCRIPTION_SIZE]    description; 
 }
 
 struct SubmitInfo {
@@ -805,7 +805,7 @@ struct PipelineColorBlendStateCreateInfo {
 	LogicOp                            logicOp; 
 	uint                               attachmentCount; 
 	PipelineColorBlendAttachmentState* pAttachments; 
-	float[4]*                          blendConstants; 
+	float[4]                           blendConstants; 
 }
 
 struct PipelineDynamicStateCreateInfo {
@@ -1070,9 +1070,9 @@ struct BufferImageCopy {
 }
 
 union ClearColorValue {
-	float[4]* float32; 
-	int[4]*   int32; 
-	uint[4]*  uint32; 
+	float[4] float32; 
+	int[4]   int32; 
+	uint[4]  uint32; 
 }
 
 struct ClearDepthStencilValue {
@@ -1099,9 +1099,9 @@ struct ClearRect {
 
 struct ImageBlit {
 	ImageSubresourceLayers srcSubresource; 
-	Offset3D[2]*           srcOffsets; 
+	Offset3D[2]            srcOffsets; 
 	ImageSubresourceLayers dstSubresource; 
-	Offset3D[2]*           dstOffsets; 
+	Offset3D[2]            dstOffsets; 
 }
 
 struct ImageCopy {
@@ -1234,11 +1234,11 @@ struct BindImageMemoryDeviceGroupInfo {
 }
 
 struct PhysicalDeviceGroupProperties {
-	StructureType                          sType; 
-	void*                                  pNext; 
-	uint                                   physicalDeviceCount; 
-	PhysicalDevice[MAX_DEVICE_GROUP_SIZE]* physicalDevices; 
-	uint                                   subsetAllocation; 
+	StructureType                         sType; 
+	void*                                 pNext; 
+	uint                                  physicalDeviceCount; 
+	PhysicalDevice[MAX_DEVICE_GROUP_SIZE] physicalDevices; 
+	uint                                  subsetAllocation; 
 }
 
 struct DeviceGroupDeviceCreateInfo {
@@ -1528,13 +1528,13 @@ struct ExternalBufferProperties {
 }
 
 struct PhysicalDeviceIDProperties {
-	StructureType    sType; 
-	void*            pNext; 
-	char[UUID_SIZE]* deviceUUID; 
-	char[UUID_SIZE]* driverUUID; 
-	char[LUID_SIZE]* deviceLUID; 
-	uint             deviceNodeMask; 
-	uint             deviceLUIDValid; 
+	StructureType   sType; 
+	void*           pNext; 
+	char[UUID_SIZE] deviceUUID; 
+	char[UUID_SIZE] driverUUID; 
+	char[LUID_SIZE] deviceLUID; 
+	uint            deviceNodeMask; 
+	uint            deviceLUIDValid; 
 }
 
 struct ExternalMemoryImageCreateInfo {
@@ -1634,9 +1634,9 @@ struct PhysicalDeviceVulkan11Features {
 struct PhysicalDeviceVulkan11Properties {
 	StructureType         sType; 
 	void*                 pNext; 
-	char[UUID_SIZE]*      deviceUUID; 
-	char[UUID_SIZE]*      driverUUID; 
-	char[LUID_SIZE]*      deviceLUID; 
+	char[UUID_SIZE]       deviceUUID; 
+	char[UUID_SIZE]       driverUUID; 
+	char[LUID_SIZE]       deviceLUID; 
 	uint                  deviceNodeMask; 
 	uint                  deviceLUIDValid; 
 	uint                  subgroupSize; 
@@ -1714,8 +1714,8 @@ struct PhysicalDeviceVulkan12Properties {
 	StructureType                   sType; 
 	void*                           pNext; 
 	DriverId                        driverID; 
-	ichar[MAX_DRIVER_NAME_SIZE]*    driverName; 
-	ichar[MAX_DRIVER_INFO_SIZE]*    driverInfo; 
+	ichar[MAX_DRIVER_NAME_SIZE]     driverName; 
+	ichar[MAX_DRIVER_INFO_SIZE]     driverInfo; 
 	ConformanceVersion              conformanceVersion; 
 	ShaderFloatControlsIndependence denormBehaviorIndependence; 
 	ShaderFloatControlsIndependence roundingModeIndependence; 
@@ -1859,12 +1859,12 @@ struct PhysicalDevice8BitStorageFeatures {
 }
 
 struct PhysicalDeviceDriverProperties {
-	StructureType                sType; 
-	void*                        pNext; 
-	DriverId                     driverID; 
-	ichar[MAX_DRIVER_NAME_SIZE]* driverName; 
-	ichar[MAX_DRIVER_INFO_SIZE]* driverInfo; 
-	ConformanceVersion           conformanceVersion; 
+	StructureType               sType; 
+	void*                       pNext; 
+	DriverId                    driverID; 
+	ichar[MAX_DRIVER_NAME_SIZE] driverName; 
+	ichar[MAX_DRIVER_INFO_SIZE] driverInfo; 
+	ConformanceVersion          conformanceVersion; 
 }
 
 struct PhysicalDeviceShaderAtomicInt64Features {
@@ -2261,13 +2261,13 @@ struct PhysicalDeviceShaderTerminateInvocationFeatures {
 }
 
 struct PhysicalDeviceToolProperties {
-	StructureType                   sType; 
-	void*                           pNext; 
-	ichar[MAX_EXTENSION_NAME_SIZE]* name; 
-	ichar[MAX_EXTENSION_NAME_SIZE]* version; 
-	ToolPurposeFlags                purposes; 
-	ichar[MAX_DESCRIPTION_SIZE]*    description; 
-	ichar[MAX_EXTENSION_NAME_SIZE]* layer; 
+	StructureType                  sType; 
+	void*                          pNext; 
+	ichar[MAX_EXTENSION_NAME_SIZE] name; 
+	ichar[MAX_EXTENSION_NAME_SIZE] version; 
+	ToolPurposeFlags               purposes; 
+	ichar[MAX_DESCRIPTION_SIZE]    description; 
+	ichar[MAX_EXTENSION_NAME_SIZE] layer; 
 }
 
 struct PhysicalDeviceShaderDemoteToHelperInvocationFeatures {
@@ -2469,9 +2469,9 @@ struct ImageBlit2 {
 	StructureType          sType; 
 	void*                  pNext; 
 	ImageSubresourceLayers srcSubresource; 
-	Offset3D[2]*           srcOffsets; 
+	Offset3D[2]            srcOffsets; 
 	ImageSubresourceLayers dstSubresource; 
-	Offset3D[2]*           dstOffsets; 
+	Offset3D[2]            dstOffsets; 
 }
 
 struct BlitImageInfo2 {
@@ -2754,7 +2754,7 @@ struct PhysicalDeviceVulkan14Properties {
 	ImageLayout*                     pCopySrcLayouts; 
 	uint                             copyDstLayoutCount; 
 	ImageLayout*                     pCopyDstLayouts; 
-	char[UUID_SIZE]*                 optimalTilingLayoutUUID; 
+	char[UUID_SIZE]                  optimalTilingLayoutUUID; 
 	uint                             identicalMemoryTypeRequirements; 
 }
 
@@ -2771,10 +2771,10 @@ struct PhysicalDeviceGlobalPriorityQueryFeatures {
 }
 
 struct QueueFamilyGlobalPriorityProperties {
-	StructureType                                  sType; 
-	void*                                          pNext; 
-	uint                                           priorityCount; 
-	QueueGlobalPriority[MAX_GLOBAL_PRIORITY_SIZE]* priorities; 
+	StructureType                                 sType; 
+	void*                                         pNext; 
+	uint                                          priorityCount; 
+	QueueGlobalPriority[MAX_GLOBAL_PRIORITY_SIZE] priorities; 
 }
 
 struct PhysicalDeviceShaderSubgroupRotateFeatures {
@@ -3054,14 +3054,14 @@ struct PhysicalDeviceHostImageCopyFeatures {
 }
 
 struct PhysicalDeviceHostImageCopyProperties {
-	StructureType    sType; 
-	void*            pNext; 
-	uint             copySrcLayoutCount; 
-	ImageLayout*     pCopySrcLayouts; 
-	uint             copyDstLayoutCount; 
-	ImageLayout*     pCopyDstLayouts; 
-	char[UUID_SIZE]* optimalTilingLayoutUUID; 
-	uint             identicalMemoryTypeRequirements; 
+	StructureType   sType; 
+	void*           pNext; 
+	uint            copySrcLayoutCount; 
+	ImageLayout*    pCopySrcLayouts; 
+	uint            copyDstLayoutCount; 
+	ImageLayout*    pCopyDstLayouts; 
+	char[UUID_SIZE] optimalTilingLayoutUUID; 
+	uint            identicalMemoryTypeRequirements; 
 }
 
 struct MemoryToImageCopy {
@@ -3216,7 +3216,7 @@ struct AcquireNextImageInfoKHR {
 struct DeviceGroupPresentCapabilitiesKHR {
 	StructureType                  sType; 
 	void*                          pNext; 
-	uint[MAX_DEVICE_GROUP_SIZE]*   presentMask; 
+	uint[MAX_DEVICE_GROUP_SIZE]    presentMask; 
 	DeviceGroupPresentModeFlagsKHR modes; 
 }
 
@@ -3896,16 +3896,16 @@ struct PerformanceCounterKHR {
 	PerformanceCounterUnitKHR    unit; 
 	PerformanceCounterScopeKHR   scope; 
 	PerformanceCounterStorageKHR storage; 
-	char[UUID_SIZE]*             uuid; 
+	char[UUID_SIZE]              uuid; 
 }
 
 struct PerformanceCounterDescriptionKHR {
 	StructureType                         sType; 
 	void*                                 pNext; 
 	PerformanceCounterDescriptionFlagsKHR flags; 
-	ichar[MAX_DESCRIPTION_SIZE]*          name; 
-	ichar[MAX_DESCRIPTION_SIZE]*          category; 
-	ichar[MAX_DESCRIPTION_SIZE]*          description; 
+	ichar[MAX_DESCRIPTION_SIZE]           name; 
+	ichar[MAX_DESCRIPTION_SIZE]           category; 
+	ichar[MAX_DESCRIPTION_SIZE]           description; 
 }
 
 struct QueryPoolPerformanceCreateInfoKHR {
@@ -4048,10 +4048,10 @@ struct FragmentShadingRateAttachmentInfoKHR {
 }
 
 struct PipelineFragmentShadingRateStateCreateInfoKHR {
-	StructureType                        sType; 
-	void*                                pNext; 
-	Extent2D                             fragmentSize; 
-	FragmentShadingRateCombinerOpKHR[2]* combinerOps; 
+	StructureType                       sType; 
+	void*                               pNext; 
+	Extent2D                            fragmentSize; 
+	FragmentShadingRateCombinerOpKHR[2] combinerOps; 
 }
 
 struct PhysicalDeviceFragmentShadingRateFeaturesKHR {
@@ -4130,12 +4130,12 @@ struct PipelineInfoKHR {
 }
 
 struct PipelineExecutablePropertiesKHR {
-	StructureType                sType; 
-	void*                        pNext; 
-	ShaderStageFlags             stages; 
-	ichar[MAX_DESCRIPTION_SIZE]* name; 
-	ichar[MAX_DESCRIPTION_SIZE]* description; 
-	uint                         subgroupSize; 
+	StructureType               sType; 
+	void*                       pNext; 
+	ShaderStageFlags            stages; 
+	ichar[MAX_DESCRIPTION_SIZE] name; 
+	ichar[MAX_DESCRIPTION_SIZE] description; 
+	uint                        subgroupSize; 
 }
 
 struct PipelineExecutableInfoKHR {
@@ -4155,20 +4155,20 @@ union PipelineExecutableStatisticValueKHR {
 struct PipelineExecutableStatisticKHR {
 	StructureType                        sType; 
 	void*                                pNext; 
-	ichar[MAX_DESCRIPTION_SIZE]*         name; 
-	ichar[MAX_DESCRIPTION_SIZE]*         description; 
+	ichar[MAX_DESCRIPTION_SIZE]          name; 
+	ichar[MAX_DESCRIPTION_SIZE]          description; 
 	PipelineExecutableStatisticFormatKHR format; 
 	PipelineExecutableStatisticValueKHR  value; 
 }
 
 struct PipelineExecutableInternalRepresentationKHR {
-	StructureType                sType; 
-	void*                        pNext; 
-	ichar[MAX_DESCRIPTION_SIZE]* name; 
-	ichar[MAX_DESCRIPTION_SIZE]* description; 
-	uint                         isText; 
-	usz                          dataSize; 
-	void*                        pData; 
+	StructureType               sType; 
+	void*                       pNext; 
+	ichar[MAX_DESCRIPTION_SIZE] name; 
+	ichar[MAX_DESCRIPTION_SIZE] description; 
+	uint                        isText; 
+	usz                         dataSize; 
+	void*                       pData; 
 }
 
 struct PipelineLibraryCreateInfoKHR {
@@ -4369,10 +4369,10 @@ struct DevicePipelineBinaryInternalCacheControlKHR {
 }
 
 struct PipelineBinaryKeyKHR {
-	StructureType                           sType; 
-	void*                                   pNext; 
-	uint                                    keySize; 
-	char[MAX_PIPELINE_BINARY_KEY_SIZE_KHR]* key; 
+	StructureType                          sType; 
+	void*                                  pNext; 
+	uint                                   keySize; 
+	char[MAX_PIPELINE_BINARY_KEY_SIZE_KHR] key; 
 }
 
 struct PipelineBinaryDataKHR {
@@ -4485,14 +4485,14 @@ struct VideoDecodeAV1SessionParametersCreateInfoKHR {
 }
 
 struct VideoDecodeAV1PictureInfoKHR {
-	StructureType                                sType; 
-	void*                                        pNext; 
-	VideoDecodeAV1PictureInfo*                   pStdPictureInfo; 
-	int[MAX_VIDEO_AV1_REFERENCES_PER_FRAME_KHR]* referenceNameSlotIndices; 
-	uint                                         frameHeaderOffset; 
-	uint                                         tileCount; 
-	uint*                                        pTileOffsets; 
-	uint*                                        pTileSizes; 
+	StructureType                               sType; 
+	void*                                       pNext; 
+	VideoDecodeAV1PictureInfo*                  pStdPictureInfo; 
+	int[MAX_VIDEO_AV1_REFERENCES_PER_FRAME_KHR] referenceNameSlotIndices; 
+	uint                                        frameHeaderOffset; 
+	uint                                        tileCount; 
+	uint*                                       pTileOffsets; 
+	uint*                                       pTileSizes; 
 }
 
 struct VideoDecodeAV1DpbSlotInfoKHR {
@@ -4579,15 +4579,15 @@ struct VideoEncodeAV1SessionParametersCreateInfoKHR {
 }
 
 struct VideoEncodeAV1PictureInfoKHR {
-	StructureType                                sType; 
-	void*                                        pNext; 
-	VideoEncodeAV1PredictionModeKHR              predictionMode; 
-	VideoEncodeAV1RateControlGroupKHR            rateControlGroup; 
-	uint                                         constantQIndex; 
-	VideoEncodeAV1PictureInfo*                   pStdPictureInfo; 
-	int[MAX_VIDEO_AV1_REFERENCES_PER_FRAME_KHR]* referenceNameSlotIndices; 
-	uint                                         primaryReferenceCdfOnly; 
-	uint                                         generateObuExtensionHeader; 
+	StructureType                               sType; 
+	void*                                       pNext; 
+	VideoEncodeAV1PredictionModeKHR             predictionMode; 
+	VideoEncodeAV1RateControlGroupKHR           rateControlGroup; 
+	uint                                        constantQIndex; 
+	VideoEncodeAV1PictureInfo*                  pStdPictureInfo; 
+	int[MAX_VIDEO_AV1_REFERENCES_PER_FRAME_KHR] referenceNameSlotIndices; 
+	uint                                        primaryReferenceCdfOnly; 
+	uint                                        generateObuExtensionHeader; 
 }
 
 struct VideoEncodeAV1DpbSlotInfoKHR {
@@ -4767,12 +4767,12 @@ struct PhysicalDeviceMaintenance7PropertiesKHR {
 }
 
 struct PhysicalDeviceLayeredApiPropertiesKHR {
-	StructureType                         sType; 
-	void*                                 pNext; 
-	uint                                  vendorID; 
-	uint                                  deviceID; 
-	PhysicalDeviceLayeredApiKHR           layeredAPI; 
-	ichar[MAX_PHYSICAL_DEVICE_NAME_SIZE]* deviceName; 
+	StructureType                        sType; 
+	void*                                pNext; 
+	uint                                 vendorID; 
+	uint                                 deviceID; 
+	PhysicalDeviceLayeredApiKHR          layeredAPI; 
+	ichar[MAX_PHYSICAL_DEVICE_NAME_SIZE] deviceName; 
 }
 
 struct PhysicalDeviceLayeredApiPropertiesListKHR {
@@ -4824,7 +4824,7 @@ struct DebugMarkerMarkerInfoEXT {
 	StructureType sType; 
 	void*         pNext; 
 	ZString       pMarkerName; 
-	float[4]*     color; 
+	float[4]      color; 
 }
 
 struct DedicatedAllocationImageCreateInfoNV {
@@ -4948,7 +4948,7 @@ struct ShaderStatisticsInfoAMD {
 	uint                   numPhysicalSgprs; 
 	uint                   numAvailableVgprs; 
 	uint                   numAvailableSgprs; 
-	uint[3]*               computeWorkGroupSize; 
+	uint[3]                computeWorkGroupSize; 
 }
 
 struct PhysicalDeviceCornerSampledImageFeaturesNV {
@@ -5199,7 +5199,7 @@ struct DebugUtilsLabelEXT {
 	StructureType sType; 
 	void*         pNext; 
 	ZString       pLabelName; 
-	float[4]*     color; 
+	float[4]      color; 
 }
 
 struct DebugUtilsObjectNameInfoEXT {
@@ -5298,7 +5298,7 @@ struct PhysicalDeviceSampleLocationsPropertiesEXT {
 	void*            pNext; 
 	SampleCountFlags sampleLocationSampleCounts; 
 	Extent2D         maxSampleLocationGridSize; 
-	float[2]*        sampleLocationCoordinateRange; 
+	float[2]         sampleLocationCoordinateRange; 
 	uint             sampleLocationSubPixelBits; 
 	uint             variableSampleLocations; 
 }
@@ -5601,7 +5601,7 @@ struct PhysicalDeviceRayTracingPropertiesNV {
 }
 
 struct TransformMatrixKHR {
-	float[3][4]* mat; 
+	float[3][4] matrix; 
 }
 
 struct AabbPositionsKHR {
@@ -5713,11 +5713,11 @@ struct PhysicalDeviceMeshShaderPropertiesNV {
 	void*         pNext; 
 	uint          maxDrawMeshTasksCount; 
 	uint          maxTaskWorkGroupInvocations; 
-	uint[3]*      maxTaskWorkGroupSize; 
+	uint[3]       maxTaskWorkGroupSize; 
 	uint          maxTaskTotalMemorySize; 
 	uint          maxTaskOutputCount; 
 	uint          maxMeshWorkGroupInvocations; 
-	uint[3]*      maxMeshWorkGroupSize; 
+	uint[3]       maxMeshWorkGroupSize; 
 	uint          maxMeshTotalMemorySize; 
 	uint          maxMeshOutputVertices; 
 	uint          maxMeshOutputPrimitives; 
@@ -5904,10 +5904,10 @@ struct PhysicalDeviceShaderImageAtomicInt64FeaturesEXT {
 }
 
 struct PhysicalDeviceMemoryBudgetPropertiesEXT {
-	StructureType                 sType; 
-	void*                         pNext; 
-	DeviceSize[MAX_MEMORY_HEAPS]* heapBudget; 
-	DeviceSize[MAX_MEMORY_HEAPS]* heapUsage; 
+	StructureType                sType; 
+	void*                        pNext; 
+	DeviceSize[MAX_MEMORY_HEAPS] heapBudget; 
+	DeviceSize[MAX_MEMORY_HEAPS] heapUsage; 
 }
 
 struct PhysicalDeviceMemoryPriorityFeaturesEXT {
@@ -6653,11 +6653,11 @@ struct PhysicalDeviceFragmentShadingRateEnumsPropertiesNV {
 }
 
 struct PipelineFragmentShadingRateEnumStateCreateInfoNV {
-	StructureType                        sType; 
-	void*                                pNext; 
-	FragmentShadingRateTypeNV            shadingRateType; 
-	FragmentShadingRateNV                shadingRate; 
-	FragmentShadingRateCombinerOpKHR[2]* combinerOps; 
+	StructureType                       sType; 
+	void*                               pNext; 
+	FragmentShadingRateTypeNV           shadingRateType; 
+	FragmentShadingRateNV               shadingRate; 
+	FragmentShadingRateCombinerOpKHR[2] combinerOps; 
 }
 
 union DeviceOrHostAddressConstKHR {
@@ -6815,18 +6815,18 @@ struct DeviceFaultAddressInfoEXT {
 }
 
 struct DeviceFaultVendorInfoEXT {
-	ichar[MAX_DESCRIPTION_SIZE]* description; 
-	ulong                        vendorFaultCode; 
-	ulong                        vendorFaultData; 
+	ichar[MAX_DESCRIPTION_SIZE] description; 
+	ulong                       vendorFaultCode; 
+	ulong                       vendorFaultData; 
 }
 
 struct DeviceFaultInfoEXT {
-	StructureType                sType; 
-	void*                        pNext; 
-	ichar[MAX_DESCRIPTION_SIZE]* description; 
-	DeviceFaultAddressInfoEXT*   pAddressInfos; 
-	DeviceFaultVendorInfoEXT*    pVendorInfos; 
-	void*                        pVendorBinaryData; 
+	StructureType               sType; 
+	void*                       pNext; 
+	ichar[MAX_DESCRIPTION_SIZE] description; 
+	DeviceFaultAddressInfoEXT*  pAddressInfos; 
+	DeviceFaultVendorInfoEXT*   pVendorInfos; 
+	void*                       pVendorBinaryData; 
 }
 
 struct DeviceFaultVendorBinaryHeaderVersionOneEXT {
@@ -6835,7 +6835,7 @@ struct DeviceFaultVendorBinaryHeaderVersionOneEXT {
 	uint                                    vendorID; 
 	uint                                    deviceID; 
 	uint                                    driverVersion; 
-	char[UUID_SIZE]*                        pipelineCacheUUID; 
+	char[UUID_SIZE]                         pipelineCacheUUID; 
 	uint                                    applicationNameOffset; 
 	uint                                    applicationVersion; 
 	uint                                    engineNameOffset; 
@@ -6989,9 +6989,9 @@ struct PhysicalDeviceExternalMemoryRDMAFeaturesNV {
 }
 
 struct PipelinePropertiesIdentifierEXT {
-	StructureType    sType; 
-	void*            pNext; 
-	char[UUID_SIZE]* pipelineIdentifier; 
+	StructureType   sType; 
+	void*           pNext; 
+	char[UUID_SIZE] pipelineIdentifier; 
 }
 
 struct PhysicalDevicePipelinePropertiesFeaturesEXT {
@@ -7182,7 +7182,7 @@ struct PhysicalDeviceOpacityMicromapPropertiesEXT {
 struct MicromapVersionInfoEXT {
 	StructureType sType; 
 	void*         pNext; 
-	char*         pVersionData; 
+	ZString       pVersionData; 
 }
 
 struct CopyMicromapToMemoryInfoEXT {
@@ -7246,8 +7246,8 @@ struct PhysicalDeviceClusterCullingShaderFeaturesHUAWEI {
 struct PhysicalDeviceClusterCullingShaderPropertiesHUAWEI {
 	StructureType sType; 
 	void*         pNext; 
-	uint[3]*      maxWorkGroupCount; 
-	uint[3]*      maxWorkGroupSize; 
+	uint[3]       maxWorkGroupCount; 
+	uint[3]       maxWorkGroupSize; 
 	uint          maxOutputClusterCount; 
 	DeviceSize    indirectBufferOffsetAlignment; 
 }
@@ -7615,9 +7615,9 @@ struct RenderPassCreationFeedbackCreateInfoEXT {
 }
 
 struct RenderPassSubpassFeedbackInfoEXT {
-	SubpassMergeStatusEXT        subpassMergeStatus; 
-	ichar[MAX_DESCRIPTION_SIZE]* description; 
-	uint                         postMergeIndex; 
+	SubpassMergeStatusEXT       subpassMergeStatus; 
+	ichar[MAX_DESCRIPTION_SIZE] description; 
+	uint                        postMergeIndex; 
 }
 
 struct RenderPassSubpassFeedbackCreateInfoEXT {
@@ -7648,23 +7648,23 @@ struct PhysicalDeviceShaderModuleIdentifierFeaturesEXT {
 }
 
 struct PhysicalDeviceShaderModuleIdentifierPropertiesEXT {
-	StructureType    sType; 
-	void*            pNext; 
-	char[UUID_SIZE]* shaderModuleIdentifierAlgorithmUUID; 
+	StructureType   sType; 
+	void*           pNext; 
+	char[UUID_SIZE] shaderModuleIdentifierAlgorithmUUID; 
 }
 
 struct PipelineShaderStageModuleIdentifierCreateInfoEXT {
 	StructureType sType; 
 	void*         pNext; 
 	uint          identifierSize; 
-	char*         pIdentifier; 
+	ZString       pIdentifier; 
 }
 
 struct ShaderModuleIdentifierEXT {
-	StructureType                                sType; 
-	void*                                        pNext; 
-	uint                                         identifierSize; 
-	char[MAX_SHADER_MODULE_IDENTIFIER_SIZE_EXT]* identifier; 
+	StructureType                               sType; 
+	void*                                       pNext; 
+	uint                                        identifierSize; 
+	char[MAX_SHADER_MODULE_IDENTIFIER_SIZE_EXT] identifier; 
 }
 
 struct PhysicalDeviceOpticalFlowFeaturesNV {
@@ -7765,10 +7765,10 @@ struct PhysicalDeviceShaderObjectFeaturesEXT {
 }
 
 struct PhysicalDeviceShaderObjectPropertiesEXT {
-	StructureType    sType; 
-	void*            pNext; 
-	char[UUID_SIZE]* shaderBinaryUUID; 
-	uint             shaderBinaryVersion; 
+	StructureType   sType; 
+	void*           pNext; 
+	char[UUID_SIZE] shaderBinaryUUID; 
+	uint            shaderBinaryVersion; 
 }
 
 struct ShaderCreateInfoEXT {
@@ -8483,7 +8483,7 @@ struct AccelerationStructureDeviceAddressInfoKHR {
 struct AccelerationStructureVersionInfoKHR {
 	StructureType sType; 
 	void*         pNext; 
-	char*         pVersionData; 
+	ZString       pVersionData; 
 }
 
 struct CopyAccelerationStructureToMemoryInfoKHR {
@@ -8608,16 +8608,16 @@ struct PhysicalDeviceMeshShaderPropertiesEXT {
 	StructureType sType; 
 	void*         pNext; 
 	uint          maxTaskWorkGroupTotalCount; 
-	uint[3]*      maxTaskWorkGroupCount; 
+	uint[3]       maxTaskWorkGroupCount; 
 	uint          maxTaskWorkGroupInvocations; 
-	uint[3]*      maxTaskWorkGroupSize; 
+	uint[3]       maxTaskWorkGroupSize; 
 	uint          maxTaskPayloadSize; 
 	uint          maxTaskSharedMemorySize; 
 	uint          maxTaskPayloadAndSharedMemorySize; 
 	uint          maxMeshWorkGroupTotalCount; 
-	uint[3]*      maxMeshWorkGroupCount; 
+	uint[3]       maxMeshWorkGroupCount; 
 	uint          maxMeshWorkGroupInvocations; 
-	uint[3]*      maxMeshWorkGroupSize; 
+	uint[3]       maxMeshWorkGroupSize; 
 	uint          maxMeshSharedMemorySize; 
 	uint          maxMeshPayloadAndSharedMemorySize; 
 	uint          maxMeshOutputMemorySize; 
@@ -8953,13 +8953,13 @@ struct VideoAV1LoopFilterFlags {
 }
 
 struct VideoAV1LoopFilter {
-	VideoAV1LoopFilterFlags                    flags; 
-	char[VIDEO_AV1_MAX_LOOP_FILTER_STRENGTHS]* loop_filter_level; 
-	char                                       loop_filter_sharpness; 
-	char                                       update_ref_delta; 
-	ichar[VIDEO_AV1_TOTAL_REFS_PER_FRAME]*     loop_filter_ref_deltas; 
-	char                                       update_mode_delta; 
-	ichar[VIDEO_AV1_LOOP_FILTER_ADJUSTMENTS]*  loop_filter_mode_deltas; 
+	VideoAV1LoopFilterFlags                   flags; 
+	char[VIDEO_AV1_MAX_LOOP_FILTER_STRENGTHS] loop_filter_level; 
+	char                                      loop_filter_sharpness; 
+	char                                      update_ref_delta; 
+	ichar[VIDEO_AV1_TOTAL_REFS_PER_FRAME]     loop_filter_ref_deltas; 
+	char                                      update_mode_delta; 
+	ichar[VIDEO_AV1_LOOP_FILTER_ADJUSTMENTS]  loop_filter_mode_deltas; 
 }
 
 struct VideoAV1QuantizationFlags {
@@ -8980,8 +8980,8 @@ struct VideoAV1Quantization {
 }
 
 struct VideoAV1Segmentation {
-	char[VIDEO_AV1_MAX_SEGMENTS]*                         featureEnabled; 
-	short[VIDEO_AV1_MAX_SEGMENTS][VIDEO_AV1_SEG_LVL_MAX]* featureData; 
+	char[VIDEO_AV1_MAX_SEGMENTS]                         featureEnabled; 
+	short[VIDEO_AV1_MAX_SEGMENTS][VIDEO_AV1_SEG_LVL_MAX] featureData; 
 }
 
 struct VideoAV1TileInfoFlags {
@@ -8994,7 +8994,7 @@ struct VideoAV1TileInfo {
 	char                  tileRows; 
 	ushort                context_update_tile_id; 
 	char                  tile_size_bytes_minus_1; 
-	char[7]*              reserved1; 
+	char[7]               reserved1; 
 	ushort*               pMiColStarts; 
 	ushort*               pMiRowStarts; 
 	ushort*               pWidthInSbsMinus1; 
@@ -9002,22 +9002,22 @@ struct VideoAV1TileInfo {
 }
 
 struct VideoAV1CDEF {
-	char                                       cdef_damping_minus_3; 
-	char                                       cdef_bits; 
-	char[VIDEO_AV1_MAX_CDEF_FILTER_STRENGTHS]* cdef_y_pri_strength; 
-	char[VIDEO_AV1_MAX_CDEF_FILTER_STRENGTHS]* cdef_y_sec_strength; 
-	char[VIDEO_AV1_MAX_CDEF_FILTER_STRENGTHS]* cdef_uv_pri_strength; 
-	char[VIDEO_AV1_MAX_CDEF_FILTER_STRENGTHS]* cdef_uv_sec_strength; 
+	char                                      cdef_damping_minus_3; 
+	char                                      cdef_bits; 
+	char[VIDEO_AV1_MAX_CDEF_FILTER_STRENGTHS] cdef_y_pri_strength; 
+	char[VIDEO_AV1_MAX_CDEF_FILTER_STRENGTHS] cdef_y_sec_strength; 
+	char[VIDEO_AV1_MAX_CDEF_FILTER_STRENGTHS] cdef_uv_pri_strength; 
+	char[VIDEO_AV1_MAX_CDEF_FILTER_STRENGTHS] cdef_uv_sec_strength; 
 }
 
 struct VideoAV1LoopRestoration {
-	VideoAV1FrameRestorationType[VIDEO_AV1_MAX_NUM_PLANES]* frameRestorationType; 
-	ushort[VIDEO_AV1_MAX_NUM_PLANES]*                       loopRestorationSize; 
+	VideoAV1FrameRestorationType[VIDEO_AV1_MAX_NUM_PLANES] frameRestorationType; 
+	ushort[VIDEO_AV1_MAX_NUM_PLANES]                       loopRestorationSize; 
 }
 
 struct VideoAV1GlobalMotion {
-	char[VIDEO_AV1_NUM_REF_FRAMES]*                                gmType; 
-	int[VIDEO_AV1_NUM_REF_FRAMES][VIDEO_AV1_GLOBAL_MOTION_PARAMS]* gm_params; 
+	char[VIDEO_AV1_NUM_REF_FRAMES]                                gmType; 
+	int[VIDEO_AV1_NUM_REF_FRAMES][VIDEO_AV1_GLOBAL_MOTION_PARAMS] gm_params; 
 }
 
 struct VideoAV1FilmGrainFlags {
@@ -9025,31 +9025,31 @@ struct VideoAV1FilmGrainFlags {
 }
 
 struct VideoAV1FilmGrain {
-	VideoAV1FilmGrainFlags               flags; 
-	char                                 grain_scaling_minus_8; 
-	char                                 ar_coeff_lag; 
-	char                                 ar_coeff_shift_minus_6; 
-	char                                 grain_scale_shift; 
-	ushort                               grain_seed; 
-	char                                 film_grain_params_ref_idx; 
-	char                                 num_y_points; 
-	char[VIDEO_AV1_MAX_NUM_Y_POINTS]*    point_y_value; 
-	char[VIDEO_AV1_MAX_NUM_Y_POINTS]*    point_y_scaling; 
-	char                                 num_cb_points; 
-	char[VIDEO_AV1_MAX_NUM_CB_POINTS]*   point_cb_value; 
-	char[VIDEO_AV1_MAX_NUM_CB_POINTS]*   point_cb_scaling; 
-	char                                 num_cr_points; 
-	char[VIDEO_AV1_MAX_NUM_CR_POINTS]*   point_cr_value; 
-	char[VIDEO_AV1_MAX_NUM_CR_POINTS]*   point_cr_scaling; 
-	ichar[VIDEO_AV1_MAX_NUM_POS_LUMA]*   ar_coeffs_y_plus_128; 
-	ichar[VIDEO_AV1_MAX_NUM_POS_CHROMA]* ar_coeffs_cb_plus_128; 
-	ichar[VIDEO_AV1_MAX_NUM_POS_CHROMA]* ar_coeffs_cr_plus_128; 
-	char                                 cb_mult; 
-	char                                 cb_luma_mult; 
-	ushort                               cb_offset; 
-	char                                 cr_mult; 
-	char                                 cr_luma_mult; 
-	ushort                               cr_offset; 
+	VideoAV1FilmGrainFlags              flags; 
+	char                                grain_scaling_minus_8; 
+	char                                ar_coeff_lag; 
+	char                                ar_coeff_shift_minus_6; 
+	char                                grain_scale_shift; 
+	ushort                              grain_seed; 
+	char                                film_grain_params_ref_idx; 
+	char                                num_y_points; 
+	char[VIDEO_AV1_MAX_NUM_Y_POINTS]    point_y_value; 
+	char[VIDEO_AV1_MAX_NUM_Y_POINTS]    point_y_scaling; 
+	char                                num_cb_points; 
+	char[VIDEO_AV1_MAX_NUM_CB_POINTS]   point_cb_value; 
+	char[VIDEO_AV1_MAX_NUM_CB_POINTS]   point_cb_scaling; 
+	char                                num_cr_points; 
+	char[VIDEO_AV1_MAX_NUM_CR_POINTS]   point_cr_value; 
+	char[VIDEO_AV1_MAX_NUM_CR_POINTS]   point_cr_scaling; 
+	ichar[VIDEO_AV1_MAX_NUM_POS_LUMA]   ar_coeffs_y_plus_128; 
+	ichar[VIDEO_AV1_MAX_NUM_POS_CHROMA] ar_coeffs_cb_plus_128; 
+	ichar[VIDEO_AV1_MAX_NUM_POS_CHROMA] ar_coeffs_cr_plus_128; 
+	char                                cb_mult; 
+	char                                cb_luma_mult; 
+	ushort                              cb_offset; 
+	char                                cr_mult; 
+	char                                cr_luma_mult; 
+	ushort                              cr_offset; 
 }
 
 struct VideoAV1SequenceHeaderFlags {
@@ -9068,7 +9068,7 @@ struct VideoAV1SequenceHeader {
 	char                        order_hint_bits_minus_1; 
 	char                        seq_force_integer_mv; 
 	char                        seq_force_screen_content_tools; 
-	char[5]*                    reserved1; 
+	char[5]                     reserved1; 
 	VideoAV1ColorConfig*        pColorConfig; 
 	VideoAV1TimingInfo*         pTimingInfo; 
 }
@@ -9078,30 +9078,30 @@ struct VideoDecodeAV1PictureInfoFlags {
 }
 
 struct VideoDecodeAV1PictureInfo {
-	VideoDecodeAV1PictureInfoFlags    flags; 
-	VideoAV1FrameType                 frame_type; 
-	uint                              current_frame_id; 
-	char                              orderHint; 
-	char                              primary_ref_frame; 
-	char                              refresh_frame_flags; 
-	char                              reserved1; 
-	VideoAV1InterpolationFilter       interpolation_filter; 
-	VideoAV1TxMode                    txMode; 
-	char                              delta_q_res; 
-	char                              delta_lf_res; 
-	char[VIDEO_AV1_SKIP_MODE_FRAMES]* skipModeFrame; 
-	char                              coded_denom; 
-	char[3]*                          reserved2; 
-	char[VIDEO_AV1_NUM_REF_FRAMES]*   orderHints; 
-	uint[VIDEO_AV1_NUM_REF_FRAMES]*   expectedFrameId; 
-	VideoAV1TileInfo*                 pTileInfo; 
-	VideoAV1Quantization*             pQuantization; 
-	VideoAV1Segmentation*             pSegmentation; 
-	VideoAV1LoopFilter*               pLoopFilter; 
-	VideoAV1CDEF*                     pCDEF; 
-	VideoAV1LoopRestoration*          pLoopRestoration; 
-	VideoAV1GlobalMotion*             pGlobalMotion; 
-	VideoAV1FilmGrain*                pFilmGrain; 
+	VideoDecodeAV1PictureInfoFlags   flags; 
+	VideoAV1FrameType                frame_type; 
+	uint                             current_frame_id; 
+	char                             orderHint; 
+	char                             primary_ref_frame; 
+	char                             refresh_frame_flags; 
+	char                             reserved1; 
+	VideoAV1InterpolationFilter      interpolation_filter; 
+	VideoAV1TxMode                   txMode; 
+	char                             delta_q_res; 
+	char                             delta_lf_res; 
+	char[VIDEO_AV1_SKIP_MODE_FRAMES] skipModeFrame; 
+	char                             coded_denom; 
+	char[3]                          reserved2; 
+	char[VIDEO_AV1_NUM_REF_FRAMES]   orderHints; 
+	uint[VIDEO_AV1_NUM_REF_FRAMES]   expectedFrameId; 
+	VideoAV1TileInfo*                pTileInfo; 
+	VideoAV1Quantization*            pQuantization; 
+	VideoAV1Segmentation*            pSegmentation; 
+	VideoAV1LoopFilter*              pLoopFilter; 
+	VideoAV1CDEF*                    pCDEF; 
+	VideoAV1LoopRestoration*         pLoopRestoration; 
+	VideoAV1GlobalMotion*            pGlobalMotion; 
+	VideoAV1FilmGrain*               pFilmGrain; 
 }
 
 struct VideoDecodeAV1ReferenceInfoFlags {
@@ -9113,7 +9113,7 @@ struct VideoDecodeAV1ReferenceInfo {
 	char                             frame_type; 
 	char                             refFrameSignBias; 
 	char                             orderHint; 
-	char[VIDEO_AV1_NUM_REF_FRAMES]*  savedOrderHints; 
+	char[VIDEO_AV1_NUM_REF_FRAMES]   savedOrderHints; 
 }
 
 struct VideoEncodeAV1DecoderModelInfo {
@@ -9148,33 +9148,33 @@ struct VideoEncodeAV1PictureInfoFlags {
 }
 
 struct VideoEncodeAV1PictureInfo {
-	VideoEncodeAV1PictureInfoFlags   flags; 
-	VideoAV1FrameType                frame_type; 
-	uint                             frame_presentation_time; 
-	uint                             current_frame_id; 
-	char                             order_hint; 
-	char                             primary_ref_frame; 
-	char                             refresh_frame_flags; 
-	char                             coded_denom; 
-	ushort                           render_width_minus_1; 
-	ushort                           render_height_minus_1; 
-	VideoAV1InterpolationFilter      interpolation_filter; 
-	VideoAV1TxMode                   txMode; 
-	char                             delta_q_res; 
-	char                             delta_lf_res; 
-	char[VIDEO_AV1_NUM_REF_FRAMES]*  ref_order_hint; 
-	ichar[VIDEO_AV1_REFS_PER_FRAME]* ref_frame_idx; 
-	char[3]*                         reserved1; 
-	uint[VIDEO_AV1_REFS_PER_FRAME]*  delta_frame_id_minus_1; 
-	VideoAV1TileInfo*                pTileInfo; 
-	VideoAV1Quantization*            pQuantization; 
-	VideoAV1Segmentation*            pSegmentation; 
-	VideoAV1LoopFilter*              pLoopFilter; 
-	VideoAV1CDEF*                    pCDEF; 
-	VideoAV1LoopRestoration*         pLoopRestoration; 
-	VideoAV1GlobalMotion*            pGlobalMotion; 
-	VideoEncodeAV1ExtensionHeader*   pExtensionHeader; 
-	uint*                            pBufferRemovalTimes; 
+	VideoEncodeAV1PictureInfoFlags  flags; 
+	VideoAV1FrameType               frame_type; 
+	uint                            frame_presentation_time; 
+	uint                            current_frame_id; 
+	char                            order_hint; 
+	char                            primary_ref_frame; 
+	char                            refresh_frame_flags; 
+	char                            coded_denom; 
+	ushort                          render_width_minus_1; 
+	ushort                          render_height_minus_1; 
+	VideoAV1InterpolationFilter     interpolation_filter; 
+	VideoAV1TxMode                  txMode; 
+	char                            delta_q_res; 
+	char                            delta_lf_res; 
+	char[VIDEO_AV1_NUM_REF_FRAMES]  ref_order_hint; 
+	ichar[VIDEO_AV1_REFS_PER_FRAME] ref_frame_idx; 
+	char[3]                         reserved1; 
+	uint[VIDEO_AV1_REFS_PER_FRAME]  delta_frame_id_minus_1; 
+	VideoAV1TileInfo*               pTileInfo; 
+	VideoAV1Quantization*           pQuantization; 
+	VideoAV1Segmentation*           pSegmentation; 
+	VideoAV1LoopFilter*             pLoopFilter; 
+	VideoAV1CDEF*                   pCDEF; 
+	VideoAV1LoopRestoration*        pLoopRestoration; 
+	VideoAV1GlobalMotion*           pGlobalMotion; 
+	VideoEncodeAV1ExtensionHeader*  pExtensionHeader; 
+	uint*                           pBufferRemovalTimes; 
 }
 
 struct VideoEncodeAV1ReferenceInfoFlags {
@@ -9186,7 +9186,7 @@ struct VideoEncodeAV1ReferenceInfo {
 	uint                             refFrameId; 
 	VideoAV1FrameType                frame_type; 
 	char                             orderHint; 
-	char[3]*                         reserved1; 
+	char[3]                          reserved1; 
 	VideoEncodeAV1ExtensionHeader*   pExtensionHeader; 
 }
 
@@ -9195,17 +9195,17 @@ struct VideoH264SpsVuiFlags {
 }
 
 struct VideoH264HrdParameters {
-	char                                cpb_cnt_minus1; 
-	char                                bit_rate_scale; 
-	char                                cpb_size_scale; 
-	char                                reserved1; 
-	uint[VIDEO_H264_CPB_CNT_LIST_SIZE]* bit_rate_value_minus1; 
-	uint[VIDEO_H264_CPB_CNT_LIST_SIZE]* cpb_size_value_minus1; 
-	char[VIDEO_H264_CPB_CNT_LIST_SIZE]* cbr_flag; 
-	uint                                initial_cpb_removal_delay_length_minus1; 
-	uint                                cpb_removal_delay_length_minus1; 
-	uint                                dpb_output_delay_length_minus1; 
-	uint                                time_offset_length; 
+	char                               cpb_cnt_minus1; 
+	char                               bit_rate_scale; 
+	char                               cpb_size_scale; 
+	char                               reserved1; 
+	uint[VIDEO_H264_CPB_CNT_LIST_SIZE] bit_rate_value_minus1; 
+	uint[VIDEO_H264_CPB_CNT_LIST_SIZE] cpb_size_value_minus1; 
+	char[VIDEO_H264_CPB_CNT_LIST_SIZE] cbr_flag; 
+	uint                               initial_cpb_removal_delay_length_minus1; 
+	uint                               cpb_removal_delay_length_minus1; 
+	uint                               dpb_output_delay_length_minus1; 
+	uint                               time_offset_length; 
 }
 
 struct VideoH264SequenceParameterSetVui {
@@ -9232,10 +9232,10 @@ struct VideoH264SpsFlags {
 }
 
 struct VideoH264ScalingLists {
-	ushort                                                                                 scaling_list_present_mask; 
-	ushort                                                                                 use_default_scaling_matrix_mask; 
-	char[VIDEO_H264_SCALING_LIST_4X4_NUM_LISTS][VIDEO_H264_SCALING_LIST_4X4_NUM_ELEMENTS]* scalingList4x4; 
-	char[VIDEO_H264_SCALING_LIST_8X8_NUM_LISTS][VIDEO_H264_SCALING_LIST_8X8_NUM_ELEMENTS]* scalingList8x8; 
+	ushort                                                                                scaling_list_present_mask; 
+	ushort                                                                                use_default_scaling_matrix_mask; 
+	char[VIDEO_H264_SCALING_LIST_4X4_NUM_LISTS][VIDEO_H264_SCALING_LIST_4X4_NUM_ELEMENTS] scalingList4x4; 
+	char[VIDEO_H264_SCALING_LIST_8X8_NUM_LISTS][VIDEO_H264_SCALING_LIST_8X8_NUM_ELEMENTS] scalingList8x8; 
 }
 
 struct VideoH264SequenceParameterSet {
@@ -9289,14 +9289,14 @@ struct VideoDecodeH264PictureInfoFlags {
 }
 
 struct VideoDecodeH264PictureInfo {
-	VideoDecodeH264PictureInfoFlags                     flags; 
-	char                                                seq_parameter_set_id; 
-	char                                                pic_parameter_set_id; 
-	char                                                reserved1; 
-	char                                                reserved2; 
-	ushort                                              frame_num; 
-	ushort                                              idr_pic_id; 
-	int[VIDEO_DECODE_H264_FIELD_ORDER_COUNT_LIST_SIZE]* picOrderCnt; 
+	VideoDecodeH264PictureInfoFlags                    flags; 
+	char                                               seq_parameter_set_id; 
+	char                                               pic_parameter_set_id; 
+	char                                               reserved1; 
+	char                                               reserved2; 
+	ushort                                             frame_num; 
+	ushort                                             idr_pic_id; 
+	int[VIDEO_DECODE_H264_FIELD_ORDER_COUNT_LIST_SIZE] picOrderCnt; 
 }
 
 struct VideoDecodeH264ReferenceInfoFlags {
@@ -9304,10 +9304,10 @@ struct VideoDecodeH264ReferenceInfoFlags {
 }
 
 struct VideoDecodeH264ReferenceInfo {
-	VideoDecodeH264ReferenceInfoFlags                   flags; 
-	ushort                                              frameNum; 
-	ushort                                              reserved; 
-	int[VIDEO_DECODE_H264_FIELD_ORDER_COUNT_LIST_SIZE]* picOrderCnt; 
+	VideoDecodeH264ReferenceInfoFlags                  flags; 
+	ushort                                             frameNum; 
+	ushort                                             reserved; 
+	int[VIDEO_DECODE_H264_FIELD_ORDER_COUNT_LIST_SIZE] picOrderCnt; 
 }
 
 struct VideoEncodeH264WeightTableFlags {
@@ -9318,17 +9318,17 @@ struct VideoEncodeH264WeightTableFlags {
 }
 
 struct VideoEncodeH264WeightTable {
-	VideoEncodeH264WeightTableFlags                                   flags; 
-	char                                                              luma_log2_weight_denom; 
-	char                                                              chroma_log2_weight_denom; 
-	ichar[VIDEO_H264_MAX_NUM_LIST_REF]*                               luma_weight_l0; 
-	ichar[VIDEO_H264_MAX_NUM_LIST_REF]*                               luma_offset_l0; 
-	ichar[VIDEO_H264_MAX_NUM_LIST_REF][VIDEO_H264_MAX_CHROMA_PLANES]* chroma_weight_l0; 
-	ichar[VIDEO_H264_MAX_NUM_LIST_REF][VIDEO_H264_MAX_CHROMA_PLANES]* chroma_offset_l0; 
-	ichar[VIDEO_H264_MAX_NUM_LIST_REF]*                               luma_weight_l1; 
-	ichar[VIDEO_H264_MAX_NUM_LIST_REF]*                               luma_offset_l1; 
-	ichar[VIDEO_H264_MAX_NUM_LIST_REF][VIDEO_H264_MAX_CHROMA_PLANES]* chroma_weight_l1; 
-	ichar[VIDEO_H264_MAX_NUM_LIST_REF][VIDEO_H264_MAX_CHROMA_PLANES]* chroma_offset_l1; 
+	VideoEncodeH264WeightTableFlags                                  flags; 
+	char                                                             luma_log2_weight_denom; 
+	char                                                             chroma_log2_weight_denom; 
+	ichar[VIDEO_H264_MAX_NUM_LIST_REF]                               luma_weight_l0; 
+	ichar[VIDEO_H264_MAX_NUM_LIST_REF]                               luma_offset_l0; 
+	ichar[VIDEO_H264_MAX_NUM_LIST_REF][VIDEO_H264_MAX_CHROMA_PLANES] chroma_weight_l0; 
+	ichar[VIDEO_H264_MAX_NUM_LIST_REF][VIDEO_H264_MAX_CHROMA_PLANES] chroma_offset_l0; 
+	ichar[VIDEO_H264_MAX_NUM_LIST_REF]                               luma_weight_l1; 
+	ichar[VIDEO_H264_MAX_NUM_LIST_REF]                               luma_offset_l1; 
+	ichar[VIDEO_H264_MAX_NUM_LIST_REF][VIDEO_H264_MAX_CHROMA_PLANES] chroma_weight_l1; 
+	ichar[VIDEO_H264_MAX_NUM_LIST_REF][VIDEO_H264_MAX_CHROMA_PLANES] chroma_offset_l1; 
 }
 
 struct VideoEncodeH264SliceHeaderFlags {
@@ -9365,12 +9365,12 @@ struct VideoEncodeH264ReferenceListsInfo {
 	VideoEncodeH264ReferenceListsInfoFlags flags; 
 	char                                   num_ref_idx_l0_active_minus1; 
 	char                                   num_ref_idx_l1_active_minus1; 
-	char[VIDEO_H264_MAX_NUM_LIST_REF]*     refPicList0; 
-	char[VIDEO_H264_MAX_NUM_LIST_REF]*     refPicList1; 
+	char[VIDEO_H264_MAX_NUM_LIST_REF]      refPicList0; 
+	char[VIDEO_H264_MAX_NUM_LIST_REF]      refPicList1; 
 	char                                   refList0ModOpCount; 
 	char                                   refList1ModOpCount; 
 	char                                   refPicMarkingOpCount; 
-	char[7]*                               reserved1; 
+	char[7]                                reserved1; 
 	VideoEncodeH264RefListModEntry*        pRefList0ModOperations; 
 	VideoEncodeH264RefListModEntry*        pRefList1ModOperations; 
 	VideoEncodeH264RefPicMarkingEntry*     pRefPicMarkingOperations; 
@@ -9385,7 +9385,7 @@ struct VideoEncodeH264PictureInfo {
 	uint                               frame_num; 
 	int                                picOrderCnt; 
 	char                               temporal_id; 
-	char[3]*                           reserved1; 
+	char[3]                            reserved1; 
 	VideoEncodeH264ReferenceListsInfo* pRefLists; 
 }
 
@@ -9413,17 +9413,17 @@ struct VideoEncodeH264SliceHeader {
 }
 
 struct VideoH265DecPicBufMgr {
-	uint[VIDEO_H265_SUBLAYERS_LIST_SIZE]* max_latency_increase_plus1; 
-	char[VIDEO_H265_SUBLAYERS_LIST_SIZE]* max_dec_pic_buffering_minus1; 
-	char[VIDEO_H265_SUBLAYERS_LIST_SIZE]* max_num_reorder_pics; 
+	uint[VIDEO_H265_SUBLAYERS_LIST_SIZE] max_latency_increase_plus1; 
+	char[VIDEO_H265_SUBLAYERS_LIST_SIZE] max_dec_pic_buffering_minus1; 
+	char[VIDEO_H265_SUBLAYERS_LIST_SIZE] max_num_reorder_pics; 
 }
 
 struct VideoH265SubLayerHrdParameters {
-	uint[VIDEO_H265_CPB_CNT_LIST_SIZE]* bit_rate_value_minus1; 
-	uint[VIDEO_H265_CPB_CNT_LIST_SIZE]* cpb_size_value_minus1; 
-	uint[VIDEO_H265_CPB_CNT_LIST_SIZE]* cpb_size_du_value_minus1; 
-	uint[VIDEO_H265_CPB_CNT_LIST_SIZE]* bit_rate_du_value_minus1; 
-	uint                                cbr_flag; 
+	uint[VIDEO_H265_CPB_CNT_LIST_SIZE] bit_rate_value_minus1; 
+	uint[VIDEO_H265_CPB_CNT_LIST_SIZE] cpb_size_value_minus1; 
+	uint[VIDEO_H265_CPB_CNT_LIST_SIZE] cpb_size_du_value_minus1; 
+	uint[VIDEO_H265_CPB_CNT_LIST_SIZE] bit_rate_du_value_minus1; 
+	uint                               cbr_flag; 
 }
 
 struct VideoH265HrdFlags {
@@ -9431,21 +9431,21 @@ struct VideoH265HrdFlags {
 }
 
 struct VideoH265HrdParameters {
-	VideoH265HrdFlags                       flags; 
-	char                                    tick_divisor_minus2; 
-	char                                    du_cpb_removal_delay_increment_length_minus1; 
-	char                                    dpb_output_delay_du_length_minus1; 
-	char                                    bit_rate_scale; 
-	char                                    cpb_size_scale; 
-	char                                    cpb_size_du_scale; 
-	char                                    initial_cpb_removal_delay_length_minus1; 
-	char                                    au_cpb_removal_delay_length_minus1; 
-	char                                    dpb_output_delay_length_minus1; 
-	char[VIDEO_H265_SUBLAYERS_LIST_SIZE]*   cpb_cnt_minus1; 
-	ushort[VIDEO_H265_SUBLAYERS_LIST_SIZE]* elemental_duration_in_tc_minus1; 
-	ushort[3]*                              reserved; 
-	VideoH265SubLayerHrdParameters*         pSubLayerHrdParametersNal; 
-	VideoH265SubLayerHrdParameters*         pSubLayerHrdParametersVcl; 
+	VideoH265HrdFlags                      flags; 
+	char                                   tick_divisor_minus2; 
+	char                                   du_cpb_removal_delay_increment_length_minus1; 
+	char                                   dpb_output_delay_du_length_minus1; 
+	char                                   bit_rate_scale; 
+	char                                   cpb_size_scale; 
+	char                                   cpb_size_du_scale; 
+	char                                   initial_cpb_removal_delay_length_minus1; 
+	char                                   au_cpb_removal_delay_length_minus1; 
+	char                                   dpb_output_delay_length_minus1; 
+	char[VIDEO_H265_SUBLAYERS_LIST_SIZE]   cpb_cnt_minus1; 
+	ushort[VIDEO_H265_SUBLAYERS_LIST_SIZE] elemental_duration_in_tc_minus1; 
+	ushort[3]                              reserved; 
+	VideoH265SubLayerHrdParameters*        pSubLayerHrdParametersNal; 
+	VideoH265SubLayerHrdParameters*        pSubLayerHrdParametersVcl; 
 }
 
 struct VideoH265VpsFlags {
@@ -9478,12 +9478,12 @@ struct VideoH265VideoParameterSet {
 }
 
 struct VideoH265ScalingLists {
-	char[VIDEO_H265_SCALING_LIST_4X4_NUM_LISTS][VIDEO_H265_SCALING_LIST_4X4_NUM_ELEMENTS]*     scalingList4x4; 
-	char[VIDEO_H265_SCALING_LIST_8X8_NUM_LISTS][VIDEO_H265_SCALING_LIST_8X8_NUM_ELEMENTS]*     scalingList8x8; 
-	char[VIDEO_H265_SCALING_LIST_16X16_NUM_LISTS][VIDEO_H265_SCALING_LIST_16X16_NUM_ELEMENTS]* scalingList16x16; 
-	char[VIDEO_H265_SCALING_LIST_32X32_NUM_LISTS][VIDEO_H265_SCALING_LIST_32X32_NUM_ELEMENTS]* scalingList32x32; 
-	char[VIDEO_H265_SCALING_LIST_16X16_NUM_LISTS]*                                             scalingListDCCoef16x16; 
-	char[VIDEO_H265_SCALING_LIST_32X32_NUM_LISTS]*                                             scalingListDCCoef32x32; 
+	char[VIDEO_H265_SCALING_LIST_4X4_NUM_LISTS][VIDEO_H265_SCALING_LIST_4X4_NUM_ELEMENTS]     scalingList4x4; 
+	char[VIDEO_H265_SCALING_LIST_8X8_NUM_LISTS][VIDEO_H265_SCALING_LIST_8X8_NUM_ELEMENTS]     scalingList8x8; 
+	char[VIDEO_H265_SCALING_LIST_16X16_NUM_LISTS][VIDEO_H265_SCALING_LIST_16X16_NUM_ELEMENTS] scalingList16x16; 
+	char[VIDEO_H265_SCALING_LIST_32X32_NUM_LISTS][VIDEO_H265_SCALING_LIST_32X32_NUM_ELEMENTS] scalingList32x32; 
+	char[VIDEO_H265_SCALING_LIST_16X16_NUM_LISTS]                                             scalingListDCCoef16x16; 
+	char[VIDEO_H265_SCALING_LIST_32X32_NUM_LISTS]                                             scalingListDCCoef32x32; 
 }
 
 struct VideoH265SpsVuiFlags {
@@ -9520,7 +9520,7 @@ struct VideoH265SequenceParameterSetVui {
 }
 
 struct VideoH265PredictorPaletteEntries {
-	ushort[VIDEO_H265_PREDICTOR_PALETTE_COMPONENTS_LIST_SIZE][VIDEO_H265_PREDICTOR_PALETTE_COMP_ENTRIES_LIST_SIZE]* predictorPaletteEntries; 
+	ushort[VIDEO_H265_PREDICTOR_PALETTE_COMPONENTS_LIST_SIZE][VIDEO_H265_PREDICTOR_PALETTE_COMP_ENTRIES_LIST_SIZE] predictorPaletteEntries; 
 }
 
 struct VideoH265SpsFlags {
@@ -9544,13 +9544,13 @@ struct VideoH265ShortTermRefPicSet {
 	char                             reserved3; 
 	char                             num_negative_pics; 
 	char                             num_positive_pics; 
-	ushort[VIDEO_H265_MAX_DPB_SIZE]* delta_poc_s0_minus1; 
-	ushort[VIDEO_H265_MAX_DPB_SIZE]* delta_poc_s1_minus1; 
+	ushort[VIDEO_H265_MAX_DPB_SIZE]  delta_poc_s0_minus1; 
+	ushort[VIDEO_H265_MAX_DPB_SIZE]  delta_poc_s1_minus1; 
 }
 
 struct VideoH265LongTermRefPicsSps {
-	uint                                         used_by_curr_pic_lt_sps_flag; 
-	uint[VIDEO_H265_MAX_LONG_TERM_REF_PICS_SPS]* lt_ref_pic_poc_lsb_sps; 
+	uint                                        used_by_curr_pic_lt_sps_flag; 
+	uint[VIDEO_H265_MAX_LONG_TERM_REF_PICS_SPS] lt_ref_pic_poc_lsb_sps; 
 }
 
 struct VideoH265SequenceParameterSet {
@@ -9600,42 +9600,42 @@ struct VideoH265PpsFlags {
 }
 
 struct VideoH265PictureParameterSet {
-	VideoH265PpsFlags                                        flags; 
-	char                                                     pps_pic_parameter_set_id; 
-	char                                                     pps_seq_parameter_set_id; 
-	char                                                     sps_video_parameter_set_id; 
-	char                                                     num_extra_slice_header_bits; 
-	char                                                     num_ref_idx_l0_default_active_minus1; 
-	char                                                     num_ref_idx_l1_default_active_minus1; 
-	ichar                                                    init_qp_minus26; 
-	char                                                     diff_cu_qp_delta_depth; 
-	ichar                                                    pps_cb_qp_offset; 
-	ichar                                                    pps_cr_qp_offset; 
-	ichar                                                    pps_beta_offset_div2; 
-	ichar                                                    pps_tc_offset_div2; 
-	char                                                     log2_parallel_merge_level_minus2; 
-	char                                                     log2_max_transform_skip_block_size_minus2; 
-	char                                                     diff_cu_chroma_qp_offset_depth; 
-	char                                                     chroma_qp_offset_list_len_minus1; 
-	ichar[VIDEO_H265_CHROMA_QP_OFFSET_LIST_SIZE]*            cb_qp_offset_list; 
-	ichar[VIDEO_H265_CHROMA_QP_OFFSET_LIST_SIZE]*            cr_qp_offset_list; 
-	char                                                     log2_sao_offset_scale_luma; 
-	char                                                     log2_sao_offset_scale_chroma; 
-	ichar                                                    pps_act_y_qp_offset_plus5; 
-	ichar                                                    pps_act_cb_qp_offset_plus5; 
-	ichar                                                    pps_act_cr_qp_offset_plus3; 
-	char                                                     pps_num_palette_predictor_initializers; 
-	char                                                     luma_bit_depth_entry_minus8; 
-	char                                                     chroma_bit_depth_entry_minus8; 
-	char                                                     num_tile_columns_minus1; 
-	char                                                     num_tile_rows_minus1; 
-	char                                                     reserved1; 
-	char                                                     reserved2; 
-	ushort[VIDEO_H265_CHROMA_QP_OFFSET_TILE_COLS_LIST_SIZE]* column_width_minus1; 
-	ushort[VIDEO_H265_CHROMA_QP_OFFSET_TILE_ROWS_LIST_SIZE]* row_height_minus1; 
-	uint                                                     reserved3; 
-	VideoH265ScalingLists*                                   pScalingLists; 
-	VideoH265PredictorPaletteEntries*                        pPredictorPaletteEntries; 
+	VideoH265PpsFlags                                       flags; 
+	char                                                    pps_pic_parameter_set_id; 
+	char                                                    pps_seq_parameter_set_id; 
+	char                                                    sps_video_parameter_set_id; 
+	char                                                    num_extra_slice_header_bits; 
+	char                                                    num_ref_idx_l0_default_active_minus1; 
+	char                                                    num_ref_idx_l1_default_active_minus1; 
+	ichar                                                   init_qp_minus26; 
+	char                                                    diff_cu_qp_delta_depth; 
+	ichar                                                   pps_cb_qp_offset; 
+	ichar                                                   pps_cr_qp_offset; 
+	ichar                                                   pps_beta_offset_div2; 
+	ichar                                                   pps_tc_offset_div2; 
+	char                                                    log2_parallel_merge_level_minus2; 
+	char                                                    log2_max_transform_skip_block_size_minus2; 
+	char                                                    diff_cu_chroma_qp_offset_depth; 
+	char                                                    chroma_qp_offset_list_len_minus1; 
+	ichar[VIDEO_H265_CHROMA_QP_OFFSET_LIST_SIZE]            cb_qp_offset_list; 
+	ichar[VIDEO_H265_CHROMA_QP_OFFSET_LIST_SIZE]            cr_qp_offset_list; 
+	char                                                    log2_sao_offset_scale_luma; 
+	char                                                    log2_sao_offset_scale_chroma; 
+	ichar                                                   pps_act_y_qp_offset_plus5; 
+	ichar                                                   pps_act_cb_qp_offset_plus5; 
+	ichar                                                   pps_act_cr_qp_offset_plus3; 
+	char                                                    pps_num_palette_predictor_initializers; 
+	char                                                    luma_bit_depth_entry_minus8; 
+	char                                                    chroma_bit_depth_entry_minus8; 
+	char                                                    num_tile_columns_minus1; 
+	char                                                    num_tile_rows_minus1; 
+	char                                                    reserved1; 
+	char                                                    reserved2; 
+	ushort[VIDEO_H265_CHROMA_QP_OFFSET_TILE_COLS_LIST_SIZE] column_width_minus1; 
+	ushort[VIDEO_H265_CHROMA_QP_OFFSET_TILE_ROWS_LIST_SIZE] row_height_minus1; 
+	uint                                                    reserved3; 
+	VideoH265ScalingLists*                                  pScalingLists; 
+	VideoH265PredictorPaletteEntries*                       pPredictorPaletteEntries; 
 }
 
 struct VideoDecodeH265PictureInfoFlags {
@@ -9643,17 +9643,17 @@ struct VideoDecodeH265PictureInfoFlags {
 }
 
 struct VideoDecodeH265PictureInfo {
-	VideoDecodeH265PictureInfoFlags                flags; 
-	char                                           sps_video_parameter_set_id; 
-	char                                           pps_seq_parameter_set_id; 
-	char                                           pps_pic_parameter_set_id; 
-	char                                           numDeltaPocsOfRefRpsIdx; 
-	int                                            picOrderCntVal; 
-	ushort                                         numBitsForSTRefPicSetInSlice; 
-	ushort                                         reserved; 
-	char[VIDEO_DECODE_H265_REF_PIC_SET_LIST_SIZE]* refPicSetStCurrBefore; 
-	char[VIDEO_DECODE_H265_REF_PIC_SET_LIST_SIZE]* refPicSetStCurrAfter; 
-	char[VIDEO_DECODE_H265_REF_PIC_SET_LIST_SIZE]* refPicSetLtCurr; 
+	VideoDecodeH265PictureInfoFlags               flags; 
+	char                                          sps_video_parameter_set_id; 
+	char                                          pps_seq_parameter_set_id; 
+	char                                          pps_pic_parameter_set_id; 
+	char                                          numDeltaPocsOfRefRpsIdx; 
+	int                                           picOrderCntVal; 
+	ushort                                        numBitsForSTRefPicSetInSlice; 
+	ushort                                        reserved; 
+	char[VIDEO_DECODE_H265_REF_PIC_SET_LIST_SIZE] refPicSetStCurrBefore; 
+	char[VIDEO_DECODE_H265_REF_PIC_SET_LIST_SIZE] refPicSetStCurrAfter; 
+	char[VIDEO_DECODE_H265_REF_PIC_SET_LIST_SIZE] refPicSetLtCurr; 
 }
 
 struct VideoDecodeH265ReferenceInfoFlags {
@@ -9673,17 +9673,17 @@ struct VideoEncodeH265WeightTableFlags {
 }
 
 struct VideoEncodeH265WeightTable {
-	VideoEncodeH265WeightTableFlags                                   flags; 
-	char                                                              luma_log2_weight_denom; 
-	ichar                                                             delta_chroma_log2_weight_denom; 
-	ichar[VIDEO_H265_MAX_NUM_LIST_REF]*                               delta_luma_weight_l0; 
-	ichar[VIDEO_H265_MAX_NUM_LIST_REF]*                               luma_offset_l0; 
-	ichar[VIDEO_H265_MAX_NUM_LIST_REF][VIDEO_H265_MAX_CHROMA_PLANES]* delta_chroma_weight_l0; 
-	ichar[VIDEO_H265_MAX_NUM_LIST_REF][VIDEO_H265_MAX_CHROMA_PLANES]* delta_chroma_offset_l0; 
-	ichar[VIDEO_H265_MAX_NUM_LIST_REF]*                               delta_luma_weight_l1; 
-	ichar[VIDEO_H265_MAX_NUM_LIST_REF]*                               luma_offset_l1; 
-	ichar[VIDEO_H265_MAX_NUM_LIST_REF][VIDEO_H265_MAX_CHROMA_PLANES]* delta_chroma_weight_l1; 
-	ichar[VIDEO_H265_MAX_NUM_LIST_REF][VIDEO_H265_MAX_CHROMA_PLANES]* delta_chroma_offset_l1; 
+	VideoEncodeH265WeightTableFlags                                  flags; 
+	char                                                             luma_log2_weight_denom; 
+	ichar                                                            delta_chroma_log2_weight_denom; 
+	ichar[VIDEO_H265_MAX_NUM_LIST_REF]                               delta_luma_weight_l0; 
+	ichar[VIDEO_H265_MAX_NUM_LIST_REF]                               luma_offset_l0; 
+	ichar[VIDEO_H265_MAX_NUM_LIST_REF][VIDEO_H265_MAX_CHROMA_PLANES] delta_chroma_weight_l0; 
+	ichar[VIDEO_H265_MAX_NUM_LIST_REF][VIDEO_H265_MAX_CHROMA_PLANES] delta_chroma_offset_l0; 
+	ichar[VIDEO_H265_MAX_NUM_LIST_REF]                               delta_luma_weight_l1; 
+	ichar[VIDEO_H265_MAX_NUM_LIST_REF]                               luma_offset_l1; 
+	ichar[VIDEO_H265_MAX_NUM_LIST_REF][VIDEO_H265_MAX_CHROMA_PLANES] delta_chroma_weight_l1; 
+	ichar[VIDEO_H265_MAX_NUM_LIST_REF][VIDEO_H265_MAX_CHROMA_PLANES] delta_chroma_offset_l1; 
 }
 
 struct VideoEncodeH265SliceSegmentHeaderFlags {
@@ -9716,10 +9716,10 @@ struct VideoEncodeH265ReferenceListsInfo {
 	VideoEncodeH265ReferenceListsInfoFlags flags; 
 	char                                   num_ref_idx_l0_active_minus1; 
 	char                                   num_ref_idx_l1_active_minus1; 
-	char[VIDEO_H265_MAX_NUM_LIST_REF]*     refPicList0; 
-	char[VIDEO_H265_MAX_NUM_LIST_REF]*     refPicList1; 
-	char[VIDEO_H265_MAX_NUM_LIST_REF]*     list_entry_l0; 
-	char[VIDEO_H265_MAX_NUM_LIST_REF]*     list_entry_l1; 
+	char[VIDEO_H265_MAX_NUM_LIST_REF]      refPicList0; 
+	char[VIDEO_H265_MAX_NUM_LIST_REF]      refPicList1; 
+	char[VIDEO_H265_MAX_NUM_LIST_REF]      list_entry_l0; 
+	char[VIDEO_H265_MAX_NUM_LIST_REF]      list_entry_l1; 
 }
 
 struct VideoEncodeH265PictureInfoFlags {
@@ -9727,13 +9727,13 @@ struct VideoEncodeH265PictureInfoFlags {
 }
 
 struct VideoEncodeH265LongTermRefPics {
-	char                                         num_long_term_sps; 
-	char                                         num_long_term_pics; 
-	char[VIDEO_H265_MAX_LONG_TERM_REF_PICS_SPS]* lt_idx_sps; 
-	char[VIDEO_H265_MAX_LONG_TERM_PICS]*         poc_lsb_lt; 
-	ushort                                       used_by_curr_pic_lt_flag; 
-	char[VIDEO_H265_MAX_DELTA_POC]*              delta_poc_msb_present_flag; 
-	char[VIDEO_H265_MAX_DELTA_POC]*              delta_poc_msb_cycle_lt; 
+	char                                        num_long_term_sps; 
+	char                                        num_long_term_pics; 
+	char[VIDEO_H265_MAX_LONG_TERM_REF_PICS_SPS] lt_idx_sps; 
+	char[VIDEO_H265_MAX_LONG_TERM_PICS]         poc_lsb_lt; 
+	ushort                                      used_by_curr_pic_lt_flag; 
+	char[VIDEO_H265_MAX_DELTA_POC]              delta_poc_msb_present_flag; 
+	char[VIDEO_H265_MAX_DELTA_POC]              delta_poc_msb_cycle_lt; 
 }
 
 struct VideoEncodeH265PictureInfo {
@@ -9745,7 +9745,7 @@ struct VideoEncodeH265PictureInfo {
 	char                               short_term_ref_pic_set_idx; 
 	int                                picOrderCntVal; 
 	char                               temporalId; 
-	char[7]*                           reserved1; 
+	char[7]                            reserved1; 
 	VideoEncodeH265ReferenceListsInfo* pRefLists; 
 	VideoH265ShortTermRefPicSet*       pShortTermRefPicSet; 
 	VideoEncodeH265LongTermRefPics*    pLongTermRefPics; 
