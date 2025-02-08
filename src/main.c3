@@ -6,10 +6,14 @@ import std::io;
 import glfw;
 import vk;
 
+const WIDTH = 1024;
+const HEIGHT = 768;
+const TITLE = "Hello Vulkan!";
+const ENGINE_NAME = "Soreal Engine";
 const ZString[*] REQUIRED_EXTENSIONS = {
     vk::KHR_SWAPCHAIN_EXTENSION_NAME,
 };
-const ENABLE_VALIDATION_LAYERS = true;
+const ENABLE_VALIDATION_LAYERS = false;
 const ZString[*] VALIDATION_LAYERS @if(ENABLE_VALIDATION_LAYERS) = {
     "VK_LAYER_KHRONOS_validation",
 };
@@ -59,7 +63,7 @@ fn int main(String[] args) {
     }
     defer glfw::terminate();
     glfw::windowHint(glfw::CLIENT_API, glfw::NO_API);
-    g_window = glfw::createWindow(800, 600, "Hello VK!", null, null);
+    g_window = glfw::createWindow(WIDTH, HEIGHT, TITLE, null, null);
     if (g_window == null) {
         return -1;
     }
@@ -128,9 +132,9 @@ fn void! createVulkanInstance() {
         .sType = vk::STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
         .pApplicationInfo = &&vk::ApplicationInfo {
             .sType = vk::STRUCTURE_TYPE_APPLICATION_INFO,
-            .pApplicationName = "Hello VK",
+            .pApplicationName = TITLE,
             .applicationVersion = vk::@make_version(1, 0, 0),
-            .pEngineName = "No Engine",
+            .pEngineName = ENGINE_NAME,
             .engineVersion = vk::@make_version(1, 0, 0),
             .apiVersion = vk::API_VERSION_1_3,
         },
