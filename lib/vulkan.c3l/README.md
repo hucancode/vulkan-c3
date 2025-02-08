@@ -11,15 +11,18 @@
 
 # Error Handling
 
-All functions that return a `VkResult` be kept as is, but you can convert it into an `Optional` using `vk::check`
+All functions that return a `VkResult` will be kept as is, but you can convert it into an `Optional` using `vk::check`
+
+You can handle errors manually like this:
 ```cpp
 fn void create() {
     vk::Result result = vk::createInstance(&createInfo, null, &instance);
     if (result != vk::Result::Success) {
-        // handle error
+        io::printfn("Failed to create instance");
     }
 }
 ```
+Or you can use `C3` idiom like this:
 ```cpp
 fn void! create() {
     vk::check(vk::createInstance(&createInfo, null, &instance))!;
