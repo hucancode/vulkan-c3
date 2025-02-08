@@ -120,8 +120,10 @@ fn int main(String[] args) {
 fn void! createVulkanInstance() {
     vk::loadProcAddressesGlobal(&glfw::getInstanceProcAddress);
     ulong extensionCount;
-    ZString* extensions = glfw::getRequiredInstanceExtensions(&extensionCount);
-    //defer free(extensions);
+    ZString* glfwExtensions = glfw::getRequiredInstanceExtensions(&extensionCount);
+    ZString* extensions = (ZString*)malloc(extensionCount * ZString.sizeof);
+    mem::copy(extensions, glfwExtensions, extensionCount * ZString.sizeof);
+    defer free(extensions);
     vk::InstanceCreateInfo createInfo = {
         .sType = vk::STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
         .pApplicationInfo = &&vk::ApplicationInfo {
@@ -133,14 +135,19 @@ fn void! createVulkanInstance() {
             .apiVersion = vk::API_VERSION_1_3,
         },
     };
+    $if env::DARWIN:
+		// Mandatory on macOS
+		createInfo.flags.enumerate_portability_khr = true;
+		extensionCount += 1;
+        extensions = (ZString*)realloc(extensions, extensionCount * ZString.sizeof);
+        extensions[extensionCount - 1] = vk::KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME;
+	$endif
+
     $if ENABLE_VALIDATION_LAYERS:
         createInfo.enabledLayerCount = VALIDATION_LAYERS.len;
         createInfo.ppEnabledLayerNames = &VALIDATION_LAYERS;
         extensionCount += 1;
-        ZString* ext2 = (ZString*)malloc(extensionCount * ZString.sizeof);
-        mem::copy(ext2, extensions, (extensionCount - 1) * ZString.sizeof);
-        defer free(extensions);
-        extensions = ext2;
+        extensions = (ZString*)realloc(extensions, extensionCount * ZString.sizeof);
         extensions[extensionCount - 1] = vk::EXT_DEBUG_UTILS_EXTENSION_NAME;
         vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo = {
             .sType = vk::STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
