@@ -21,7 +21,7 @@ const MAX_FRAMES_IN_FLIGHT = 2;
 glfw::Window* g_window;
 vk::Instance g_instance;
 vk::SurfaceKHR g_surface;
-vk::DebugUtilsMessengerEXT g_debugMessenger;
+vk::DebugUtilsMessengerEXT g_debugMessenger @if(ENABLE_VALIDATION_LAYERS);
 
 vk::PhysicalDevice g_physicalDevice;
 vk::Device g_device;
@@ -67,6 +67,9 @@ fn int main(String[] args) {
     defer glfw::destroyWindow(g_window);
     createVulkanInstance()!!;
     defer vk::destroyInstance(g_instance, null);
+    $if ENABLE_VALIDATION_LAYERS:
+		defer vk::destroyDebugUtilsMessengerEXT(g_instance, g_debugMessenger, null);
+    $endif
     io::printfn("Vulkan instance created %x", g_instance);
     createWindowSurface()!!;
     defer vk::destroySurfaceKHR(g_instance, g_surface, null);
@@ -410,14 +413,11 @@ fn void! createSwapchain() {
 
 fn void destroySwapchain() {
     for (uint i = 0; i < g_swapChainImageCount; i++) {
-        vk::destroyImage(g_device, g_swapChainImages[i], null);
         vk::destroyImageView(g_device, g_swapChainImageViews[i], null);
-        vk::destroyFramebuffer(g_device, g_swapChainFramebuffers[i], null);
     }
     vk::destroySwapchainKHR(g_device, g_swapChain, null);
     free(g_swapChainImageViews);
     free(g_swapChainImages);
-    free(g_swapChainFramebuffers);
 }
 
 fn vk::ShaderModule! createShaderModule(char[] code) {
@@ -471,15 +471,15 @@ fn void! createRenderPass() {
                 .layout = vk::IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
             },
         },
-        // .dependencyCount = 1,
-        // .pDependencies = &&vk::SubpassDependency {
-        //     .srcSubpass = vk::SUBPASS_EXTERNAL,
-        //     .dstSubpass = 0,
-        //     .srcStageMask = vk::PipelineStageFlags { .color_attachment_output = true },
-        //     .srcAccessMask = vk::AccessFlags {},
-        //     .dstStageMask = vk::PipelineStageFlags { .color_attachment_output = true },
-        //     .dstAccessMask = vk::AccessFlags { .color_attachment_write = true},
-        // },
+        .dependencyCount = 1,
+        .pDependencies = &&vk::SubpassDependency {
+            .srcSubpass = vk::SUBPASS_EXTERNAL,
+            .dstSubpass = 0,
+            .srcStageMask = vk::PipelineStageFlags { .color_attachment_output = true },
+            .srcAccessMask = vk::AccessFlags {},
+            .dstStageMask = vk::PipelineStageFlags { .color_attachment_output = true },
+            .dstAccessMask = vk::AccessFlags { .color_attachment_write = true},
+        },
     };
     vk::check(vk::createRenderPass(g_device, &createInfo, null, &g_renderPass))!;
 }
@@ -628,17 +628,15 @@ fn void destroySemaphores() {
 }
 
 fn void! render() {
-    vk::check(vk::waitForFences(g_device, 1, &g_inFlightFences[g_currentFrame], (uint)true, uint.max))!;
+    vk::check(vk::waitForFences(g_device, 1, &g_inFlightFences[g_currentFrame], vk::TRUE, ulong.max))!;
     uint imageIndex;
-    anyfault excuse = @catch(vk::check(vk::acquireNextImageKHR(g_device, g_swapChain, uint.max, g_imageAvailableSemaphore[g_currentFrame], (vk::Fence)0, &imageIndex)));
-    if (excuse) {
-        if (excuse == vk::VulkanError.ERROR_OUT_OF_DATE_KHR) {
-            recreateSwapchain()!;
-            return;
-        }
-        if (excuse != vk::VulkanError.SUBOPTIMAL_KHR) {
-            return excuse?;
-        }
+    anyfault excuse = @catch(vk::check(vk::acquireNextImageKHR(g_device, g_swapChain, ulong.max, g_imageAvailableSemaphore[g_currentFrame], (vk::Fence)0, &imageIndex)));
+    if (excuse == vk::VulkanError.ERROR_OUT_OF_DATE_KHR) {
+        recreateSwapchain()!;
+        return;
+    }
+    if (excuse && excuse != vk::VulkanError.SUBOPTIMAL_KHR) {
+        return excuse?;
     }
     vk::check(vk::resetFences(g_device, 1, &g_inFlightFences[g_currentFrame]))!;
     vk::check(vk::resetCommandBuffer(g_commandBuffers[g_currentFrame], CommandBufferResetFlags{}))!;
@@ -664,12 +662,10 @@ fn void! render() {
         .pImageIndices = &imageIndex,
     };
     excuse = @catch(vk::check(vk::queuePresentKHR(g_presentQueue, &presentInfo)));
-    if (excuse) {
-        if (excuse == vk::VulkanError.ERROR_OUT_OF_DATE_KHR || excuse == vk::VulkanError.SUBOPTIMAL_KHR) {
-            recreateSwapchain()!;
-        } else {
-            return excuse?;
-        }
+    if (excuse == vk::VulkanError.ERROR_OUT_OF_DATE_KHR || excuse == vk::VulkanError.SUBOPTIMAL_KHR) {
+        recreateSwapchain()!;
+    } else if (excuse) {
+        return excuse?;
     }
     g_currentFrame = (g_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
@@ -679,24 +675,15 @@ fn void! recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
         .sType = vk::STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
     };
     vk::check(vk::beginCommandBuffer(commandBuffer, &beginInfo))!;
-
     vk::RenderPassBeginInfo renderPassInfo = {
         .sType = vk::STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
         .renderPass = g_renderPass,
         .framebuffer = g_swapChainFramebuffers[imageIndex],
-        .renderArea = {
-            .offset = { .x = 0, .y = 0 },
-            .extent = g_swapChainExtent,
-        },
+        .renderArea = { .extent = g_swapChainExtent },
         .clearValueCount = 1,
-        .pClearValues = &&ClearValue {
-            .color = {
-                .float32 = float[4] { 0.0, 0.0, 0.0, 1.0 }
-            },
-        },
+        .pClearValues = &&vk::ClearValue { .color = { .float32 = float[4] { 0.0117, 0.0117, 0.0179, 1.0 } } },
     };
     vk::cmdBeginRenderPass(commandBuffer, &renderPassInfo, vk::SUBPASS_CONTENTS_INLINE);
-    defer vk::cmdEndRenderPass(commandBuffer);
     vk::cmdBindPipeline(commandBuffer, vk::PIPELINE_BIND_POINT_GRAPHICS, g_graphicsPipeline);
     vk::Viewport viewport = {
         .width = g_swapChainExtent.width,
@@ -709,11 +696,14 @@ fn void! recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
     vk::cmdSetViewport(commandBuffer, 0, 1, &viewport);
     vk::cmdSetScissor(commandBuffer, 0, 1, &scissor);
     vk::cmdDraw(commandBuffer, 6, 1, 0, 0);
+    vk::cmdEndRenderPass(commandBuffer);
     vk::check(vk::endCommandBuffer(commandBuffer))!;
 }
 
 fn void! recreateSwapchain() {
     vk::deviceWaitIdle(g_device);
+    destroyFrameBuffers();
     destroySwapchain();
     createSwapchain()!;
+    createFrameBuffers()!;
 }
