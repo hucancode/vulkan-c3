@@ -197,18 +197,69 @@ fn vk::ExtensionProperties[]! getAvailableExtensions() {
 }
 
 fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
+    uint score = 0;
     vk::PhysicalDeviceProperties properties;
     vk::PhysicalDeviceFeatures features;
-    io::printfn("Checking device %x", device);
     vk::getPhysicalDeviceProperties(device, &properties);
-    io::printfn("fetched device properperty %s", (ZString)properties.deviceName[0..]);
+    ZString deviceName = (ZString)properties.deviceName[0..];
+    io::printfn("Scoring device %s", deviceName);
+    defer io::printfn("Device %s scored %d", score);
     vk::getPhysicalDeviceFeatures(device, &features);
-    uint score = 0;
-    if (properties.deviceType == vk::PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+    $if !env::DARWIN:
+        if (!features.geometryShader) {
+            return 0;
+        }
+    $endif
+    {
+        vk::ExtensionProperties[]! extensions = getAvailableExtensions();
+        if (catch excuse = extensions) {
+            io::printfn("Cound not get extension list for %s", deviceName);
+            return 0;
+        }
+        defer free(extensions.ptr);
+        foreach (required: REQUIRED_EXTENSIONS) {
+            bool found = false;
+            foreach (e : extensions) {
+                ZString name = (ZString)e.extensionName[0..];
+                if (name == required) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                io::printfn("Extension %s not found in %s", required, deviceName);
+                return 0;
+            }
+        }
+    }
+    {
+        SwapchainSupportDetails! support = querySwapchainSupport(device);
+        if (catch excuse = support) {
+            io::printfn("Cound not get swapchain support for %s", deviceName);
+            return 0;
+        }
+        support.free();
+    }
+    {
+        QueueFamilyIndices! indices = findQueueFamilies(device);
+        if (catch excuse = indices) {
+            io::printfn("Cound not get queue families for %s", deviceName);
+            return 0;
+        }
+    }
+    switch (properties.deviceType) {
+    case vk::PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
+        score += 400_000;
+    case vk::PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
+        score += 300_000;
+    case vk::PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
+        score += 200_000;
+    case vk::PHYSICAL_DEVICE_TYPE_CPU:
+        nextcase;
+    case vk::PHYSICAL_DEVICE_TYPE_OTHER:
         score += 100_000;
     }
     score += properties.limits.maxImageDimension2D;
-    // TODO: check fore more conditions
     return score;
 }
 
@@ -521,18 +572,15 @@ fn void! createGraphicsPipeline() {
     vk::PipelineVertexInputStateCreateInfo vertexInputInfo = {
         .sType = vk::STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
     };
-
     vk::PipelineInputAssemblyStateCreateInfo inputAssembly = {
         .sType = vk::STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
         .topology = vk::PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
     };
-
     vk::PipelineViewportStateCreateInfo viewportState = {
         .sType = vk::STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
         .viewportCount = 1,
         .scissorCount = 1,
     };
-
     vk::PipelineRasterizationStateCreateInfo rasterizer = {
         .sType = vk::STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
         .polygonMode = vk::POLYGON_MODE_FILL,
@@ -540,13 +588,11 @@ fn void! createGraphicsPipeline() {
         .frontFace = vk::FRONT_FACE_CLOCKWISE,
         .lineWidth = 1.0,
     };
-
     vk::PipelineMultisampleStateCreateInfo multisampling = {
         .sType = vk::STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
         .rasterizationSamples = vk::SampleCountFlags { .n_1 = true },
         .minSampleShading = 1.0,
     };
-
     vk::PipelineColorBlendAttachmentState colorBlendAttachment = {
         .colorWriteMask = vk::ColorComponentFlags {
             .r = true,
@@ -555,19 +601,18 @@ fn void! createGraphicsPipeline() {
             .a = true,
         },
     };
-
     vk::PipelineColorBlendStateCreateInfo colorBlending = {
         .sType = vk::STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
         .attachmentCount = 1,
         .pAttachments = &colorBlendAttachment,
     };
-
-    vk::PipelineLayoutCreateInfo pipelineLayoutInfo = {
-        .sType = vk::STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-    };
-
-    vk::check(vk::createPipelineLayout(g_device, &pipelineLayoutInfo, null, &g_pipelineLayout))!;
-
+    vk::check(vk::createPipelineLayout(
+        g_device,
+        &&vk::PipelineLayoutCreateInfo {
+            .sType = vk::STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+        },
+        null,
+        &g_pipelineLayout))!;
     vk::GraphicsPipelineCreateInfo pipelineInfo = {
         .sType = vk::STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
         .stageCount = 2,
