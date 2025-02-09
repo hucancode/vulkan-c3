@@ -11,13 +11,39 @@
       "dependencies": [],
       "linked-libraries": ["glfw"]
     },
+    "linux-x86": {
+      "link-args": [],
+      "dependencies": [],
+      "linked-libraries": ["glfw"]
+    },
     "linux-x64": {
       "link-args": [],
       "dependencies": [],
       "linked-libraries": ["glfw"]
     },
+    "linux-aarch64": {
+      "link-args": [],
+      "dependencies": [],
+      "linked-libraries": ["glfw"]
+    },
+    "windows-x86": {
+      "linked-libraries": []
+    },
     "windows-x64": {
       "linked-libraries": []
+    },
+    "windows-aarch64": {
+      "linked-libraries": []
+    },
+    "wasm32": {
+      "link-args": [],
+      "dependencies": [],
+      "linked-libraries": ["glfw"]
+    },
+    "wasm64": {
+      "link-args": [],
+      "dependencies": [],
+      "linked-libraries": ["glfw"]
     }
   }
 }
