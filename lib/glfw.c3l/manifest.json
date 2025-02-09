@@ -26,9 +26,6 @@
       "dependencies": [],
       "linked-libraries": ["glfw"]
     },
-    "windows-x86": {
-      "linked-libraries": []
-    },
     "windows-x64": {
       "linked-libraries": []
     },

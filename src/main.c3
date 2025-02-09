@@ -142,7 +142,7 @@ fn void! createVulkanInstance() {
     $if env::DARWIN:
         // Mandatory on macOS
         createInfo.flags.enumerate_portability_khr = true;
-        extensionCount += 1;
+        extensionCount++;
         extensions = (ZString*)realloc(extensions, extensionCount * ZString.sizeof);
         extensions[extensionCount - 1] = vk::KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME;
     $endif
@@ -150,7 +150,7 @@ fn void! createVulkanInstance() {
     $if ENABLE_VALIDATION_LAYERS:
         createInfo.enabledLayerCount = VALIDATION_LAYERS.len;
         createInfo.ppEnabledLayerNames = &VALIDATION_LAYERS;
-        extensionCount += 1;
+        extensionCount++;
         extensions = (ZString*)realloc(extensions, extensionCount * ZString.sizeof);
         extensions[extensionCount - 1] = vk::EXT_DEBUG_UTILS_EXTENSION_NAME;
         vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo = {
