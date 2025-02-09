@@ -72,7 +72,7 @@ fn int main(String[] args) {
     createVulkanInstance()!!;
     defer vk::destroyInstance(g_instance, null);
     $if ENABLE_VALIDATION_LAYERS:
-		defer vk::destroyDebugUtilsMessengerEXT(g_instance, g_debugMessenger, null);
+        defer vk::destroyDebugUtilsMessengerEXT(g_instance, g_debugMessenger, null);
     $endif
     io::printfn("Vulkan instance created %x", g_instance);
     createWindowSurface()!!;
@@ -140,12 +140,12 @@ fn void! createVulkanInstance() {
         },
     };
     $if env::DARWIN:
-		// Mandatory on macOS
-		createInfo.flags.enumerate_portability_khr = true;
-		extensionCount += 1;
+        // Mandatory on macOS
+        createInfo.flags.enumerate_portability_khr = true;
+        extensionCount += 1;
         extensions = (ZString*)realloc(extensions, extensionCount * ZString.sizeof);
         extensions[extensionCount - 1] = vk::KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME;
-	$endif
+    $endif
 
     $if ENABLE_VALIDATION_LAYERS:
         createInfo.enabledLayerCount = VALIDATION_LAYERS.len;
@@ -155,17 +155,8 @@ fn void! createVulkanInstance() {
         extensions[extensionCount - 1] = vk::EXT_DEBUG_UTILS_EXTENSION_NAME;
         vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo = {
             .sType = vk::STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-            .messageSeverity = vk::DebugUtilsMessageSeverityFlagsEXT {
-                .error = true,
-                .warning = true,
-                .info = true,
-            },
-            .messageType = vk::DebugUtilsMessageTypeFlagsEXT {
-                .general = true,
-                .validation = true,
-                .performance = true,
-                .device_address_binding = true,
-            },
+            .messageSeverity = vk::DebugUtilsMessageSeverityFlagsEXT { .error, .warning, .info },
+            .messageType = vk::DebugUtilsMessageTypeFlagsEXT { .general, .validation, .performance, .device_address_binding },
             .pfnUserCallback = fn uint(vk::DebugUtilsMessageSeverityFlagsEXT messageSeverity,
                 vk::DebugUtilsMessageTypeFlagsEXT messageType,
                 vk::DebugUtilsMessengerCallbackDataEXT* pCallbackData,
@@ -357,10 +348,10 @@ fn void! createLogicalDevice() {
     QueueFamilyIndices indices = findQueueFamilies(g_physicalDevice)!;
     ZString[] layers;
     $if ENABLE_VALIDATION_LAYERS:
-		layers = ZString[*] {
-		  "VK_LAYER_KHRONOS_validation"
-		};
-	$endif
+        layers = ZString[*] {
+          "VK_LAYER_KHRONOS_validation"
+        };
+    $endif
     vk::DeviceQueueCreateInfo queueCreateInfo = {
         .sType = vk::STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
         .queueFamilyIndex = indices.graphicsFamily,
@@ -434,12 +425,12 @@ fn void! createSwapchain() {
         .imageColorSpace = g_swapChainFormat.colorSpace,
         .imageExtent = g_swapChainExtent,
         .imageArrayLayers = 1,
-        .imageUsage = vk::ImageUsageFlags { .color_attachment = true },
+        .imageUsage = vk::ImageUsageFlags { .color_attachment },
         .imageSharingMode = vk::SHARING_MODE_EXCLUSIVE,
         .queueFamilyIndexCount = 2,
         .pQueueFamilyIndices = &indiceArray,
         .preTransform = swapChainSupport.capabilities.currentTransform,
-        .compositeAlpha = vk::CompositeAlphaFlagsKHR { .opaque = true },
+        .compositeAlpha = vk::CompositeAlphaFlagsKHR { .opaque },
         .presentMode = presentMode,
         .clipped = (uint)true,
         .oldSwapchain = (vk::SwapchainKHR)0,
@@ -462,7 +453,7 @@ fn void! createSwapchain() {
             .viewType = vk::IMAGE_VIEW_TYPE_2D,
             .format = g_swapChainFormat.format,
             .subresourceRange = {
-                .aspectMask = vk::ImageAspectFlags { .color = true },
+                .aspectMask = vk::ImageAspectFlags { .color },
                 .baseMipLevel = 0,
                 .levelCount = 1,
                 .baseArrayLayer = 0,
@@ -498,13 +489,13 @@ fn void! loadShader() {
     g_fragmentShader = createShaderModule(&FRAGMENT_CODE)!;
     g_vertexShaderStageInfo[0] = {
         .sType = vk::STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-        .stage = vk::ShaderStageFlags { .vertex = true },
+        .stage = vk::ShaderStageFlags { .vertex },
         .module_ = g_vertexShader,
         .pName = "main",
     };
     g_vertexShaderStageInfo[1] = {
         .sType = vk::STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-        .stage = vk::ShaderStageFlags { .fragment = true },
+        .stage = vk::ShaderStageFlags { .fragment },
         .module_ = g_fragmentShader,
         .pName = "main",
     };
@@ -516,7 +507,7 @@ fn void! createRenderPass() {
         .attachmentCount = 1,
         .pAttachments = &&vk::AttachmentDescription {
             .format = g_swapChainFormat.format,
-            .samples = vk::SampleCountFlags { .n_1 = true },
+            .samples = vk::SampleCountFlags { .n_1 },
             .loadOp = vk::ATTACHMENT_LOAD_OP_CLEAR,
             .storeOp = vk::ATTACHMENT_STORE_OP_STORE,
             .stencilLoadOp = vk::ATTACHMENT_LOAD_OP_DONT_CARE,
@@ -537,10 +528,10 @@ fn void! createRenderPass() {
         .pDependencies = &&vk::SubpassDependency {
             .srcSubpass = vk::SUBPASS_EXTERNAL,
             .dstSubpass = 0,
-            .srcStageMask = vk::PipelineStageFlags { .color_attachment_output = true },
+            .srcStageMask = vk::PipelineStageFlags { .color_attachment_output },
             .srcAccessMask = vk::AccessFlags {},
-            .dstStageMask = vk::PipelineStageFlags { .color_attachment_output = true },
-            .dstAccessMask = vk::AccessFlags { .color_attachment_write = true},
+            .dstStageMask = vk::PipelineStageFlags { .color_attachment_output },
+            .dstAccessMask = vk::AccessFlags { .color_attachment_write },
         },
     };
     vk::check(vk::createRenderPass(g_device, &createInfo, null, &g_renderPass))!;
@@ -595,22 +586,17 @@ fn void! createGraphicsPipeline() {
     vk::PipelineRasterizationStateCreateInfo rasterizer = {
         .sType = vk::STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
         .polygonMode = vk::POLYGON_MODE_FILL,
-        .cullMode = vk::CullModeFlags { .back = true },
+        .cullMode = vk::CullModeFlags { .back },
         .frontFace = vk::FRONT_FACE_CLOCKWISE,
         .lineWidth = 1.0,
     };
     vk::PipelineMultisampleStateCreateInfo multisampling = {
         .sType = vk::STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
-        .rasterizationSamples = vk::SampleCountFlags { .n_1 = true },
+        .rasterizationSamples = vk::SampleCountFlags { .n_1 },
         .minSampleShading = 1.0,
     };
     vk::PipelineColorBlendAttachmentState colorBlendAttachment = {
-        .colorWriteMask = vk::ColorComponentFlags {
-            .r = true,
-            .g = true,
-            .b = true,
-            .a = true,
-        },
+        .colorWriteMask = vk::ColorComponentFlags { .r, .g, .b, .a },
     };
     vk::PipelineColorBlendStateCreateInfo colorBlending = {
         .sType = vk::STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
@@ -647,7 +633,7 @@ fn void! createCommandPool() {
     QueueFamilyIndices queueFamilyIndices = findQueueFamilies(g_physicalDevice)!;
     vk::CommandPoolCreateInfo poolInfo = {
         .sType = vk::STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-        .flags = vk::CommandPoolCreateFlags { .reset_command_buffer = true },
+        .flags = vk::CommandPoolCreateFlags { .reset_command_buffer },
         .queueFamilyIndex = queueFamilyIndices.graphicsFamily,
     };
     vk::check(vk::createCommandPool(g_device, &poolInfo, null, &g_commandPool))!;
@@ -666,7 +652,7 @@ fn void! createSemaphores() {
     };
     vk::FenceCreateInfo fenceInfo = {
         .sType = vk::STRUCTURE_TYPE_FENCE_CREATE_INFO,
-        .flags = vk::FenceCreateFlags { .signaled = true },
+        .flags = vk::FenceCreateFlags { .signaled },
     };
     for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         vk::check(vk::createSemaphore(g_device, &semaphoreInfo, null, &g_imageAvailableSemaphore[i]))!;
@@ -702,7 +688,7 @@ fn void! render() {
         .sType = vk::STRUCTURE_TYPE_SUBMIT_INFO,
         .waitSemaphoreCount = 1,
         .pWaitSemaphores = &g_imageAvailableSemaphore[g_currentFrame],
-        .pWaitDstStageMask = &&vk::PipelineStageFlags { .color_attachment_output = true },
+        .pWaitDstStageMask = &&vk::PipelineStageFlags { .color_attachment_output },
         .commandBufferCount = 1,
         .pCommandBuffers = &g_commandBuffers[g_currentFrame],
         .signalSemaphoreCount = 1,
