@@ -1,6 +1,6 @@
 module std::core::env;
 const bool GLFW_INCLUDE_VULKAN = true;
-module helloc3vk;
+module hellovk;
 import std::core::mem;
 import std::io;
 import glfw;
@@ -612,7 +612,7 @@ fn void! createGraphicsPipeline() {
         &g_pipelineLayout))!;
     vk::GraphicsPipelineCreateInfo pipelineInfo = {
         .sType = vk::STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-        .stageCount = 2,
+        .stageCount = g_vertexShaderStageInfo.len,
         .pStages = &g_vertexShaderStageInfo,
         .pVertexInputState = &vertexInputInfo,
         .pInputAssemblyState = &inputAssembly,

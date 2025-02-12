@@ -3,11 +3,11 @@
 ## Installation
 
 Copy `vulkan.c3l` to your project's `lib` folder and you are good to go. In your code file, import the library
-```
+```cpp
 import vk;
 ```
 If you are using GLFW, you may need to turn on a flag to enable vulkan support on GLFW
-```
+```cpp
 module std::core::env;
 const bool GLFW_INCLUDE_VULKAN = true;
 ```

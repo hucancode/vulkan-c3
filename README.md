@@ -1,10 +1,12 @@
-# Hello Vulkan
-This is a hello world project for Vulkan API that uses the `C3`
+# Vulkan C3 Binding
+
+This is a Vulkan binding for `C3`. On the details of how to include this library in your project, see [vulkan.c3l](./lib/vulkan.c3l/README.md)
 
 ![](./readme/rectangle.png)
 
 # Installation
-To build this program we need
+
+To build example program we need
 - [C3](https://c3-lang.org)
 - [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
 - [make](https://www.gnu.org/software/make)
