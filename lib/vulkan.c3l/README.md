@@ -10,6 +10,7 @@ If you are using GLFW, you may need to turn on a flag to enable vulkan support o
 ```cpp
 module std::core::env;
 const bool GLFW_INCLUDE_VULKAN = true;
+import glfw;
 ```
 
 ## Usage
