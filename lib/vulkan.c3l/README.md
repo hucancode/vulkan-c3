@@ -1,5 +1,19 @@
 # Vulkan Bindings for C3
 
+## Installation
+
+Copy `vulkan.c3l` to your project's `lib` folder and you are good to go. In your code file, import the library
+```
+import vk;
+```
+If you are using GLFW, you may need to turn on a flag to enable vulkan support on GLFW
+```
+module std::core::env;
+const bool GLFW_INCLUDE_VULKAN = true;
+```
+
+## Usage
+
 * Vulkan functions are renamed as follows: `vkFunctionName` -> `vk::functionName`
 * Vulkan constants are renamed as follows: `VK_CONSTANT_NAME` -> `vk::CONSTANT_NAME`
 * Vulkan structs are renamed as follows: `VkStructName` -> `vk::StructName`
@@ -9,7 +23,7 @@
 * All string equivalents (e.g. `char *`) are converted to `ZString`
 * Array (e.g `VkPhysicalDevice*`) are renamed as follows: `VkStructName*` -> `vk::StructName`, they are not converted into `C3` arrays or slices. You need to handle them manually like you do in `C`
 
-# Error Handling
+## Error Handling
 
 All functions that return a `VkResult` will be kept as is, but you can convert it into an `Optional` using `vk::check`
 
