@@ -55,10 +55,10 @@ def no_vk(t):
     return t
 
 OPAQUE_STRUCTS = """
-distinct WLSurface = void*;// @extern("wl_surface"); // Opaque struct defined by Wayland
-distinct WLDisplay = void*;// @extern("wl_display"); // Opaque struct defined by Wayland
-distinct XCBConnection = void*;// @extern("xcb_connection_t"); // Opaque struct defined by xcb
-distinct IOSurfaceRef = void*; // Opaque struct defined by Apple’s CoreGraphics framework
+distinct WLSurface = any;// @extern("wl_surface"); // Opaque struct defined by Wayland
+distinct WLDisplay = any;// @extern("wl_display"); // Opaque struct defined by Wayland
+distinct XCBConnection = any;// @extern("xcb_connection_t"); // Opaque struct defined by xcb
+distinct IOSurfaceRef = any; // Opaque struct defined by Apple’s CoreGraphics framework
 
 """
 
@@ -67,27 +67,26 @@ def convert_type(t):
         "Bool32":      'uint',
         "float":       'float',
         "double":      'double',
-        "uint32_t":    'uint',
-        "uint64_t":    'ulong',
         "size_t":      'usz',
+        'int8_t':     'ichar',
         'int16_t':     'short',
         'int32_t':     'int',
         'int64_t':     'long',
         'int':         'CInt',
         'uint8_t':     'char',
-        'int8_t':     'ichar',
         "uint16_t":    'ushort',
+        "uint32_t":    'uint',
+        "uint64_t":    'ulong',
         "char":        "ichar",
         "void":        "void",
-        "void*":       "void*",
-        "void *":      "void*",
+        "void*":       "any",
+        "void *":      "any",
         "char*":       'ZString',
         'uint8_t*':     'ZString',
         "uint32_t* const*": "uint*[]",
-        "void*": 'void*',
         "char* const*": 'ZString*',
         "ObjectTableEntryNVX* const*": "ObjectTableEntryNVX**",
-        "void* const *": "void**",
+        "void* const *": "any*",
         "AccelerationStructureGeometryKHR* const*": "AccelerationStructureGeometryKHR**",
         "AccelerationStructureBuildRangeInfoKHR* const*": "AccelerationStructureBuildRangeInfoKHR**",
         "MicromapUsageEXT* const*": "MicromapUsageEXT*[]",
@@ -559,7 +558,6 @@ def parse_structs(f):
     for _type, name, fields in data:
         fields = re.findall(r"\s+(.+?)[\s:]+([_a-zA-Z0-9[\]]+);", fields)
         f.write(f"{_type} {name} {{\n")
-        prev_name = ""
         ffields = []
         for type_, fname in fields:
             # If the field name only has a number in it, then it is a C bit field.
@@ -570,31 +568,11 @@ def parse_structs(f):
                 bit_field = list(filter(bool, bit_field))
                 # [type, fieldname]
                 assert len(bit_field) == 2, "Failed to parse the bit field!"
-
-                bit_field_type = ""
-                # Right now there are only two ways that C bit fields exist in
-                # the header files.
-
-                # First one uses the 8 MOST significant bits for one field, and
-                # 24 bits for the other field.
-                # In the bindings these two fields are merged into one u32.
-                if int(fname) == 24:
-                    prev_name = bit_field[1]
-                    continue
-
-                elif prev_name:
-                    bit_field_type = do_type("uint")
-                    bit_field_name = prev_name + "And" + bit_field[1].capitalize()
-                    comment = " // Most significant byte is {}".format(bit_field[1])
-                    ffields.append(tuple([bit_field_name, bit_field_type, comment]))
-                    prev_name = ""
-                    continue
-
-                # The second way has many fields that are each 1 bit
-                elif int(fname) == 1:
-                    bit_field_type = do_type(bit_field[0])
-                    ffields.append(tuple(["bitfield", bit_field_type, comment]))
-                    break
+                bit_field_type = do_type(bit_field[0])
+                bit_field_name = bit_field[1]
+                comment = " // TODO: Make this field {} bit width".format(fname)
+                ffields.append(tuple([bit_field_name, bit_field_type, comment]))
+                continue
 
             if '[' in fname:
                 fname, type_ = parse_array(fname, type_)
@@ -603,21 +581,16 @@ def parse_structs(f):
             if "Flag_Bits" in type_:
                 continue
             t = do_type(type_)
-            if t.endswith("char*"):
-                print(" type", t, "in", name, "origninal", type_)
             ffields.append(tuple([n, t, comment]))
-            prev_name = fname
 
         max_len = max([len(t) for _, t, _ in ffields], default=0)
+        max_len_name = max([len(n) for n, _, _ in ffields], default=0)
 
         for name, type, comment in ffields:
-            k = max_len
             name = name[0].lower() + name[1:]
             if name == "module":
                 name += "_"
-            f.write("\t{} {}; {}\n".format(type.ljust(k), name, comment or ""))
-
-
+            f.write("\t{} {}; {}\n".format(type.ljust(max_len), name.ljust(max_len_name), comment or ""))
         f.write("}\n\n")
 
     f.write("// Opaque structs\n")
@@ -807,12 +780,12 @@ distinct DeviceSize    = ulong;
 distinct DeviceAddress = ulong;
 distinct SampleMask    = uint;
 
-distinct Handle                 = void*;
+distinct Handle                 = any;
 distinct NonDispatchableHandle  = ulong;
 
-def SetProcAddressFnType = fn void(void*, ZString);
+def SetProcAddressFnType = fn void(any, ZString);
 
-distinct RemoteAddressNV = void*; // Declared inline before MemoryGetRemoteAddressInfoNV
+distinct RemoteAddressNV = any; // Declared inline before MemoryGetRemoteAddressInfoNV
 
 // Base constants
 const LOD_CLAMP_NONE                        = 1000.0;
@@ -870,15 +843,15 @@ with open("../structs.c3i", 'w', encoding='utf-8') as f:
     f.write("""
 import std::core::cinterop;
 import std::os::win32;
-distinct Win32_HINSTANCE            @if(!env::WIN32) = void*;
-distinct Win32_HANDLE               @if(!env::WIN32) = void*;
+distinct Win32_HINSTANCE            @if(!env::WIN32) = any;
+distinct Win32_HANDLE               @if(!env::WIN32) = any;
 distinct Win32_HWND                 @if(!env::WIN32) = Win32_HANDLE;
 distinct Win32_HMONITOR             @if(!env::WIN32) = Win32_HANDLE;
 distinct Win32_LPCWSTR              @if(!env::WIN32) = short;
-distinct Win32_SECURITY_ATTRIBUTES  @if(!env::WIN32) = void*;
+distinct Win32_SECURITY_ATTRIBUTES  @if(!env::WIN32) = any;
 distinct Win32_DWORD                @if(!env::WIN32) = uint;
 distinct Win32_LONG                 @if(!env::WIN32) = int;
-distinct Win32_LUID                 @if(!env::WIN32) = void*;
+distinct Win32_LUID                 @if(!env::WIN32) = any;
 
 /* @if(xlib.IS_SUPPORTED) {
 def XlibDisplay  = xlib.Display;
@@ -886,19 +859,19 @@ def XlibWindow   = xlib.Window;
 def XlibVisualID = xlib.VisualID;
 }
 */
-distinct XlibDisplay  = void*; // Opaque struct defined by Xlib
+distinct XlibDisplay  = any; // Opaque struct defined by Xlib
 distinct XlibWindow   = CULong;
 distinct XlibVisualID = CULong;
 
 distinct XCBVisualID  = uint;
 distinct XCBWindow    = uint;
-distinct CAMetalLayer = void*;
+distinct CAMetalLayer = any;
 
-distinct MTLBuffer_id       = void*;
-distinct MTLTexture_id      = void*;
-distinct MTLSharedEvent_id  = void*;
-distinct MTLDevice_id       = void*;
-distinct MTLCommandQueue_id = void*;
+distinct MTLBuffer_id       = any;
+distinct MTLTexture_id      = any;
+distinct MTLSharedEvent_id  = any;
+distinct MTLDevice_id       = any;
+distinct MTLCommandQueue_id = any;
 
 /********************************/
 """)
