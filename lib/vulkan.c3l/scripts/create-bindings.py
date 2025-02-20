@@ -55,10 +55,10 @@ def no_vk(t):
     return t
 
 OPAQUE_STRUCTS = """
-distinct WLSurface = any;// @extern("wl_surface"); // Opaque struct defined by Wayland
-distinct WLDisplay = any;// @extern("wl_display"); // Opaque struct defined by Wayland
-distinct XCBConnection = any;// @extern("xcb_connection_t"); // Opaque struct defined by xcb
-distinct IOSurfaceRef = any; // Opaque struct defined by Apple’s CoreGraphics framework
+distinct WLSurface = void*;// @extern("wl_surface"); // Opaque struct defined by Wayland
+distinct WLDisplay = void*;// @extern("wl_display"); // Opaque struct defined by Wayland
+distinct XCBConnection = void*;// @extern("xcb_connection_t"); // Opaque struct defined by xcb
+distinct IOSurfaceRef = void*; // Opaque struct defined by Apple’s CoreGraphics framework
 
 """
 
@@ -79,14 +79,14 @@ def convert_type(t):
         "uint64_t":    'ulong',
         "char":        "ichar",
         "void":        "void",
-        "void*":       "any",
-        "void *":      "any",
+        "void*":       "void*",
+        "void *":      "void*",
         "char*":       'ZString',
         'uint8_t*':     'ZString',
         "uint32_t* const*": "uint*[]",
         "char* const*": 'ZString*',
         "ObjectTableEntryNVX* const*": "ObjectTableEntryNVX**",
-        "void* const *": "any*",
+        "void* const *": "void*",
         "AccelerationStructureGeometryKHR* const*": "AccelerationStructureGeometryKHR**",
         "AccelerationStructureBuildRangeInfoKHR* const*": "AccelerationStructureBuildRangeInfoKHR**",
         "MicromapUsageEXT* const*": "MicromapUsageEXT*[]",
@@ -780,12 +780,12 @@ distinct DeviceSize    = ulong;
 distinct DeviceAddress = ulong;
 distinct SampleMask    = uint;
 
-distinct Handle                 = any;
+distinct Handle                 = void*;
 distinct NonDispatchableHandle  = ulong;
 
-def SetProcAddressFnType = fn void(any, ZString);
+def SetProcAddressFnType = fn void(void*, ZString);
 
-distinct RemoteAddressNV = any; // Declared inline before MemoryGetRemoteAddressInfoNV
+distinct RemoteAddressNV = void*; // Declared inline before MemoryGetRemoteAddressInfoNV
 
 // Base constants
 const LOD_CLAMP_NONE                        = 1000.0;
@@ -843,15 +843,15 @@ with open("../structs.c3i", 'w', encoding='utf-8') as f:
     f.write("""
 import std::core::cinterop;
 import std::os::win32;
-distinct Win32_HINSTANCE            @if(!env::WIN32) = any;
-distinct Win32_HANDLE               @if(!env::WIN32) = any;
+distinct Win32_HINSTANCE            @if(!env::WIN32) = void*;
+distinct Win32_HANDLE               @if(!env::WIN32) = void*;
 distinct Win32_HWND                 @if(!env::WIN32) = Win32_HANDLE;
 distinct Win32_HMONITOR             @if(!env::WIN32) = Win32_HANDLE;
 distinct Win32_LPCWSTR              @if(!env::WIN32) = short;
-distinct Win32_SECURITY_ATTRIBUTES  @if(!env::WIN32) = any;
+distinct Win32_SECURITY_ATTRIBUTES  @if(!env::WIN32) = void*;
 distinct Win32_DWORD                @if(!env::WIN32) = uint;
 distinct Win32_LONG                 @if(!env::WIN32) = int;
-distinct Win32_LUID                 @if(!env::WIN32) = any;
+distinct Win32_LUID                 @if(!env::WIN32) = void*;
 
 /* @if(xlib.IS_SUPPORTED) {
 def XlibDisplay  = xlib.Display;
@@ -859,19 +859,19 @@ def XlibWindow   = xlib.Window;
 def XlibVisualID = xlib.VisualID;
 }
 */
-distinct XlibDisplay  = any; // Opaque struct defined by Xlib
+distinct XlibDisplay  = void*; // Opaque struct defined by Xlib
 distinct XlibWindow   = CULong;
 distinct XlibVisualID = CULong;
 
 distinct XCBVisualID  = uint;
 distinct XCBWindow    = uint;
-distinct CAMetalLayer = any;
+distinct CAMetalLayer = void*;
 
-distinct MTLBuffer_id       = any;
-distinct MTLTexture_id      = any;
-distinct MTLSharedEvent_id  = any;
-distinct MTLDevice_id       = any;
-distinct MTLCommandQueue_id = any;
+distinct MTLBuffer_id       = void*;
+distinct MTLTexture_id      = void*;
+distinct MTLSharedEvent_id  = void*;
+distinct MTLDevice_id       = void*;
+distinct MTLCommandQueue_id = void*;
 
 /********************************/
 """)
