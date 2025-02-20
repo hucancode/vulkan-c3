@@ -551,29 +551,88 @@ def parse_fake_enums(f):
 
         f.write("}\n\n")
 
+
+def parse_c_bitfields(name, raw_fields) -> (bool, str):
+    type_sizes = {
+        "char": 8,
+        "short": 16,
+        "int": 32,
+        "long": 64,
+        "long long": 64,
+        "uint8_t": 8,
+        "uint16_t": 16,
+        "uint32_t": 32,
+        "uint64_t": 64,
+        "int8_t": 8,
+        "int16_t": 16,
+        "int32_t": 32,
+        "int64_t": 64,
+        "float": 32,
+        "VkTransformMatrixKHR": 32*3*4, # 3x4 matrix
+        "VkSRTDataNV": 32*16, # 16 floats, a, b, c, sx, sy, sz, tx, ty, tz, qx, qy, qz, qw, pvx, pvy, pvz
+        "VkClusterAccelerationStructureClusterFlagsNV": 32, # VkFlags
+        "VkClusterAccelerationStructureGeometryIndexAndGeometryFlagsNV": 32,
+        "VkDeviceAddress": 64, # 64-bit address
+        "VkStridedDeviceAddressNV": 64*2, # 64-bit address and stride
+
+    }
+    def determine_backing_type(bit_size: int) -> str:
+        if bit_size <= 8:
+            return "char"
+        elif bit_size <= 16:
+            return "ushort"
+        elif bit_size <= 32:
+            return "uint"
+        elif bit_size <= 64:
+            return "ulong"
+        else:
+            return f"char[{(bit_size + 7) // 8}]"
+    field_pattern = re.compile(r"\s*([\w\s]+?)\s+(\w+)\s*(?::\s*(\d+))?;")
+
+    bit_offset = 0
+    has_bitfields = False
+
+    fields = []
+
+    for field_match in field_pattern.finditer(raw_fields):
+        type_name, field_name, bit_size = field_match.groups()
+        type_name = type_name.strip()
+        comment = None
+
+        if bit_size:
+            has_bitfields = True
+            bit_size = int(bit_size)
+        else:
+            if type_name in type_sizes:
+                bit_size = type_sizes[type_name]
+            else:
+                bit_size = 32 # Default to 32 if unknown
+                comment = "TODO: unknown bit size for type " + type_name + ", default to 32"
+
+        field_name = re.sub(r"_flag$", "", field_name)  # Strip trailing '_flag'
+        c3_type = "bool" if bit_size == 1 else do_type(type_name)
+        fields.append(f"\t{c3_type} {field_name}: {bit_offset if bit_size == 1 else f'{bit_offset}..{bit_offset + bit_size - 1}'}; "+(f"// {comment}" if comment else ""))
+        bit_offset += bit_size
+
+    backing_type = determine_backing_type(bit_offset)
+
+    c3_struct = f"bitstruct {name} : {backing_type} {{\n" + "\n".join(fields) + "\n}\n\n"
+
+    return has_bitfields, c3_struct
+
 def parse_structs(f):
     data = re.findall(r"typedef (struct|union) Vk(\w+?) {(.+?)} \w+?;", src, re.S)
     data += re.findall(r"typedef (struct|union) Std(\w+?) {(.+?)} \w+?;", src, re.S)
 
     for _type, name, fields in data:
+        ok, c3_bitstruct = parse_c_bitfields(name, fields)
+        if ok:
+            f.write(c3_bitstruct)
+            continue
         fields = re.findall(r"\s+(.+?)[\s:]+([_a-zA-Z0-9[\]]+);", fields)
         f.write(f"{_type} {name} {{\n")
         ffields = []
         for type_, fname in fields:
-            # If the field name only has a number in it, then it is a C bit field.
-            if is_int(fname):
-                comment = None
-                bit_field = type_.split(' ')
-                # Get rid of empty spaces
-                bit_field = list(filter(bool, bit_field))
-                # [type, fieldname]
-                assert len(bit_field) == 2, "Failed to parse the bit field!"
-                bit_field_type = do_type(bit_field[0])
-                bit_field_name = bit_field[1]
-                comment = " // TODO: Make this field {} bit width".format(fname)
-                ffields.append(tuple([bit_field_name, bit_field_type, comment]))
-                continue
-
             if '[' in fname:
                 fname, type_ = parse_array(fname, type_)
             comment = None
@@ -613,8 +672,6 @@ def parse_structs(f):
     for n, t in aliases:
         k = max_len
         f.write("def {} = {};\n".format(n.ljust(k), t))
-
-
 
 procedure_map = {}
 
