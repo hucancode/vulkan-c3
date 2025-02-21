@@ -2,6 +2,7 @@
 // Vulkan wrapper generated from "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Headers/master/include/vulkan/vulkan_core.h"
 //
 module vk;
+
 // Core API
 macro int @make_version($major, $minor, $patch) {
 	return (($major << 22U) | ($minor << 12U) | $patch);
@@ -1241,5 +1242,3 @@ distinct OpticalFlowSessionNV          = NonDispatchableHandle;
 distinct ShaderEXT                     = NonDispatchableHandle;
 distinct IndirectExecutionSetEXT       = NonDispatchableHandle;
 distinct IndirectCommandsLayoutEXT     = NonDispatchableHandle;
-
-

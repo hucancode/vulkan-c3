@@ -54,6 +54,7 @@ fault VulkanError {
 fault BindingError {
     ERROR_UNHANDLED,
 }
+// module vk @private;
 
 fn void! check(vk::Result result) {
     switch (result) {

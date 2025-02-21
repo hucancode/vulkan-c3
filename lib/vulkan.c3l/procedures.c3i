@@ -719,6 +719,7 @@ def ProcWaitSemaphoresKHR = fn Result(Device device, SemaphoreWaitInfo* pWaitInf
 def ProcWriteAccelerationStructuresPropertiesKHR = fn Result(Device device, uint accelerationStructureCount, AccelerationStructureKHR* pAccelerationStructures, QueryType queryType, usz dataSize, void* pData, usz stride);
 def ProcWriteMicromapsPropertiesEXT = fn Result(Device device, uint micromapCount, MicromapEXT* pMicromaps, QueryType queryType, usz dataSize, void* pData, usz stride);
 
+module vk::internal;
 // Loader Procedures
 ProcAllocationFunction                   allocationFunction;
 ProcCreateInstance                       createInstance;
@@ -1428,5 +1429,3 @@ ProcWaitSemaphores                                         waitSemaphores;
 ProcWaitSemaphoresKHR                                      waitSemaphoresKHR;
 ProcWriteAccelerationStructuresPropertiesKHR               writeAccelerationStructuresPropertiesKHR;
 ProcWriteMicromapsPropertiesEXT                            writeMicromapsPropertiesEXT;
-
-

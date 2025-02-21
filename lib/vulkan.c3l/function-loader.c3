@@ -1,7 +1,7 @@
 //
 // Vulkan wrapper generated from "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Headers/master/include/vulkan/vulkan_core.h"
 //
-module vk;
+module vk::internal;
 
 fn void loadProcAddressesCustom(SetProcAddressFnType setProcAddr) {
 	// Loader Procedures
@@ -2028,4 +2028,21 @@ fn void loadProcAddressesGlobal(void* vkGetInstanceProcAddr) {
 	reallocationFunction                     = (ProcReallocationFunction) getInstanceProcAddr(null, "vkReallocationFunction");
 }
 
+module vk;
+import vk::internal;
 
+fn void loadProcAddressesCustom(SetProcAddressFnType setProcAddr) {
+    internal::loadProcAddressesCustom(setProcAddr);
+}
+
+fn void loadProcAddressesDevice(Device device) {
+    internal::loadProcAddressesDevice(device);
+}
+
+fn void loadProcAddressesInstance(Instance instance) {
+    internal::loadProcAddressesInstance(instance);
+}
+
+fn void loadProcAddressesGlobal(void* vkGetInstanceProcAddr) {
+    internal::loadProcAddressesGlobal(vkGetInstanceProcAddr);
+}
