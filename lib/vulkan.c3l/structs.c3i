@@ -244,8 +244,8 @@ struct PhysicalDeviceFeatures {
 	uint shader_resource_min_lod                     ;
 	uint sparse_binding                              ;
 	uint sparse_residency_buffer                     ;
-	uint sparse_residency_image2_d                   ;
-	uint sparse_residency_image3_d                   ;
+	uint sparse_residency_image2d                   ;
+	uint sparse_residency_image3d                   ;
 	uint sparse_residency2_samples                   ;
 	uint sparse_residency4_samples                   ;
 	uint sparse_residency8_samples                   ;
@@ -256,9 +256,9 @@ struct PhysicalDeviceFeatures {
 }
 
 struct PhysicalDeviceLimits {
-	uint             max_image_dimension1_d                               ;
-	uint             max_image_dimension2_d                               ;
-	uint             max_image_dimension3_d                               ;
+	uint             max_image_dimension1d                               ;
+	uint             max_image_dimension2d                               ;
+	uint             max_image_dimension3d                               ;
 	uint             max_image_dimension_cube                             ;
 	uint             max_image_array_layers                               ;
 	uint             max_texel_buffer_elements                            ;
@@ -372,9 +372,9 @@ struct PhysicalDeviceMemoryProperties {
 }
 
 struct PhysicalDeviceSparseProperties {
-	uint residency_standard2_d_block_shape            ;
-	uint residency_standard2_d_multisample_block_shape;
-	uint residency_standard3_d_block_shape            ;
+	uint residency_standard2d_block_shape            ;
+	uint residency_standard2d_multisample_block_shape;
+	uint residency_standard3d_block_shape            ;
 	uint residency_aligned_mip_size                   ;
 	uint residency_non_resident_strict                ;
 }
@@ -6337,13 +6337,13 @@ struct GeneratedCommandsMemoryRequirementsInfoNV {
 struct PhysicalDeviceInheritedViewportScissorFeaturesNV {
 	StructureType s_type                       ;
 	void*         p_next                       ;
-	uint          inherited_viewport_scissor2_d;
+	uint          inherited_viewport_scissor2d;
 }
 
 struct CommandBufferInheritanceViewportScissorInfoNV {
 	StructureType s_type              ;
 	void*         p_next              ;
-	uint          viewport_scissor2_d ;
+	uint          viewport_scissor2d ;
 	uint          viewport_depth_count;
 	Viewport*     p_viewport_depths   ;
 }
@@ -7164,8 +7164,8 @@ struct MultiDrawIndexedInfoEXT {
 struct PhysicalDeviceImage2DViewOf3DFeaturesEXT {
 	StructureType s_type               ;
 	void*         p_next               ;
-	uint          image2_d_view_of3_d  ;
-	uint          sampler2_d_view_of3_d;
+	uint          image2d_view_of3d  ;
+	uint          sampler2d_view_of3d;
 }
 
 struct PhysicalDeviceShaderTileImageFeaturesEXT {
@@ -7365,7 +7365,7 @@ struct PhysicalDeviceSchedulingControlsPropertiesARM {
 struct PhysicalDeviceImageSlicedViewOf3DFeaturesEXT {
 	StructureType s_type                 ;
 	void*         p_next                 ;
-	uint          image_sliced_view_of3_d;
+	uint          image_sliced_view_of3d;
 }
 
 struct ImageViewSlicedCreateInfoEXT {
@@ -8214,7 +8214,7 @@ struct DisplaySurfaceStereoCreateInfoNV {
 struct DisplayModeStereoPropertiesNV {
 	StructureType s_type           ;
 	void*         p_next           ;
-	uint          hdmi3_d_supported;
+	uint          hdmi3d_supported;
 }
 
 struct PhysicalDeviceRawAccessChainsFeaturesNV {
