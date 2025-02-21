@@ -202,7 +202,7 @@ fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
             io::printfn("Cound not get extension list for %s", deviceName);
             return 0;
         }
-        defer free(extensions.ptr);
+        defer free(extensions);
         foreach (required: REQUIRED_EXTENSIONS) {
             bool found = false;
             foreach (e : extensions) {
@@ -251,7 +251,7 @@ fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
 
 fn void! pickPhysicalDevice() {
     vk::PhysicalDevice[] devices = vk::enumeratePhysicalDevices(g_instance)!;
-    defer free(devices.ptr);
+    defer free(devices);
     g_physical_device = devices[0];
     uint bestScore = 0;
     foreach (device: devices) {
@@ -532,7 +532,7 @@ fn void destroyFrameBuffers() {
     foreach (buffer : g_swap_chain_framebuffers) {
         vk::destroyFramebuffer(g_device, buffer, null);
     }
-    free(g_swap_chain_framebuffers.ptr);
+    free(g_swap_chain_framebuffers);
 }
 
 
