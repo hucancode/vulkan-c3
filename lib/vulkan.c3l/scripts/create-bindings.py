@@ -638,7 +638,7 @@ def parse_structs(f):
             if '[' in fname:
                 fname, type_ = parse_array(fname, type_)
             comment = None
-            n = fix_arg(fname)
+            n = to_snake_case(fix_arg(fname))
             if "Flag_Bits" in type_:
                 continue
             t = do_type(type_)
