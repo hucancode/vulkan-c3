@@ -22,25 +22,33 @@ import glfw;
   * Enum values are renamed as follows: `VK_ENUM_VALUE` -> `vk::ENUM_VALUE`
 * Vulkan flags are converted to `bitstruct` and renamed as follows: `VkFlagName` -> `vk::FlagName`
 * All string equivalents (e.g. `char *`) are converted to `ZString`
-* Array (e.g `VkPhysicalDevice*`) are renamed as follows: `VkStructName*` -> `vk::StructName`, they are not converted into `C3` arrays or slices. You need to handle them manually like you do in `C`
 
 ## Error Handling
 
-All functions that return a `VkResult` will be kept as is, but you can convert it into an `Optional` using `vk::check`
-
 You can handle errors manually like this:
 ```cpp
+vk::InstanceCreateInfo createInfo = {
+    .s_type = vk::STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+    .p_application_info = &&vk::ApplicationInfo {
+        .s_type = vk::STRUCTURE_TYPE_APPLICATION_INFO,
+        .p_application_name = "Hello",
+        .application_version = vk::@make_version(1, 0, 0),
+        .p_engine_name = "Soreal Engine",
+        .engine_version = vk::@make_version(1, 0, 0),
+        .api_version = vk::API_VERSION_1_3,
+    },
+};
 fn void create() {
-    vk::Result result = vk::createInstance(&createInfo, null, &instance);
-    if (result != vk::Result::Success) {
-        io::printfn("Failed to create instance");
+    anyfault excuse = vk::createInstance(&createInfo, null, &instance);
+    if (excuse == vk::Error::NOT_READY) {
+        io::printfn("not ready to create instance");
     }
 }
 ```
-Or you can use `C3` idiom like this:
+Or you can use shorthand like so:
 ```cpp
-fn void! create() {
-    vk::check(vk::createInstance(&createInfo, null, &instance))!;
+fn void create() {
+    vk::createInstance(&createInfo, null, &instance)!!;
 }
 ```
 
