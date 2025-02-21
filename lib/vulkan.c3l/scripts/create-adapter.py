@@ -118,13 +118,13 @@ def generate_adapters(function_defs, function_ptrs):
             param_str = ', '.join(param_names)
 
             if return_type == "Result":
-                output.append(f"fn void! {var_name}({params}) {{")
+                output.append(f"fn void! {var_name}({params}) @inline {{")
                 output.append(f"\tvk::check(internal::{var_name}({param_str}))!;")
             elif return_type == "void":
-                output.append(f"fn void {var_name}({params}) {{")
+                output.append(f"fn void {var_name}({params}) @inline {{")
                 output.append(f"\tinternal::{var_name}({param_str});")
             else:
-                output.append(f"fn {return_type} {var_name}({params}) {{")
+                output.append(f"fn {return_type} {var_name}({params}) @inline {{")
                 output.append(f"\treturn internal::{var_name}({param_str});")
 
         output.append("}")
