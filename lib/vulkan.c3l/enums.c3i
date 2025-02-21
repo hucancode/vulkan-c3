@@ -284,6 +284,48 @@ const ChromaLocation CHROMA_LOCATION_MIDPOINT         = 1;
 const ChromaLocation CHROMA_LOCATION_COSITED_EVEN_KHR = CHROMA_LOCATION_COSITED_EVEN;
 const ChromaLocation CHROMA_LOCATION_MIDPOINT_KHR     = CHROMA_LOCATION_MIDPOINT;
 
+bitstruct ClusterAccelerationStructureAddressResolutionFlagsNV : Flags @overlap {
+	bool indirected_dst_implicit_data : 0;
+	bool indirected_scratch_data      : 1;
+	bool indirected_dst_address_array : 2;
+	bool indirected_dst_sizes_array   : 3;
+	bool indirected_src_infos_array   : 4;
+	bool indirected_src_infos_count   : 5;
+}
+
+bitstruct ClusterAccelerationStructureClusterFlagsNV : Flags @overlap {
+	bool allow_disable_opacity_micromaps : 0;
+}
+
+bitstruct ClusterAccelerationStructureGeometryFlagsNV : Flags @overlap {
+	bool cull_disable                   : 0;
+	bool no_duplicate_anyhit_invocation : 1;
+	bool opaque                         : 2;
+}
+
+bitstruct ClusterAccelerationStructureIndexFormatFlagsNV : Flags @overlap {
+	bool n_8bit  : 0;
+	bool n_16bit : 1;
+	bool n_32bit : 2;
+}
+
+distinct ClusterAccelerationStructureOpModeNV = CInt;
+const ClusterAccelerationStructureOpModeNV CLUSTER_ACCELERATION_STRUCTURE_OP_MODE_IMPLICIT_DESTINATIONS_NV = 0;
+const ClusterAccelerationStructureOpModeNV CLUSTER_ACCELERATION_STRUCTURE_OP_MODE_EXPLICIT_DESTINATIONS_NV = 1;
+const ClusterAccelerationStructureOpModeNV CLUSTER_ACCELERATION_STRUCTURE_OP_MODE_COMPUTE_SIZES_NV         = 2;
+
+distinct ClusterAccelerationStructureOpTypeNV = CInt;
+const ClusterAccelerationStructureOpTypeNV CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_MOVE_OBJECTS_NV                    = 0;
+const ClusterAccelerationStructureOpTypeNV CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_BUILD_CLUSTERS_BOTTOM_LEVEL_NV     = 1;
+const ClusterAccelerationStructureOpTypeNV CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_BUILD_TRIANGLE_CLUSTER_NV          = 2;
+const ClusterAccelerationStructureOpTypeNV CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_BUILD_TRIANGLE_CLUSTER_TEMPLATE_NV = 3;
+const ClusterAccelerationStructureOpTypeNV CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_INSTANTIATE_TRIANGLE_CLUSTER_NV    = 4;
+
+distinct ClusterAccelerationStructureTypeNV = CInt;
+const ClusterAccelerationStructureTypeNV CLUSTER_ACCELERATION_STRUCTURE_TYPE_CLUSTERS_BOTTOM_LEVEL_NV     = 0;
+const ClusterAccelerationStructureTypeNV CLUSTER_ACCELERATION_STRUCTURE_TYPE_TRIANGLE_CLUSTER_NV          = 1;
+const ClusterAccelerationStructureTypeNV CLUSTER_ACCELERATION_STRUCTURE_TYPE_TRIANGLE_CLUSTER_TEMPLATE_NV = 2;
+
 distinct CoarseSampleOrderTypeNV = CInt;
 const CoarseSampleOrderTypeNV COARSE_SAMPLE_ORDER_TYPE_DEFAULT_NV      = 0;
 const CoarseSampleOrderTypeNV COARSE_SAMPLE_ORDER_TYPE_CUSTOM_NV       = 1;
@@ -361,28 +403,32 @@ const ComponentSwizzle COMPONENT_SWIZZLE_B        = 5;
 const ComponentSwizzle COMPONENT_SWIZZLE_A        = 6;
 
 distinct ComponentTypeKHR = CInt;
-const ComponentTypeKHR COMPONENT_TYPE_FLOAT16_KHR = 0;
-const ComponentTypeKHR COMPONENT_TYPE_FLOAT32_KHR = 1;
-const ComponentTypeKHR COMPONENT_TYPE_FLOAT64_KHR = 2;
-const ComponentTypeKHR COMPONENT_TYPE_SINT8_KHR   = 3;
-const ComponentTypeKHR COMPONENT_TYPE_SINT16_KHR  = 4;
-const ComponentTypeKHR COMPONENT_TYPE_SINT32_KHR  = 5;
-const ComponentTypeKHR COMPONENT_TYPE_SINT64_KHR  = 6;
-const ComponentTypeKHR COMPONENT_TYPE_UINT8_KHR   = 7;
-const ComponentTypeKHR COMPONENT_TYPE_UINT16_KHR  = 8;
-const ComponentTypeKHR COMPONENT_TYPE_UINT32_KHR  = 9;
-const ComponentTypeKHR COMPONENT_TYPE_UINT64_KHR  = 10;
-const ComponentTypeKHR COMPONENT_TYPE_FLOAT16_NV  = COMPONENT_TYPE_FLOAT16_KHR;
-const ComponentTypeKHR COMPONENT_TYPE_FLOAT32_NV  = COMPONENT_TYPE_FLOAT32_KHR;
-const ComponentTypeKHR COMPONENT_TYPE_FLOAT64_NV  = COMPONENT_TYPE_FLOAT64_KHR;
-const ComponentTypeKHR COMPONENT_TYPE_SINT8_NV    = COMPONENT_TYPE_SINT8_KHR;
-const ComponentTypeKHR COMPONENT_TYPE_SINT16_NV   = COMPONENT_TYPE_SINT16_KHR;
-const ComponentTypeKHR COMPONENT_TYPE_SINT32_NV   = COMPONENT_TYPE_SINT32_KHR;
-const ComponentTypeKHR COMPONENT_TYPE_SINT64_NV   = COMPONENT_TYPE_SINT64_KHR;
-const ComponentTypeKHR COMPONENT_TYPE_UINT8_NV    = COMPONENT_TYPE_UINT8_KHR;
-const ComponentTypeKHR COMPONENT_TYPE_UINT16_NV   = COMPONENT_TYPE_UINT16_KHR;
-const ComponentTypeKHR COMPONENT_TYPE_UINT32_NV   = COMPONENT_TYPE_UINT32_KHR;
-const ComponentTypeKHR COMPONENT_TYPE_UINT64_NV   = COMPONENT_TYPE_UINT64_KHR;
+const ComponentTypeKHR COMPONENT_TYPE_FLOAT16_KHR     = 0;
+const ComponentTypeKHR COMPONENT_TYPE_FLOAT32_KHR     = 1;
+const ComponentTypeKHR COMPONENT_TYPE_FLOAT64_KHR     = 2;
+const ComponentTypeKHR COMPONENT_TYPE_SINT8_KHR       = 3;
+const ComponentTypeKHR COMPONENT_TYPE_SINT16_KHR      = 4;
+const ComponentTypeKHR COMPONENT_TYPE_SINT32_KHR      = 5;
+const ComponentTypeKHR COMPONENT_TYPE_SINT64_KHR      = 6;
+const ComponentTypeKHR COMPONENT_TYPE_UINT8_KHR       = 7;
+const ComponentTypeKHR COMPONENT_TYPE_UINT16_KHR      = 8;
+const ComponentTypeKHR COMPONENT_TYPE_UINT32_KHR      = 9;
+const ComponentTypeKHR COMPONENT_TYPE_UINT64_KHR      = 10;
+const ComponentTypeKHR COMPONENT_TYPE_SINT8_PACKED_NV = 1000491000;
+const ComponentTypeKHR COMPONENT_TYPE_UINT8_PACKED_NV = 1000491001;
+const ComponentTypeKHR COMPONENT_TYPE_FLOAT_E4M3_NV   = 1000491002;
+const ComponentTypeKHR COMPONENT_TYPE_FLOAT_E5M2_NV   = 1000491003;
+const ComponentTypeKHR COMPONENT_TYPE_FLOAT16_NV      = COMPONENT_TYPE_FLOAT16_KHR;
+const ComponentTypeKHR COMPONENT_TYPE_FLOAT32_NV      = COMPONENT_TYPE_FLOAT32_KHR;
+const ComponentTypeKHR COMPONENT_TYPE_FLOAT64_NV      = COMPONENT_TYPE_FLOAT64_KHR;
+const ComponentTypeKHR COMPONENT_TYPE_SINT8_NV        = COMPONENT_TYPE_SINT8_KHR;
+const ComponentTypeKHR COMPONENT_TYPE_SINT16_NV       = COMPONENT_TYPE_SINT16_KHR;
+const ComponentTypeKHR COMPONENT_TYPE_SINT32_NV       = COMPONENT_TYPE_SINT32_KHR;
+const ComponentTypeKHR COMPONENT_TYPE_SINT64_NV       = COMPONENT_TYPE_SINT64_KHR;
+const ComponentTypeKHR COMPONENT_TYPE_UINT8_NV        = COMPONENT_TYPE_UINT8_KHR;
+const ComponentTypeKHR COMPONENT_TYPE_UINT16_NV       = COMPONENT_TYPE_UINT16_KHR;
+const ComponentTypeKHR COMPONENT_TYPE_UINT32_NV       = COMPONENT_TYPE_UINT32_KHR;
+const ComponentTypeKHR COMPONENT_TYPE_UINT64_NV       = COMPONENT_TYPE_UINT64_KHR;
 
 bitstruct CompositeAlphaFlagsKHR : Flags @overlap {
 	bool opaque          : 0;
@@ -399,6 +445,12 @@ distinct ConservativeRasterizationModeEXT = CInt;
 const ConservativeRasterizationModeEXT CONSERVATIVE_RASTERIZATION_MODE_DISABLED_EXT      = 0;
 const ConservativeRasterizationModeEXT CONSERVATIVE_RASTERIZATION_MODE_OVERESTIMATE_EXT  = 1;
 const ConservativeRasterizationModeEXT CONSERVATIVE_RASTERIZATION_MODE_UNDERESTIMATE_EXT = 2;
+
+distinct CooperativeVectorMatrixLayoutNV = CInt;
+const CooperativeVectorMatrixLayoutNV COOPERATIVE_VECTOR_MATRIX_LAYOUT_ROW_MAJOR_NV           = 0;
+const CooperativeVectorMatrixLayoutNV COOPERATIVE_VECTOR_MATRIX_LAYOUT_COLUMN_MAJOR_NV        = 1;
+const CooperativeVectorMatrixLayoutNV COOPERATIVE_VECTOR_MATRIX_LAYOUT_INFERENCING_OPTIMAL_NV = 2;
+const CooperativeVectorMatrixLayoutNV COOPERATIVE_VECTOR_MATRIX_LAYOUT_TRAINING_OPTIMAL_NV    = 3;
 
 distinct CopyAccelerationStructureModeKHR = CInt;
 const CopyAccelerationStructureModeKHR COPY_ACCELERATION_STRUCTURE_MODE_CLONE_KHR       = 0;
@@ -507,12 +559,13 @@ bitstruct DebugUtilsMessageTypeFlagsEXT : Flags @overlap {
 }
 
 bitstruct DependencyFlags : Flags @overlap {
-	bool by_region         : 0;
-	bool device_group      : 2;
-	bool view_local        : 1;
-	bool feedback_loop_ext : 3;
-	bool view_local_khr    : 1;
-	bool device_group_khr  : 2;
+	bool by_region                                          : 0;
+	bool device_group                                       : 2;
+	bool view_local                                         : 1;
+	bool feedback_loop_ext                                  : 3;
+	bool queue_family_ownership_transfer_use_all_stages_khr : 5;
+	bool view_local_khr                                     : 1;
+	bool device_group_khr                                   : 2;
 }
 
 distinct DepthBiasRepresentationEXT = CInt;
@@ -559,25 +612,26 @@ bitstruct DescriptorSetLayoutCreateFlags : Flags @overlap {
 }
 
 distinct DescriptorType = CInt;
-const DescriptorType DESCRIPTOR_TYPE_SAMPLER                    = 0;
-const DescriptorType DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER     = 1;
-const DescriptorType DESCRIPTOR_TYPE_SAMPLED_IMAGE              = 2;
-const DescriptorType DESCRIPTOR_TYPE_STORAGE_IMAGE              = 3;
-const DescriptorType DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER       = 4;
-const DescriptorType DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER       = 5;
-const DescriptorType DESCRIPTOR_TYPE_UNIFORM_BUFFER             = 6;
-const DescriptorType DESCRIPTOR_TYPE_STORAGE_BUFFER             = 7;
-const DescriptorType DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC     = 8;
-const DescriptorType DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC     = 9;
-const DescriptorType DESCRIPTOR_TYPE_INPUT_ATTACHMENT           = 10;
-const DescriptorType DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK       = 1000138000;
-const DescriptorType DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR = 1000150000;
-const DescriptorType DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV  = 1000165000;
-const DescriptorType DESCRIPTOR_TYPE_SAMPLE_WEIGHT_IMAGE_QCOM   = 1000440000;
-const DescriptorType DESCRIPTOR_TYPE_BLOCK_MATCH_IMAGE_QCOM     = 1000440001;
-const DescriptorType DESCRIPTOR_TYPE_MUTABLE_EXT                = 1000351000;
-const DescriptorType DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT   = DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK;
-const DescriptorType DESCRIPTOR_TYPE_MUTABLE_VALVE              = DESCRIPTOR_TYPE_MUTABLE_EXT;
+const DescriptorType DESCRIPTOR_TYPE_SAMPLER                               = 0;
+const DescriptorType DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER                = 1;
+const DescriptorType DESCRIPTOR_TYPE_SAMPLED_IMAGE                         = 2;
+const DescriptorType DESCRIPTOR_TYPE_STORAGE_IMAGE                         = 3;
+const DescriptorType DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER                  = 4;
+const DescriptorType DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER                  = 5;
+const DescriptorType DESCRIPTOR_TYPE_UNIFORM_BUFFER                        = 6;
+const DescriptorType DESCRIPTOR_TYPE_STORAGE_BUFFER                        = 7;
+const DescriptorType DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC                = 8;
+const DescriptorType DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC                = 9;
+const DescriptorType DESCRIPTOR_TYPE_INPUT_ATTACHMENT                      = 10;
+const DescriptorType DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK                  = 1000138000;
+const DescriptorType DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR            = 1000150000;
+const DescriptorType DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV             = 1000165000;
+const DescriptorType DESCRIPTOR_TYPE_SAMPLE_WEIGHT_IMAGE_QCOM              = 1000440000;
+const DescriptorType DESCRIPTOR_TYPE_BLOCK_MATCH_IMAGE_QCOM                = 1000440001;
+const DescriptorType DESCRIPTOR_TYPE_MUTABLE_EXT                           = 1000351000;
+const DescriptorType DESCRIPTOR_TYPE_PARTITIONED_ACCELERATION_STRUCTURE_NV = 1000570000;
+const DescriptorType DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT              = DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK;
+const DescriptorType DESCRIPTOR_TYPE_MUTABLE_VALVE                         = DESCRIPTOR_TYPE_MUTABLE_EXT;
 
 distinct DescriptorUpdateTemplateType = CInt;
 const DescriptorUpdateTemplateType DESCRIPTOR_UPDATE_TEMPLATE_TYPE_DESCRIPTOR_SET       = 0;
@@ -689,7 +743,7 @@ const DriverId DRIVER_ID_MESA_DOZEN                    = 23;
 const DriverId DRIVER_ID_MESA_NVK                      = 24;
 const DriverId DRIVER_ID_IMAGINATION_OPEN_SOURCE_MESA  = 25;
 const DriverId DRIVER_ID_MESA_HONEYKRISP               = 26;
-const DriverId DRIVER_ID_RESERVED_27                   = 27;
+const DriverId DRIVER_ID_VULKAN_SC_EMULATION_ON_VULKAN = 27;
 const DriverId DRIVER_ID_AMD_PROPRIETARY_KHR           = DRIVER_ID_AMD_PROPRIETARY;
 const DriverId DRIVER_ID_AMD_OPEN_SOURCE_KHR           = DRIVER_ID_AMD_OPEN_SOURCE;
 const DriverId DRIVER_ID_MESA_RADV_KHR                 = DRIVER_ID_MESA_RADV;
@@ -857,6 +911,9 @@ bitstruct ExternalMemoryHandleTypeFlags : Flags @overlap {
 	bool zircon_vmo_fuchsia              : 11;
 	bool rdma_address_nv                 : 12;
 	bool screen_buffer_qnx               : 14;
+	bool mtlbuffer_ext                   : 16;
+	bool mtltexture_ext                  : 17;
+	bool mtlheap_ext                     : 18;
 	bool opaque_fd_khr                   : 0;
 	bool opaque_win32_khr                : 1;
 	bool opaque_win32_kmt_khr            : 2;
@@ -1330,11 +1387,13 @@ bitstruct GeometryInstanceFlagsKHR : Flags @overlap {
 }
 
 distinct GeometryTypeKHR = CInt;
-const GeometryTypeKHR GEOMETRY_TYPE_TRIANGLES_KHR = 0;
-const GeometryTypeKHR GEOMETRY_TYPE_AABBS_KHR     = 1;
-const GeometryTypeKHR GEOMETRY_TYPE_INSTANCES_KHR = 2;
-const GeometryTypeKHR GEOMETRY_TYPE_TRIANGLES_NV  = GEOMETRY_TYPE_TRIANGLES_KHR;
-const GeometryTypeKHR GEOMETRY_TYPE_AABBS_NV      = GEOMETRY_TYPE_AABBS_KHR;
+const GeometryTypeKHR GEOMETRY_TYPE_TRIANGLES_KHR           = 0;
+const GeometryTypeKHR GEOMETRY_TYPE_AABBS_KHR               = 1;
+const GeometryTypeKHR GEOMETRY_TYPE_INSTANCES_KHR           = 2;
+const GeometryTypeKHR GEOMETRY_TYPE_SPHERES_NV              = 1000429004;
+const GeometryTypeKHR GEOMETRY_TYPE_LINEAR_SWEPT_SPHERES_NV = 1000429005;
+const GeometryTypeKHR GEOMETRY_TYPE_TRIANGLES_NV            = GEOMETRY_TYPE_TRIANGLES_KHR;
+const GeometryTypeKHR GEOMETRY_TYPE_AABBS_NV                = GEOMETRY_TYPE_AABBS_KHR;
 
 bitstruct GraphicsPipelineLibraryFlagsEXT : Flags @overlap {
 	bool vertex_input_interface    : 0;
@@ -1770,10 +1829,11 @@ const OpacityMicromapFormatEXT OPACITY_MICROMAP_FORMAT_2_STATE_EXT = 1;
 const OpacityMicromapFormatEXT OPACITY_MICROMAP_FORMAT_4_STATE_EXT = 2;
 
 distinct OpacityMicromapSpecialIndexEXT = CInt;
-const OpacityMicromapSpecialIndexEXT OPACITY_MICROMAP_SPECIAL_INDEX_FULLY_TRANSPARENT_EXT         = -1;
-const OpacityMicromapSpecialIndexEXT OPACITY_MICROMAP_SPECIAL_INDEX_FULLY_OPAQUE_EXT              = -2;
-const OpacityMicromapSpecialIndexEXT OPACITY_MICROMAP_SPECIAL_INDEX_FULLY_UNKNOWN_TRANSPARENT_EXT = -3;
-const OpacityMicromapSpecialIndexEXT OPACITY_MICROMAP_SPECIAL_INDEX_FULLY_UNKNOWN_OPAQUE_EXT      = -4;
+const OpacityMicromapSpecialIndexEXT OPACITY_MICROMAP_SPECIAL_INDEX_FULLY_TRANSPARENT_EXT                        = -1;
+const OpacityMicromapSpecialIndexEXT OPACITY_MICROMAP_SPECIAL_INDEX_FULLY_OPAQUE_EXT                             = -2;
+const OpacityMicromapSpecialIndexEXT OPACITY_MICROMAP_SPECIAL_INDEX_FULLY_UNKNOWN_TRANSPARENT_EXT                = -3;
+const OpacityMicromapSpecialIndexEXT OPACITY_MICROMAP_SPECIAL_INDEX_FULLY_UNKNOWN_OPAQUE_EXT                     = -4;
+const OpacityMicromapSpecialIndexEXT OPACITY_MICROMAP_SPECIAL_INDEX_CLUSTER_GEOMETRY_DISABLE_OPACITY_MICROMAP_NV = -5;
 
 bitstruct OpticalFlowExecuteFlagsNV : Flags @overlap {
 	bool disable_temporal_hints : 0;
@@ -1826,6 +1886,19 @@ bitstruct OpticalFlowUsageFlagsNV : Flags @overlap {
 distinct OutOfBandQueueTypeNV = CInt;
 const OutOfBandQueueTypeNV OUT_OF_BAND_QUEUE_TYPE_RENDER_NV  = 0;
 const OutOfBandQueueTypeNV OUT_OF_BAND_QUEUE_TYPE_PRESENT_NV = 1;
+
+bitstruct PartitionedAccelerationStructureInstanceFlagsNV : Flags @overlap {
+	bool flag_triangle_facing_cull_disable : 0;
+	bool flag_triangle_flip_facing         : 1;
+	bool flag_force_opaque                 : 2;
+	bool flag_force_no_opaque              : 3;
+	bool flag_enable_explicit_bounding_box : 4;
+}
+
+distinct PartitionedAccelerationStructureOpTypeNV = CInt;
+const PartitionedAccelerationStructureOpTypeNV PARTITIONED_ACCELERATION_STRUCTURE_OP_TYPE_WRITE_INSTANCE_NV              = 0;
+const PartitionedAccelerationStructureOpTypeNV PARTITIONED_ACCELERATION_STRUCTURE_OP_TYPE_UPDATE_INSTANCE_NV             = 1;
+const PartitionedAccelerationStructureOpTypeNV PARTITIONED_ACCELERATION_STRUCTURE_OP_TYPE_WRITE_PARTITION_TRANSLATION_NV = 2;
 
 bitstruct PeerMemoryFeatureFlags : Flags @overlap {
 	bool copy_src        : 0;
@@ -1913,8 +1986,9 @@ const PipelineBindPoint PIPELINE_BIND_POINT_SUBPASS_SHADING_HUAWEI = 1000369003;
 const PipelineBindPoint PIPELINE_BIND_POINT_RAY_TRACING_NV         = PIPELINE_BIND_POINT_RAY_TRACING_KHR;
 
 bitstruct PipelineCacheCreateFlags : Flags @overlap {
-	bool externally_synchronized     : 0;
-	bool externally_synchronized_ext : 0;
+	bool externally_synchronized           : 0;
+	bool internally_synchronized_merge_khr : 3;
+	bool externally_synchronized_ext       : 0;
 }
 
 distinct PipelineCacheHeaderVersion = CInt;
@@ -2199,6 +2273,14 @@ const RasterizationOrderAMD RASTERIZATION_ORDER_RELAXED_AMD = 1;
 distinct RayTracingInvocationReorderModeNV = CInt;
 const RayTracingInvocationReorderModeNV RAY_TRACING_INVOCATION_REORDER_MODE_NONE_NV    = 0;
 const RayTracingInvocationReorderModeNV RAY_TRACING_INVOCATION_REORDER_MODE_REORDER_NV = 1;
+
+distinct RayTracingLssIndexingModeNV = CInt;
+const RayTracingLssIndexingModeNV RAY_TRACING_LSS_INDEXING_MODE_LIST_NV       = 0;
+const RayTracingLssIndexingModeNV RAY_TRACING_LSS_INDEXING_MODE_SUCCESSIVE_NV = 1;
+
+distinct RayTracingLssPrimitiveEndCapsModeNV = CInt;
+const RayTracingLssPrimitiveEndCapsModeNV RAY_TRACING_LSS_PRIMITIVE_END_CAPS_MODE_NONE_NV    = 0;
+const RayTracingLssPrimitiveEndCapsModeNV RAY_TRACING_LSS_PRIMITIVE_END_CAPS_MODE_CHAINED_NV = 1;
 
 distinct RayTracingShaderGroupTypeKHR = CInt;
 const RayTracingShaderGroupTypeKHR RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR              = 0;
@@ -3277,7 +3359,6 @@ const StructureType STRUCTURE_TYPE_IMAGE_VIEW_SLICED_CREATE_INFO_EXT            
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_SET_HOST_MAPPING_FEATURES_VALVE          = 1000420000;
 const StructureType STRUCTURE_TYPE_DESCRIPTOR_SET_BINDING_REFERENCE_VALVE                              = 1000420001;
 const StructureType STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_HOST_MAPPING_INFO_VALVE                       = 1000420002;
-const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLAMP_ZERO_ONE_FEATURES_EXT                   = 1000421000;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_NON_SEAMLESS_CUBE_MAP_FEATURES_EXT                  = 1000422000;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_RENDER_PASS_STRIPED_FEATURES_ARM                    = 1000424000;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_RENDER_PASS_STRIPED_PROPERTIES_ARM                  = 1000424001;
@@ -3294,6 +3375,9 @@ const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_DECOMPRESSION_PROPERTI
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_GENERATED_COMMANDS_COMPUTE_FEATURES_NV       = 1000428000;
 const StructureType STRUCTURE_TYPE_COMPUTE_PIPELINE_INDIRECT_BUFFER_INFO_NV                            = 1000428001;
 const StructureType STRUCTURE_TYPE_PIPELINE_INDIRECT_DEVICE_ADDRESS_INFO_NV                            = 1000428002;
+const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_LINEAR_SWEPT_SPHERES_FEATURES_NV        = 1000429008;
+const StructureType STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_LINEAR_SWEPT_SPHERES_DATA_NV        = 1000429009;
+const StructureType STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_SPHERES_DATA_NV                     = 1000429010;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_LINEAR_COLOR_ATTACHMENT_FEATURES_NV                 = 1000430000;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_MAXIMAL_RECONVERGENCE_FEATURES_KHR           = 1000434000;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_COMPRESSION_CONTROL_SWAPCHAIN_FEATURES_EXT    = 1000437000;
@@ -3351,6 +3435,10 @@ const StructureType STRUCTURE_TYPE_AMIGO_PROFILING_SUBMIT_INFO_SEC              
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PER_VIEW_VIEWPORTS_FEATURES_QCOM          = 1000488000;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_INVOCATION_REORDER_FEATURES_NV          = 1000490000;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_INVOCATION_REORDER_PROPERTIES_NV        = 1000490001;
+const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_VECTOR_FEATURES_NV                      = 1000491000;
+const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_VECTOR_PROPERTIES_NV                    = 1000491001;
+const StructureType STRUCTURE_TYPE_COOPERATIVE_VECTOR_PROPERTIES_NV                                    = 1000491002;
+const StructureType STRUCTURE_TYPE_CONVERT_COOPERATIVE_VECTOR_MATRIX_INFO_NV                           = 1000491004;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_SPARSE_ADDRESS_SPACE_FEATURES_NV           = 1000492000;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_SPARSE_ADDRESS_SPACE_PROPERTIES_NV         = 1000492001;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_MUTABLE_DESCRIPTOR_TYPE_FEATURES_EXT                = 1000351000;
@@ -3440,6 +3528,20 @@ const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_LAYERED_API_VULKAN_PROPERTIES
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_ATOMIC_FLOAT16_VECTOR_FEATURES_NV            = 1000563000;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_REPLICATED_COMPOSITES_FEATURES_EXT           = 1000564000;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_VALIDATION_FEATURES_NV                  = 1000568000;
+const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_CLUSTER_ACCELERATION_STRUCTURE_FEATURES_NV          = 1000569000;
+const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_CLUSTER_ACCELERATION_STRUCTURE_PROPERTIES_NV        = 1000569001;
+const StructureType STRUCTURE_TYPE_CLUSTER_ACCELERATION_STRUCTURE_CLUSTERS_BOTTOM_LEVEL_INPUT_NV       = 1000569002;
+const StructureType STRUCTURE_TYPE_CLUSTER_ACCELERATION_STRUCTURE_TRIANGLE_CLUSTER_INPUT_NV            = 1000569003;
+const StructureType STRUCTURE_TYPE_CLUSTER_ACCELERATION_STRUCTURE_MOVE_OBJECTS_INPUT_NV                = 1000569004;
+const StructureType STRUCTURE_TYPE_CLUSTER_ACCELERATION_STRUCTURE_INPUT_INFO_NV                        = 1000569005;
+const StructureType STRUCTURE_TYPE_CLUSTER_ACCELERATION_STRUCTURE_COMMANDS_INFO_NV                     = 1000569006;
+const StructureType STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CLUSTER_ACCELERATION_STRUCTURE_CREATE_INFO_NV  = 1000569007;
+const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_PARTITIONED_ACCELERATION_STRUCTURE_FEATURES_NV      = 1000570000;
+const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_PARTITIONED_ACCELERATION_STRUCTURE_PROPERTIES_NV    = 1000570001;
+const StructureType STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_PARTITIONED_ACCELERATION_STRUCTURE_NV          = 1000570002;
+const StructureType STRUCTURE_TYPE_PARTITIONED_ACCELERATION_STRUCTURE_INSTANCES_INPUT_NV               = 1000570003;
+const StructureType STRUCTURE_TYPE_BUILD_PARTITIONED_ACCELERATION_STRUCTURE_INFO_NV                    = 1000570004;
+const StructureType STRUCTURE_TYPE_PARTITIONED_ACCELERATION_STRUCTURE_FLAGS_NV                         = 1000570005;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_GENERATED_COMMANDS_FEATURES_EXT              = 1000572000;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_DEVICE_GENERATED_COMMANDS_PROPERTIES_EXT            = 1000572001;
 const StructureType STRUCTURE_TYPE_GENERATED_COMMANDS_MEMORY_REQUIREMENTS_INFO_EXT                     = 1000572002;
@@ -3454,16 +3556,27 @@ const StructureType STRUCTURE_TYPE_INDIRECT_EXECUTION_SET_SHADER_INFO_EXT       
 const StructureType STRUCTURE_TYPE_INDIRECT_EXECUTION_SET_SHADER_LAYOUT_INFO_EXT                       = 1000572012;
 const StructureType STRUCTURE_TYPE_GENERATED_COMMANDS_PIPELINE_INFO_EXT                                = 1000572013;
 const StructureType STRUCTURE_TYPE_GENERATED_COMMANDS_SHADER_INFO_EXT                                  = 1000572014;
+const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_8_FEATURES_KHR                          = 1000574000;
+const StructureType STRUCTURE_TYPE_MEMORY_BARRIER_ACCESS_FLAGS_3_KHR                                   = 1000574002;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ALIGNMENT_CONTROL_FEATURES_MESA               = 1000575000;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_ALIGNMENT_CONTROL_PROPERTIES_MESA             = 1000575001;
 const StructureType STRUCTURE_TYPE_IMAGE_ALIGNMENT_CONTROL_CREATE_INFO_MESA                            = 1000575002;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLAMP_CONTROL_FEATURES_EXT                    = 1000582000;
 const StructureType STRUCTURE_TYPE_PIPELINE_VIEWPORT_DEPTH_CLAMP_CONTROL_CREATE_INFO_EXT               = 1000582001;
+const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_VIDEO_MAINTENANCE_2_FEATURES_KHR                    = 1000586000;
+const StructureType STRUCTURE_TYPE_VIDEO_DECODE_H264_INLINE_SESSION_PARAMETERS_INFO_KHR                = 1000586001;
+const StructureType STRUCTURE_TYPE_VIDEO_DECODE_H265_INLINE_SESSION_PARAMETERS_INFO_KHR                = 1000586002;
+const StructureType STRUCTURE_TYPE_VIDEO_DECODE_AV1_INLINE_SESSION_PARAMETERS_INFO_KHR                 = 1000586003;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_HDR_VIVID_FEATURES_HUAWEI                           = 1000590000;
 const StructureType STRUCTURE_TYPE_HDR_VIVID_DYNAMIC_METADATA_HUAWEI                                   = 1000590001;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_2_FEATURES_NV                    = 1000593000;
 const StructureType STRUCTURE_TYPE_COOPERATIVE_MATRIX_FLEXIBLE_DIMENSIONS_PROPERTIES_NV                = 1000593001;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_2_PROPERTIES_NV                  = 1000593002;
+const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_OPACITY_MICROMAP_FEATURES_ARM              = 1000596000;
+const StructureType STRUCTURE_TYPE_IMPORT_MEMORY_METAL_HANDLE_INFO_EXT                                 = 1000602000;
+const StructureType STRUCTURE_TYPE_MEMORY_METAL_HANDLE_PROPERTIES_EXT                                  = 1000602001;
+const StructureType STRUCTURE_TYPE_MEMORY_GET_METAL_HANDLE_INFO_EXT                                    = 1000602002;
+const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLAMP_ZERO_ONE_FEATURES_KHR                   = 1000421000;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_ATTRIBUTE_ROBUSTNESS_FEATURES_EXT            = 1000608000;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTER_FEATURES                           = STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTERS_FEATURES;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETER_FEATURES                      = STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES;
@@ -3671,6 +3784,7 @@ const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_4_PROPERTIES_KHR 
 const StructureType STRUCTURE_TYPE_DEVICE_BUFFER_MEMORY_REQUIREMENTS_KHR                               = STRUCTURE_TYPE_DEVICE_BUFFER_MEMORY_REQUIREMENTS;
 const StructureType STRUCTURE_TYPE_DEVICE_IMAGE_MEMORY_REQUIREMENTS_KHR                                = STRUCTURE_TYPE_DEVICE_IMAGE_MEMORY_REQUIREMENTS;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_ROTATE_FEATURES_KHR                 = STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_SUBGROUP_ROTATE_FEATURES;
+const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLAMP_ZERO_ONE_FEATURES_EXT                   = STRUCTURE_TYPE_PHYSICAL_DEVICE_DEPTH_CLAMP_ZERO_ONE_FEATURES_KHR;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_PROTECTED_ACCESS_FEATURES_EXT              = STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_PROTECTED_ACCESS_FEATURES;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_5_FEATURES_KHR                          = STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_5_FEATURES;
 const StructureType STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_5_PROPERTIES_KHR                        = STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_5_PROPERTIES;
@@ -4172,6 +4286,7 @@ bitstruct VideoSessionCreateFlagsKHR : Flags @overlap {
 	bool inline_queries                       : 2;
 	bool allow_encode_quantization_delta_map  : 3;
 	bool allow_encode_emphasis_map            : 4;
+	bool inline_session_parameters            : 5;
 }
 
 bitstruct VideoSessionParametersCreateFlagsKHR : Flags @overlap {
@@ -4408,6 +4523,7 @@ bitstruct FormatFeatureFlags2 : Flags64 @overlap {
 	bool sampled_image_depth_comparison_khr                                          : 33;
 	bool sampled_image_filter_minmax_khr                                             : 16;
 	bool sampled_image_filter_cubic_ext                                              : 13;
+	bool acceleration_structure_radius_buffer_nv                                     : 51;
 	bool linear_color_attachment_nv                                                  : 38;
 	bool weight_image_qcom                                                           : 34;
 	bool weight_sampled_image_qcom                                                   : 35;
@@ -4421,50 +4537,53 @@ bitstruct FormatFeatureFlags2 : Flags64 @overlap {
 }
 
 bitstruct PipelineCreateFlags2 : Flags64 @overlap {
-	bool disable_optimization                               : 0;
-	bool allow_derivatives                                  : 1;
-	bool derivative                                         : 2;
-	bool view_index_from_device_index                       : 3;
-	bool dispatch_base                                      : 4;
-	bool fail_on_pipeline_compile_required                  : 8;
-	bool early_return_on_failure                            : 9;
-	bool no_protected_access                                : 27;
-	bool protected_access_only                              : 30;
-	bool execution_graph_amdx                               : 32;
-	bool enable_legacy_dithering_ext                        : 34;
-	bool disable_optimization_khr                           : 0;
-	bool allow_derivatives_khr                              : 1;
-	bool derivative_khr                                     : 2;
-	bool view_index_from_device_index_khr                   : 3;
-	bool dispatch_base_khr                                  : 4;
-	bool defer_compile_nv                                   : 5;
-	bool capture_statistics_khr                             : 6;
-	bool capture_internal_representations_khr               : 7;
-	bool fail_on_pipeline_compile_required_khr              : 8;
-	bool early_return_on_failure_khr                        : 9;
-	bool link_time_optimization_ext                         : 10;
-	bool retain_link_time_optimization_info_ext             : 23;
-	bool library_khr                                        : 11;
-	bool ray_tracing_skip_triangles_khr                     : 12;
-	bool ray_tracing_skip_aabbs_khr                         : 13;
-	bool ray_tracing_no_null_any_hit_shaders_khr            : 14;
-	bool ray_tracing_no_null_closest_hit_shaders_khr        : 15;
-	bool ray_tracing_no_null_miss_shaders_khr               : 16;
-	bool ray_tracing_no_null_intersection_shaders_khr       : 17;
-	bool ray_tracing_shader_group_handle_capture_replay_khr : 19;
-	bool indirect_bindable_nv                               : 18;
-	bool ray_tracing_allow_motion_nv                        : 20;
-	bool rendering_fragment_shading_rate_attachment_khr     : 21;
-	bool rendering_fragment_density_map_attachment_ext      : 22;
-	bool ray_tracing_opacity_micromap_ext                   : 24;
-	bool color_attachment_feedback_loop_ext                 : 25;
-	bool depth_stencil_attachment_feedback_loop_ext         : 26;
-	bool no_protected_access_ext                            : 27;
-	bool protected_access_only_ext                          : 30;
-	bool ray_tracing_displacement_micromap_nv               : 28;
-	bool descriptor_buffer_ext                              : 29;
-	bool capture_data_khr                                   : 31;
-	bool indirect_bindable_ext                              : 38;
+	bool disable_optimization                                  : 0;
+	bool allow_derivatives                                     : 1;
+	bool derivative                                            : 2;
+	bool view_index_from_device_index                          : 3;
+	bool dispatch_base                                         : 4;
+	bool fail_on_pipeline_compile_required                     : 8;
+	bool early_return_on_failure                               : 9;
+	bool no_protected_access                                   : 27;
+	bool protected_access_only                                 : 30;
+	bool execution_graph_amdx                                  : 32;
+	bool ray_tracing_skip_built_in_primitives_khr              : 12;
+	bool ray_tracing_allow_spheres_and_linear_swept_spheres_nv : 33;
+	bool enable_legacy_dithering_ext                           : 34;
+	bool disable_optimization_khr                              : 0;
+	bool allow_derivatives_khr                                 : 1;
+	bool derivative_khr                                        : 2;
+	bool view_index_from_device_index_khr                      : 3;
+	bool dispatch_base_khr                                     : 4;
+	bool defer_compile_nv                                      : 5;
+	bool capture_statistics_khr                                : 6;
+	bool capture_internal_representations_khr                  : 7;
+	bool fail_on_pipeline_compile_required_khr                 : 8;
+	bool early_return_on_failure_khr                           : 9;
+	bool link_time_optimization_ext                            : 10;
+	bool retain_link_time_optimization_info_ext                : 23;
+	bool library_khr                                           : 11;
+	bool ray_tracing_skip_triangles_khr                        : 12;
+	bool ray_tracing_skip_aabbs_khr                            : 13;
+	bool ray_tracing_no_null_any_hit_shaders_khr               : 14;
+	bool ray_tracing_no_null_closest_hit_shaders_khr           : 15;
+	bool ray_tracing_no_null_miss_shaders_khr                  : 16;
+	bool ray_tracing_no_null_intersection_shaders_khr          : 17;
+	bool ray_tracing_shader_group_handle_capture_replay_khr    : 19;
+	bool indirect_bindable_nv                                  : 18;
+	bool ray_tracing_allow_motion_nv                           : 20;
+	bool rendering_fragment_shading_rate_attachment_khr        : 21;
+	bool rendering_fragment_density_map_attachment_ext         : 22;
+	bool ray_tracing_opacity_micromap_ext                      : 24;
+	bool color_attachment_feedback_loop_ext                    : 25;
+	bool depth_stencil_attachment_feedback_loop_ext            : 26;
+	bool no_protected_access_ext                               : 27;
+	bool protected_access_only_ext                             : 30;
+	bool ray_tracing_displacement_micromap_nv                  : 28;
+	bool descriptor_buffer_ext                                 : 29;
+	bool disallow_opacity_micromap_arm                         : 37;
+	bool capture_data_khr                                      : 31;
+	bool indirect_bindable_ext                                 : 38;
 }
 
 bitstruct PipelineStageFlags2 : Flags64 @overlap {
@@ -4542,6 +4661,7 @@ bitstruct PipelineStageFlags2 : Flags64 @overlap {
 	bool micromap_build_ext                   : 30;
 	bool cluster_culling_shader_huawei        : 41;
 	bool optical_flow_nv                      : 29;
+	bool convert_cooperative_vector_matrix_nv : 44;
 }
 
 

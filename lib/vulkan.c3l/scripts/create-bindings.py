@@ -552,73 +552,75 @@ def parse_fake_enums(f):
         f.write("}\n\n")
 
 
-def parse_c_bitfields(name, raw_fields) -> (bool, str):
-    type_sizes = {
-        "char": 8,
-        "short": 16,
-        "int": 32,
-        "long": 64,
-        "long long": 64,
-        "uint8_t": 8,
-        "uint16_t": 16,
-        "uint32_t": 32,
-        "uint64_t": 64,
-        "int8_t": 8,
-        "int16_t": 16,
-        "int32_t": 32,
-        "int64_t": 64,
-        "float": 32,
-        "VkTransformMatrixKHR": 32*3*4, # 3x4 matrix
-        "VkSRTDataNV": 32*16, # 16 floats, a, b, c, sx, sy, sz, tx, ty, tz, qx, qy, qz, qw, pvx, pvy, pvz
-        "VkClusterAccelerationStructureClusterFlagsNV": 32, # VkFlags
-        "VkClusterAccelerationStructureGeometryIndexAndGeometryFlagsNV": 32,
-        "VkDeviceAddress": 64, # 64-bit address
-        "VkStridedDeviceAddressNV": 64*2, # 64-bit address and stride
 
-    }
-    def determine_backing_type(bit_size: int) -> str:
-        if bit_size <= 8:
-            return "char"
-        elif bit_size <= 16:
-            return "ushort"
-        elif bit_size <= 32:
-            return "uint"
-        elif bit_size <= 64:
-            return "ulong"
-        else:
-            return f"char[{(bit_size + 7) // 8}]"
+def parse_c_bitfields(name, raw_fields):
+    def determine_backing_type(bit_size):
+        standard_sizes = [8, 16, 32, 64, 128, 256]
+        for size in standard_sizes:
+            if bit_size <= size:
+                warning = f" /* Warning: unusual bitstruct size {bit_size} bit, rounded up to {size} */" if bit_size not in standard_sizes else ""
+                return {8: "char", 16: "ushort", 32: "uint", 64: "ulong"}.get(size, f"char[{size // 8}]") + warning
+        warning = f" /* Warning: unusual bitstruct size {bit_size} bit */"
+        return f"char[{(bit_size + 7) // 8}]" + warning
+
     field_pattern = re.compile(r"\s*([\w\s]+?)\s+(\w+)\s*(?::\s*(\d+))?;")
-
     bit_offset = 0
     has_bitfields = False
-
-    fields = []
+    has_normalfields = False
+    result_entries = []
+    current_bitfield = []
+    current_bit_size = 0
 
     for field_match in field_pattern.finditer(raw_fields):
         type_name, field_name, bit_size = field_match.groups()
         type_name = type_name.strip()
-        comment = None
+        field_name = to_snake_case(field_name)
+        field_name = re.sub(r"_flag$", "", field_name)  # Strip trailing '_flag'
 
         if bit_size:
             has_bitfields = True
             bit_size = int(bit_size)
+            c3_type = "bool" if bit_size == 1 else do_type(type_name)
+            current_bitfield.append((c3_type, field_name, bit_size, bit_offset))
+            bit_offset += bit_size
+            current_bit_size += bit_size
         else:
-            if type_name in type_sizes:
-                bit_size = type_sizes[type_name]
+            has_normalfields = True
+            if current_bitfield:
+                backing_type = determine_backing_type(current_bit_size)
+                result_entries.append(("bitstruct", backing_type, current_bitfield))
+                current_bitfield = []
+                current_bit_size = 0
+                bit_offset = 0
+
+            result_entries.append(("field", do_type(type_name), field_name))
+
+    if current_bitfield:
+        backing_type = determine_backing_type(current_bit_size)
+        result_entries.append(("bitstruct", backing_type, current_bitfield))
+
+    ret = ""
+    if has_normalfields:
+        ret = f"struct {name} {{\n"
+
+    for entry in result_entries:
+        if entry[0] == "field":
+            _, c3_type, field_name = entry
+            ret += f"    {c3_type} {field_name};\n"
+        elif entry[0] == "bitstruct":
+            _, backing_type, bitfield = entry
+            if has_normalfields:
+                ret += f"bitstruct : {backing_type} {{\n"
             else:
-                bit_size = 32 # Default to 32 if unknown
-                comment = "TODO: unknown bit size for type " + type_name + ", default to 32"
+                ret += f"bitstruct {name} : {backing_type} {{\n"
+            for t, n, s, o in bitfield:
+                ret += f"    {t} {n}: {o if s == 1 else f'{o}..{o + s - 1}'};\n"
+            ret += "}\n"
 
-        field_name = re.sub(r"_flag$", "", field_name)  # Strip trailing '_flag'
-        c3_type = "bool" if bit_size == 1 else do_type(type_name)
-        fields.append(f"\t{c3_type} {field_name}: {bit_offset if bit_size == 1 else f'{bit_offset}..{bit_offset + bit_size - 1}'}; "+(f"// {comment}" if comment else ""))
-        bit_offset += bit_size
+    if has_normalfields:
+        ret += "}\n\n"
 
-    backing_type = determine_backing_type(bit_offset)
-
-    c3_struct = f"bitstruct {name} : {backing_type} {{\n" + "\n".join(fields) + "\n}\n\n"
-
-    return has_bitfields, c3_struct
+    return has_bitfields, ret
 
 def parse_structs(f):
     data = re.findall(r"typedef (struct|union) Vk(\w+?) {(.+?)} \w+?;", src, re.S)
