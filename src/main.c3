@@ -50,7 +50,7 @@ vk::Semaphore[MAX_FRAMES_IN_FLIGHT] g_image_available_semaphore;
 vk::Semaphore[MAX_FRAMES_IN_FLIGHT] g_render_finished_semaphore;
 vk::Fence[MAX_FRAMES_IN_FLIGHT] g_in_flight_fences;
 
-uint g_current_frame = 0;
+uint g_current_frame;
 
 fn int main(String[] args) {
     io::printfn("GLFW %s",glfw::getVersionString());
@@ -402,7 +402,6 @@ fn void! createSwapchain() {
         .composite_alpha = vk::CompositeAlphaFlagsKHR { .opaque },
         .present_mode = presentMode,
         .clipped = (uint)true,
-        .old_swapchain = (vk::SwapchainKHR)0,
     };
     if (indices.graphics_family != indices.present_family) {
         createInfo.image_sharing_mode = vk::SHARING_MODE_CONCURRENT;
@@ -421,9 +420,7 @@ fn void! createSwapchain() {
             .format = g_swap_chain_format.format,
             .subresource_range = {
                 .aspect_mask = vk::ImageAspectFlags { .color },
-                .base_mip_level = 0,
                 .level_count = 1,
-                .base_array_layer = 0,
                 .layer_count = 1,
             },
         };
