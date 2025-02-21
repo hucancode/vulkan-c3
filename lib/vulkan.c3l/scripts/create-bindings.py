@@ -67,16 +67,16 @@ def convert_type(t):
         "Bool32":      'uint',
         "float":       'float',
         "double":      'double',
-        "uint32_t":    'uint',
-        "uint64_t":    'ulong',
         "size_t":      'usz',
+        'int8_t':     'ichar',
         'int16_t':     'short',
         'int32_t':     'int',
         'int64_t':     'long',
         'int':         'CInt',
         'uint8_t':     'char',
-        'int8_t':     'ichar',
         "uint16_t":    'ushort',
+        "uint32_t":    'uint',
+        "uint64_t":    'ulong',
         "char":        "ichar",
         "void":        "void",
         "void*":       "void*",
@@ -84,10 +84,9 @@ def convert_type(t):
         "char*":       'ZString',
         'uint8_t*':     'ZString',
         "uint32_t* const*": "uint*[]",
-        "void*": 'void*',
         "char* const*": 'ZString*',
         "ObjectTableEntryNVX* const*": "ObjectTableEntryNVX**",
-        "void* const *": "void**",
+        "void* const *": "void*",
         "AccelerationStructureGeometryKHR* const*": "AccelerationStructureGeometryKHR**",
         "AccelerationStructureBuildRangeInfoKHR* const*": "AccelerationStructureBuildRangeInfoKHR**",
         "MicromapUsageEXT* const*": "MicromapUsageEXT*[]",
@@ -552,72 +551,107 @@ def parse_fake_enums(f):
 
         f.write("}\n\n")
 
+
+
+def parse_c_bitfields(name, raw_fields):
+    def determine_backing_type(bit_size):
+        standard_sizes = [8, 16, 32, 64, 128, 256]
+        for size in standard_sizes:
+            if bit_size <= size:
+                warning = f" /* Warning: unusual bitstruct size {bit_size} bit, rounded up to {size} */" if bit_size not in standard_sizes else ""
+                return {8: "char", 16: "ushort", 32: "uint", 64: "ulong"}.get(size, f"char[{size // 8}]") + warning
+        warning = f" /* Warning: unusual bitstruct size {bit_size} bit */"
+        return f"char[{(bit_size + 7) // 8}]" + warning
+
+    field_pattern = re.compile(r"\s*([\w\s]+?)\s+(\w+)\s*(?::\s*(\d+))?;")
+    bit_offset = 0
+    has_bitfields = False
+    has_normalfields = False
+    result_entries = []
+    current_bitfield = []
+    current_bit_size = 0
+
+    for field_match in field_pattern.finditer(raw_fields):
+        type_name, field_name, bit_size = field_match.groups()
+        type_name = type_name.strip()
+        field_name = to_snake_case(field_name)
+        field_name = re.sub(r"_flag$", "", field_name)  # Strip trailing '_flag'
+
+        if bit_size:
+            has_bitfields = True
+            bit_size = int(bit_size)
+            c3_type = "bool" if bit_size == 1 else do_type(type_name)
+            current_bitfield.append((c3_type, field_name, bit_size, bit_offset))
+            bit_offset += bit_size
+            current_bit_size += bit_size
+        else:
+            has_normalfields = True
+            if current_bitfield:
+                backing_type = determine_backing_type(current_bit_size)
+                result_entries.append(("bitstruct", backing_type, current_bitfield))
+                current_bitfield = []
+                current_bit_size = 0
+                bit_offset = 0
+
+            result_entries.append(("field", do_type(type_name), field_name))
+
+    if current_bitfield:
+        backing_type = determine_backing_type(current_bit_size)
+        result_entries.append(("bitstruct", backing_type, current_bitfield))
+
+    ret = ""
+    if has_normalfields:
+        ret = f"struct {name} {{\n"
+
+    for entry in result_entries:
+        if entry[0] == "field":
+            _, c3_type, field_name = entry
+            ret += f"    {c3_type} {field_name};\n"
+        elif entry[0] == "bitstruct":
+            _, backing_type, bitfield = entry
+            if has_normalfields:
+                ret += f"bitstruct : {backing_type} {{\n"
+            else:
+                ret += f"bitstruct {name} : {backing_type} {{\n"
+            for t, n, s, o in bitfield:
+                ret += f"    {t} {n}: {o if s == 1 else f'{o}..{o + s - 1}'};\n"
+            ret += "}\n"
+
+    if has_normalfields:
+        ret += "}\n\n"
+
+    return has_bitfields, ret
+
 def parse_structs(f):
     data = re.findall(r"typedef (struct|union) Vk(\w+?) {(.+?)} \w+?;", src, re.S)
     data += re.findall(r"typedef (struct|union) Std(\w+?) {(.+?)} \w+?;", src, re.S)
 
     for _type, name, fields in data:
+        ok, c3_bitstruct = parse_c_bitfields(name, fields)
+        if ok:
+            f.write(c3_bitstruct)
+            continue
         fields = re.findall(r"\s+(.+?)[\s:]+([_a-zA-Z0-9[\]]+);", fields)
         f.write(f"{_type} {name} {{\n")
-        prev_name = ""
         ffields = []
         for type_, fname in fields:
-            # If the field name only has a number in it, then it is a C bit field.
-            if is_int(fname):
-                comment = None
-                bit_field = type_.split(' ')
-                # Get rid of empty spaces
-                bit_field = list(filter(bool, bit_field))
-                # [type, fieldname]
-                assert len(bit_field) == 2, "Failed to parse the bit field!"
-
-                bit_field_type = ""
-                # Right now there are only two ways that C bit fields exist in
-                # the header files.
-
-                # First one uses the 8 MOST significant bits for one field, and
-                # 24 bits for the other field.
-                # In the bindings these two fields are merged into one u32.
-                if int(fname) == 24:
-                    prev_name = bit_field[1]
-                    continue
-
-                elif prev_name:
-                    bit_field_type = do_type("uint")
-                    bit_field_name = prev_name + "And" + bit_field[1].capitalize()
-                    comment = " // Most significant byte is {}".format(bit_field[1])
-                    ffields.append(tuple([bit_field_name, bit_field_type, comment]))
-                    prev_name = ""
-                    continue
-
-                # The second way has many fields that are each 1 bit
-                elif int(fname) == 1:
-                    bit_field_type = do_type(bit_field[0])
-                    ffields.append(tuple(["bitfield", bit_field_type, comment]))
-                    break
-
             if '[' in fname:
                 fname, type_ = parse_array(fname, type_)
             comment = None
-            n = fix_arg(fname)
+            n = to_snake_case(fix_arg(fname))
             if "Flag_Bits" in type_:
                 continue
             t = do_type(type_)
-            if t.endswith("char*"):
-                print(" type", t, "in", name, "origninal", type_)
             ffields.append(tuple([n, t, comment]))
-            prev_name = fname
 
         max_len = max([len(t) for _, t, _ in ffields], default=0)
+        max_len_name = max([len(n) for n, _, _ in ffields], default=0)
 
         for name, type, comment in ffields:
-            k = max_len
             name = name[0].lower() + name[1:]
             if name == "module":
                 name += "_"
-            f.write("\t{} {}; {}\n".format(type.ljust(k), name, comment or ""))
-
-
+            f.write("\t{} {}; {}\n".format(type.ljust(max_len), name.ljust(max_len_name), comment or ""))
         f.write("}\n\n")
 
     f.write("// Opaque structs\n")
@@ -640,8 +674,6 @@ def parse_structs(f):
     for n, t in aliases:
         k = max_len
         f.write("def {} = {};\n".format(n.ljust(k), t))
-
-
 
 procedure_map = {}
 
