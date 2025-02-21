@@ -267,10 +267,8 @@ fn void! pickPhysicalDevice() {
 
 struct SwapchainSupportDetails {
     vk::SurfaceCapabilitiesKHR capabilities;
-    vk::SurfaceFormatKHR* formats;
-    uint format_count;
-    vk::PresentModeKHR* present_modes;
-    uint present_mode_count;
+    vk::SurfaceFormatKHR[] formats;
+    vk::PresentModeKHR[] present_modes;
 }
 fn void SwapchainSupportDetails.free(SwapchainSupportDetails* self) {
     free(self.formats);
@@ -345,19 +343,19 @@ fn void! createLogicalDevice() {
     vk::getDeviceQueue(g_device, indices.present_family, 0, &g_present_queue);
 }
 
-fn vk::SurfaceFormatKHR pickSwapSurfaceFormat(vk::SurfaceFormatKHR* formats, int count) {
-    for (int i = 0; i < count; i++) {
-        if (formats[i].format == vk::FORMAT_B8G8R8A8_SRGB && formats[i].color_space == vk::COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-            return formats[i];
+fn vk::SurfaceFormatKHR pickSwapSurfaceFormat(vk::SurfaceFormatKHR[] formats) {
+    foreach (f: formats) {
+        if (f.format == vk::FORMAT_B8G8R8A8_SRGB && f.color_space == vk::COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+            return f;
         }
     }
     return formats[0];
 }
 
-fn vk::PresentModeKHR pickSwapPresentMode(vk::PresentModeKHR* presentModes, int count) {
-    for (int i = 0; i < count; i++) {
-        if (presentModes[i] == vk::PRESENT_MODE_MAILBOX_KHR) {
-            return presentModes[i];
+fn vk::PresentModeKHR pickSwapPresentMode(vk::PresentModeKHR[] presentModes) {
+    foreach (p: presentModes) {
+        if (p == vk::PRESENT_MODE_MAILBOX_KHR) {
+            return p;
         }
     }
     return vk::PRESENT_MODE_FIFO_KHR;
@@ -379,8 +377,8 @@ fn vk::Extent2D pickSwapExtent(vk::SurfaceCapabilitiesKHR capabilities) {
 fn void! createSwapchain() {
     QueueFamilyIndices indices = findQueueFamilies(g_physical_device)!;
     SwapchainSupportDetails swapChainSupport = querySwapchainSupport(g_physical_device)!;
-    vk::PresentModeKHR presentMode = pickSwapPresentMode(swapChainSupport.present_modes, swapChainSupport.present_mode_count);
-    g_swap_chain_format = pickSwapSurfaceFormat(swapChainSupport.formats, swapChainSupport.format_count);
+    vk::PresentModeKHR presentMode = pickSwapPresentMode(swapChainSupport.present_modes);
+    g_swap_chain_format = pickSwapSurfaceFormat(swapChainSupport.formats);
     g_swap_chain_extent = pickSwapExtent(swapChainSupport.capabilities);
     uint count = swapChainSupport.capabilities.min_image_count + 1;
     bool unlimited = swapChainSupport.capabilities.max_image_count == 0;
