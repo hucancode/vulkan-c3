@@ -983,12 +983,10 @@ fn void draw(vk::CommandBuffer commandBuffer) {
 
 fn void update() {
     g_ubo.time = (float)time::now().diff_sec(g_start_timestamp);
-    float s = (math::sin(g_ubo.time)+1.0)*0.25 + 0.25;
-    float t = (math::cos(g_ubo.time)+1.0)*0.25 + 0.25;
     g_ubo.model = MATRIX4F_IDENTITY
-        .scale({s, s, s})
-        .rotate_z((float)g_ubo.time)
-        .translate({t, 0.0, 0.0})
+        .rotate_x((float)math::sin((float)g_ubo.time*0.53))
+        .rotate_y((float)math::sin((float)g_ubo.time*0.97))
+        .rotate_z((float)math::sin((float)g_ubo.time*1.17))
         .transpose();
     g_last_frame_timestamp = time::now();
     updateUniforms();
