@@ -1,0 +1,9 @@
+module hellovk;
+import std::math::vector;
+
+struct Vertex {
+	Vec4f position;
+	Vec4f color;
+	Vec4f normal;
+	Vec2f texCoord;
+}

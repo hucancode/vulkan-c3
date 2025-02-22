@@ -3,6 +3,10 @@ const bool GLFW_INCLUDE_VULKAN = true;
 module hellovk;
 import std::core::mem;
 import std::io;
+import std::time;
+import std::math;
+import std::math::matrix;
+import std::math::vector;
 import glfw;
 import vk;
 
@@ -13,7 +17,7 @@ const ENGINE_NAME = "Soreal Engine";
 const ZString[*] REQUIRED_EXTENSIONS = {
     vk::KHR_SWAPCHAIN_EXTENSION_NAME,
 };
-const ENABLE_VALIDATION_LAYERS = false;
+const ENABLE_VALIDATION_LAYERS = true;
 const ZString[*] VALIDATION_LAYERS @if(ENABLE_VALIDATION_LAYERS) = {
     "VK_LAYER_KHRONOS_validation",
 };
@@ -21,6 +25,69 @@ const char[*] VERTEX_CODE = $embed("shaders/vert.spv");
 const char[*] FRAGMENT_CODE = $embed("shaders/frag.spv");
 
 const MAX_FRAMES_IN_FLIGHT = 2;
+const Vertex[] VERTICES = {
+	// Front-top-left
+	{.position = {-1.0, 1.0, 1.0, 1.0}, .color = {0.25, 0.25, 0.5, 1.0}},
+	// Front-top-right
+	{.position = {1.0, 1.0, 1.0, 1.0}, .color = {0.5, 0.5, 0.0, 1.0}},
+	// Front-bottom-right
+	{.position = {1.0, -1.0, 1.0, 1.0}, .color = {0.0, 0.5, 0.5, 1.0}},
+	// Front-bottom-left
+	{.position = {-1.0, -1.0, 1.0, 1.0}, .color = {0.5, 1.0, 0.5, 1.0}},
+	// Back-top-left
+	{.position = {-1.0, 1.0, -1.0, 1.0}, .color = {1.0, 0.5, 0.0, 1.0}},
+	// Back-top-right
+	{.position = {1.0, 1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}},
+	// Back-bottom-right
+	{.position = {1.0, -1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}},
+	// Back-bottom-left
+	{.position = {-1.0, -1.0, -1.0, 1.0}, .color = {0.25, 0.25, 1.0, 1.0}},
+};
+
+const ushort[] INDICES = {
+	// Front face
+	0,
+	2,
+	1,
+	0,
+	3,
+	2,
+	// Right face
+	1,
+	6,
+	5,
+	1,
+	2,
+	6,
+	// Back face
+	5,
+	7,
+	4,
+	5,
+	6,
+	7,
+	// Left face
+	4,
+	3,
+	0,
+	4,
+	7,
+	3,
+	// Top face
+	4,
+	1,
+	5,
+	4,
+	0,
+	1,
+	// Bottom face
+	3,
+	6,
+	2,
+	3,
+	7,
+	6,
+};
 
 glfw::Window* g_window;
 vk::Instance g_instance;
@@ -39,16 +106,28 @@ vk::Image[] g_swap_chain_images;
 vk::ImageView[] g_swap_chain_image_views;
 vk::Framebuffer[] g_swap_chain_framebuffers;
 
-vk::PipelineShaderStageCreateInfo[2] g_vertex_shader_stage_info;
 vk::RenderPass g_render_pass;
+vk::DescriptorSetLayout g_descriptor_set_layout;
 vk::PipelineLayout g_pipeline_layout;
 vk::Pipeline g_graphics_pipeline;
+vk::DescriptorPool g_descriptor_pool;
+vk::DescriptorSet[MAX_FRAMES_IN_FLIGHT] g_descriptor_sets;
 
 vk::CommandPool g_command_pool;
 vk::CommandBuffer[MAX_FRAMES_IN_FLIGHT] g_command_buffers;
 vk::Semaphore[MAX_FRAMES_IN_FLIGHT] g_image_available_semaphore;
 vk::Semaphore[MAX_FRAMES_IN_FLIGHT] g_render_finished_semaphore;
 vk::Fence[MAX_FRAMES_IN_FLIGHT] g_in_flight_fences;
+vk::Buffer[MAX_FRAMES_IN_FLIGHT] g_uniform_buffers;
+vk::DeviceMemory[MAX_FRAMES_IN_FLIGHT] g_uniform_memory;
+void*[MAX_FRAMES_IN_FLIGHT] g_uniform_buffer_mapped;
+vk::Buffer g_index_buffer;
+vk::DeviceMemory g_index_memory;
+vk::Buffer g_vertex_buffer;
+vk::DeviceMemory g_vertex_memory;
+time::Time g_last_frame_timestamp;
+time::Time g_start_timestamp;
+UniformBufferObject g_ubo;
 
 uint g_current_frame;
 
@@ -66,50 +145,16 @@ fn int main(String[] args) {
     }
     io::printfn("Window created %x", g_window);
     defer glfw::destroyWindow(g_window);
-    createVulkanInstance()!!;
-    defer vk::destroyInstance(g_instance, null);
-    $if ENABLE_VALIDATION_LAYERS:
-        defer vk::destroyDebugUtilsMessengerEXT(g_instance, g_debug_messenger, null);
-    $endif
-    io::printfn("Vulkan instance created %x", g_instance);
-    createWindowSurface()!!;
-    defer vk::destroySurfaceKHR(g_instance, g_surface, null);
-    io::printfn("Window surface created %x", g_surface);
-    pickPhysicalDevice()!!;
-    io::printfn("Physical device picked %x", g_physical_device);
-    createLogicalDevice()!!;
-    defer vk::destroyDevice(g_device, null);
-    io::printfn("Logical device created %x", g_device);
-    createSwapchain()!!;
-    defer destroySwapchain();
-    io::printfn("Swap chain created %x", g_swap_chain);
-    loadShader()!!;
-    createRenderPass()!!;
-    defer vk::destroyRenderPass(g_device, g_render_pass, null);
-    io::printfn("Render pass created %x", g_render_pass);
-    createFrameBuffers()!!;
-    defer destroyFrameBuffers();
-    io::printfn("Frame buffers created %x", g_swap_chain_framebuffers);
-    createGraphicsPipeline()!!;
-    defer {
-        vk::destroyPipelineLayout(g_device, g_pipeline_layout, null);
-        vk::destroyPipeline(g_device, g_graphics_pipeline, null);
-    }
-    io::print("Graphics pipeline created\n");
-    createCommandPool()!!;
-    defer vk::destroyCommandPool(g_device, g_command_pool, null);
-    io::print("Command pool created\n");
-    createSemaphores()!!;
-    defer destroySemaphores();
-    io::print("Semaphores created\n");
+    init()!!;
+    defer destroy();
     while (!glfw::windowShouldClose(g_window)) {
         glfw::pollEvents();
+        update();
         anyfault excuse = @catch(render());
         if (excuse) {
             io::printfn("Error: while rendering");
         };
     }
-    vk::deviceWaitIdle(g_device)!!;
     return 0;
 }
 
@@ -153,7 +198,6 @@ fn void! createVulkanInstance() {
                 vk::DebugUtilsMessageTypeFlagsEXT messageType,
                 vk::DebugUtilsMessengerCallbackDataEXT* pCallbackData,
                 void* pUserData) {
-                io::printfn("Validation layer: %s", pCallbackData.p_message);
                 return 0;
             },
         };
@@ -178,8 +222,19 @@ fn void! createVulkanInstance() {
     $endif
 }
 
+fn void destroyVulkanInstance() {
+    $if ENABLE_VALIDATION_LAYERS:
+        vk::destroyDebugUtilsMessengerEXT(g_instance, g_debug_messenger, null);
+    $endif
+    vk::destroyInstance(g_instance, null);
+}
+
 fn void! createWindowSurface() {
     vk::check(glfw::createWindowSurface(g_instance, g_window, null, &g_surface))!;
+}
+
+fn void destroySurface() {
+    vk::destroySurfaceKHR(g_instance, g_surface, null);
 }
 
 fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
@@ -263,6 +318,10 @@ fn void! pickPhysicalDevice() {
         }
     }
     io::printfn("Selected physical device: %x with score %d", g_physical_device, bestScore);
+}
+
+fn void destroyDevice() {
+    vk::destroyDevice(g_device, null);
 }
 
 struct SwapchainSupportDetails {
@@ -405,7 +464,7 @@ fn void! createSwapchain() {
     };
     if (indices.graphics_family != indices.present_family) {
         createInfo.image_sharing_mode = vk::SHARING_MODE_CONCURRENT;
-        createInfo.queue_family_index_count = 2;
+        createInfo.queue_family_index_count = indiceArray.len;
         createInfo.p_queue_family_indices = &indiceArray;
     }
     vk::createSwapchainKHR(g_device, &createInfo, null, &g_swap_chain)!;
@@ -448,27 +507,6 @@ fn vk::ShaderModule! createShaderModule(char[] code) {
     return ret;
 }
 
-fn void! loadShader() {
-    vk::ShaderModule v = createShaderModule(&VERTEX_CODE)!;
-    vk::ShaderModule f = createShaderModule(&FRAGMENT_CODE)!;
-    defer {
-        // vk::destroyShaderModule(g_device, v, null);
-        // vk::destroyShaderModule(g_device, f, null);
-    }
-    g_vertex_shader_stage_info[0] = {
-        .s_type = vk::STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-        .stage = vk::ShaderStageFlags { .vertex },
-        .module_ = v,
-        .p_name = "main",
-    };
-    g_vertex_shader_stage_info[1] = {
-        .s_type = vk::STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-        .stage = vk::ShaderStageFlags { .fragment },
-        .module_ = f,
-        .p_name = "main",
-    };
-}
-
 fn void! createRenderPass() {
     vk::RenderPassCreateInfo createInfo = {
         .s_type = vk::STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
@@ -497,16 +535,22 @@ fn void! createRenderPass() {
             .src_subpass = vk::SUBPASS_EXTERNAL,
             .dst_subpass = 0,
             .src_stage_mask = vk::PipelineStageFlags { .color_attachment_output },
-            .src_access_mask = vk::AccessFlags {},
+            .src_access_mask = vk::AccessFlags { .color_attachment_write },
             .dst_stage_mask = vk::PipelineStageFlags { .color_attachment_output },
             .dst_access_mask = vk::AccessFlags { .color_attachment_write },
+            .dependency_flags = vk::DependencyFlags { .by_region },
         },
     };
+    io::printfn("PipelineStageFlags::color_attachment_output = 0x%x", (uint)vk::PipelineStageFlags { .color_attachment_output });
     vk::createRenderPass(g_device, &createInfo, null, &g_render_pass)!;
 }
 
+fn void destroyRenderPass() {
+    vk::destroyRenderPass(g_device, g_render_pass, null);
+}
+
 fn void! createFrameBuffers() {
-    uint n = g_swap_chain_images.len;
+    uint n = g_swap_chain_image_views.len;
     vk::Framebuffer* buffers = (vk::Framebuffer*)malloc(n * vk::Framebuffer.sizeof);
     g_swap_chain_framebuffers = buffers[:n];
     for (uint i = 0; i < n; i++) {
@@ -530,8 +574,45 @@ fn void destroyFrameBuffers() {
     free(g_swap_chain_framebuffers);
 }
 
+fn void! createDescriptorSetLayout() {
+	vk::DescriptorSetLayoutCreateInfo info = {
+		.s_type        = vk::STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+		.binding_count = 1,
+		.p_bindings    = &&vk::DescriptorSetLayoutBinding {
+			.binding = 0,
+			.descriptor_type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.descriptor_count = 1,
+			.stage_flags = vk::ShaderStageFlags{.vertex},
+		},
+	};
+	vk::createDescriptorSetLayout(
+		g_device,
+		&info,
+		null,
+		&g_descriptor_set_layout,
+	)!;
+}
+
+fn void destroyDescriptorSetLayout() {
+    vk::destroyDescriptorSetLayout(g_device, g_descriptor_set_layout, null);
+}
 
 fn void! createGraphicsPipeline() {
+    vk::ShaderModule v = createShaderModule(&VERTEX_CODE)!;
+    defer vk::destroyShaderModule(g_device, v, null);
+    vk::ShaderModule f = createShaderModule(&FRAGMENT_CODE)!;
+    defer vk::destroyShaderModule(g_device, f, null);
+    vk::PipelineShaderStageCreateInfo[*] shader_stages = {{
+        .s_type = vk::STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+        .stage = vk::ShaderStageFlags { .vertex },
+        .module_ = v,
+        .p_name = "main",
+    }, {
+        .s_type = vk::STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+        .stage = vk::ShaderStageFlags { .fragment },
+        .module_ = f,
+        .p_name = "main",
+    }};
     vk::DynamicState[*] dynamicStates = {
         vk::DYNAMIC_STATE_VIEWPORT,
         vk::DYNAMIC_STATE_SCISSOR
@@ -541,8 +622,28 @@ fn void! createGraphicsPipeline() {
         .dynamic_state_count = dynamicStates.len,
         .p_dynamic_states = &dynamicStates,
     };
+    vk::VertexInputBindingDescription v_binding_description = {
+		.binding   = 0,
+		.stride    = Vertex.sizeof,
+		.input_rate = vk::VERTEX_INPUT_RATE_VERTEX,
+	};
+	vk::VertexInputAttributeDescription[*] v_pos_attribute_description = {{
+	   .binding = 0, .location = 0, .format = vk::FORMAT_R32G32B32A32_SFLOAT, .offset = Vertex.position.offsetof
+	}, {
+	   .binding = 0, .location = 1, .format = vk::FORMAT_R32G32B32A32_SFLOAT, .offset = Vertex.color.offsetof
+	}, {
+	   .binding = 0, .location = 2, .format = vk::FORMAT_R32G32B32A32_SFLOAT, .offset = Vertex.normal.offsetof
+	}, {
+	   .binding = 0, .location = 3, .format = vk::FORMAT_R32G32_SFLOAT, .offset = Vertex.texCoord.offsetof
+	}};
+	io::printfn("vertex size %d, position offset %d, color offset %d, normal offset %d, texcoord offset %d",
+	Vertex.sizeof, Vertex.position.offsetof, Vertex.color.offsetof, Vertex.normal.offsetof, Vertex.texCoord.offsetof);
     vk::PipelineVertexInputStateCreateInfo vertexInputInfo = {
         .s_type = vk::STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+        .vertex_binding_description_count   = 1,
+    	.p_vertex_binding_descriptions      = &v_binding_description,
+    	.vertex_attribute_description_count = v_pos_attribute_description.len,
+    	.p_vertex_attribute_descriptions    = &v_pos_attribute_description,
     };
     vk::PipelineInputAssemblyStateCreateInfo inputAssembly = {
         .s_type = vk::STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
@@ -577,13 +678,15 @@ fn void! createGraphicsPipeline() {
         g_device,
         &&vk::PipelineLayoutCreateInfo {
             .s_type = vk::STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+            .set_layout_count = 1,
+            .p_set_layouts = &g_descriptor_set_layout,
         },
         null,
         &g_pipeline_layout)!;
     vk::GraphicsPipelineCreateInfo pipelineInfo = {
         .s_type = vk::STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-        .stage_count = g_vertex_shader_stage_info.len,
-        .p_stages = &g_vertex_shader_stage_info,
+        .stage_count = shader_stages.len,
+        .p_stages = &shader_stages,
         .p_vertex_input_state = &vertexInputInfo,
         .p_input_assembly_state = &inputAssembly,
         .p_viewport_state = &viewportState,
@@ -597,6 +700,11 @@ fn void! createGraphicsPipeline() {
         .base_pipeline_index = -1,
     };
     vk::createGraphicsPipelines(g_device, (vk::PipelineCache)0, 1, &pipelineInfo, null, &g_graphics_pipeline)!;
+}
+
+fn void destroyGraphicsPipeline() {
+    vk::destroyPipeline(g_device, g_graphics_pipeline, null);
+    vk::destroyPipelineLayout(g_device, g_pipeline_layout, null);
 }
 
 fn void! createCommandPool() {
@@ -614,6 +722,11 @@ fn void! createCommandPool() {
         .command_buffer_count = g_command_buffers.len,
     };
     vk::allocateCommandBuffers(g_device, &allocInfo, &g_command_buffers)!;
+}
+
+fn void destroyCommandPool() {
+    vk::freeCommandBuffers(g_device, g_command_pool, g_command_buffers.len, &g_command_buffers);
+    vk::destroyCommandPool(g_device, g_command_pool, null);
 }
 
 fn void! createSemaphores() {
@@ -639,15 +752,168 @@ fn void destroySemaphores() {
     }
 }
 
+fn uint! findMemoryType(vk::PhysicalDevice device, uint filter, vk::MemoryPropertyFlags flags) {
+    vk::PhysicalDeviceMemoryProperties props;
+    vk::getPhysicalDeviceMemoryProperties(device, &props);
+    for (uint i = 0; i < props.memory_type_count; i++) {
+        if (filter & (1 << i) == 0) {
+            continue;
+        }
+        if ((props.memory_types[i].property_flags & flags) != flags) {
+            continue;
+        }
+        return i;
+    }
+    return vk::VulkanError.ERROR_UNKNOWN?;
+}
+fn void! createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Buffer* buffer, vk::DeviceMemory* memory) {
+    vk::BufferCreateInfo bufferInfo = {
+        .s_type = vk::STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+        .size = size,
+        .usage = usage,
+        .sharing_mode = vk::SHARING_MODE_EXCLUSIVE,
+    };
+    vk::createBuffer(g_device, &bufferInfo, null, buffer)!;
+    vk::MemoryRequirements requirements;
+    vk::getBufferMemoryRequirements(g_device, *buffer, &requirements);
+    vk::MemoryAllocateInfo allocInfo = {
+        .s_type = vk::STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+        .allocation_size = requirements.size,
+        .memory_type_index = findMemoryType(g_physical_device, requirements.memory_type_bits, properties)!,
+    };
+    vk::allocateMemory(g_device, &allocInfo, null, memory)!;
+    vk::bindBufferMemory(g_device, *buffer, *memory, 0)!;
+}
+
+fn void! copyBuffer(vk::Buffer dst, vk::Buffer src, vk::DeviceSize size) {
+    vk::CommandBuffer command_buffer;
+    vk::allocateCommandBuffers(g_device, &&vk::CommandBufferAllocateInfo {
+        .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        .level = vk::COMMAND_BUFFER_LEVEL_PRIMARY,
+        .command_pool = g_command_pool,
+        .command_buffer_count = 1,
+    }, &command_buffer)!;
+    defer vk::freeCommandBuffers(g_device, g_command_pool, 1, &command_buffer);
+    vk::beginCommandBuffer(command_buffer, &&vk::CommandBufferBeginInfo {
+        .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+        .flags = vk::CommandBufferUsageFlags { .one_time_submit },
+    })!;
+    vk::cmdCopyBuffer(command_buffer, src, dst, 1, &&vk::BufferCopy { .size = size });
+    vk::endCommandBuffer(command_buffer)!;
+    vk::queueSubmit(g_graphics_queue, 1, &&vk::SubmitInfo {
+        .s_type = vk::STRUCTURE_TYPE_SUBMIT_INFO,
+        .command_buffer_count = 1,
+        .p_command_buffers = &command_buffer,
+    }, (vk::Fence)0)!;
+    vk::queueWaitIdle(g_graphics_queue)!;
+}
+
+fn void! createBufferInit(void* data, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags flags, vk::Buffer* buffer, vk::DeviceMemory* memory) {
+    vk::Buffer stg_buffer;
+    vk::DeviceMemory stg_memory;
+    createBuffer(size, vk::BufferUsageFlags { .transfer_src }, vk::MemoryPropertyFlags { .host_visible, .host_coherent }, &stg_buffer, &stg_memory)!;
+    defer {
+        vk::destroyBuffer(g_device, stg_buffer, null);
+        vk::freeMemory(g_device, stg_memory, null);
+    }
+    void* mapped;
+    vk::mapMemory(g_device, stg_memory, 0, size, vk::MemoryMapFlags{}, &mapped)!;
+    defer vk::unmapMemory(g_device, stg_memory);
+    mem::copy(mapped, data, (usz)size);
+    createBuffer(size, vk::BufferUsageFlags { .transfer_dst } | usage, flags, buffer, memory)!;
+    copyBuffer(*buffer, stg_buffer, size)!;
+}
+
+fn void! createBuffers() {
+    io::printfn("Vertex size: %d, Indices size: %d", Vertex.sizeof*VERTICES.len, ushort.sizeof*INDICES.len);
+    createBufferInit(VERTICES.ptr, (vk::DeviceSize)(Vertex.sizeof*VERTICES.len), vk::BufferUsageFlags { .vertex_buffer }, vk::MemoryPropertyFlags { .device_local }, &g_vertex_buffer, &g_vertex_memory)!;
+    createBufferInit(INDICES.ptr, (vk::DeviceSize)(ushort.sizeof*INDICES.len), vk::BufferUsageFlags { .index_buffer }, vk::MemoryPropertyFlags { .device_local }, &g_index_buffer, &g_index_memory)!;
+    for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        createBufferInit(&g_ubo, UniformBufferObject.sizeof, vk::BufferUsageFlags { .uniform_buffer }, vk::MemoryPropertyFlags { .host_visible, .host_coherent }, &g_uniform_buffers[i], &g_uniform_memory[i])!;
+        vk::mapMemory(g_device, g_uniform_memory[i], 0, UniformBufferObject.sizeof, vk::MemoryMapFlags{}, &g_uniform_buffer_mapped[i])!;
+    }
+}
+
+fn void destroyBuffers() {
+    vk::destroyBuffer(g_device, g_vertex_buffer, null);
+    vk::freeMemory(g_device, g_vertex_memory, null);
+    vk::destroyBuffer(g_device, g_index_buffer, null);
+    vk::freeMemory(g_device, g_index_memory, null);
+    for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        vk::destroyBuffer(g_device, g_uniform_buffers[i], null);
+        vk::freeMemory(g_device, g_uniform_memory[i], null);
+    }
+}
+
+fn void createUBO() {
+    int width, height;
+    glfw::getFramebufferSize(g_window, &width, &height);
+    if(height <= 0) {
+        return;
+    }
+    g_ubo.model = MATRIX4F_IDENTITY;
+    g_ubo.view = matrix::look_at(<float>)({0.0, 5.0, 5.0}, {}, {0.0, 1.0, 0.0}).transpose();
+    g_ubo.projection = matrix::perspective(<float>)((float)math::deg_to_rad(45), (float)width/(float)height, 0.1, 10000.0).transpose();
+    g_ubo.time = 0.0;
+    updateUniforms();
+}
+
+fn void! createDescriptorSets() {
+	vk::DescriptorPoolCreateInfo create_info = {
+		.s_type         = vk::STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+		.pool_size_count = 1,
+		.p_pool_sizes    = &&vk::DescriptorPoolSize {
+			.type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.descriptor_count = MAX_FRAMES_IN_FLIGHT,
+		},
+		.max_sets       = MAX_FRAMES_IN_FLIGHT,
+	};
+	vk::createDescriptorPool(g_device, &create_info, null, &g_descriptor_pool)!;
+	vk::DescriptorSetLayout* set_layouts = (vk::DescriptorSetLayout*) malloc(vk::DescriptorSetLayout.sizeof* MAX_FRAMES_IN_FLIGHT);
+	for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        set_layouts[i] = g_descriptor_set_layout;
+    }
+	vk::DescriptorSetAllocateInfo alloc_info = {
+		.s_type              = vk::STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+		.descriptor_pool     = g_descriptor_pool,
+		.descriptor_set_count = MAX_FRAMES_IN_FLIGHT,
+		.p_set_layouts        = set_layouts,
+	};
+	vk::allocateDescriptorSets(g_device, &alloc_info, &g_descriptor_sets)!;
+	for (uint i =0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		vk::WriteDescriptorSet descriptor_write = {
+    		.s_type           = vk::STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+    		.dst_set          = g_descriptor_sets[i],
+    		.dst_binding      = 0,
+    		.descriptor_type  = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+    		.descriptor_count = 1,
+    		.p_buffer_info     = &&vk::DescriptorBufferInfo {
+    			.buffer = g_uniform_buffers[i],
+    			.offset = 0,
+    			.range = UniformBufferObject.sizeof,
+			},
+		};
+		vk::updateDescriptorSets(g_device, 1, &descriptor_write, 0, null);
+	}
+}
+
+fn void destroyDescriptorSets() {
+	vk::destroyDescriptorPool(g_device, g_descriptor_pool, null);
+}
+
+fn void updateUniforms() {
+    mem::copy(g_uniform_buffer_mapped[g_current_frame], &g_ubo, UniformBufferObject.sizeof);
+}
+
 fn void! render() {
     vk::waitForFences(g_device, 1, &g_in_flight_fences[g_current_frame], vk::TRUE, ulong.max)!;
     uint imageIndex;
     anyfault excuse = @catch(vk::acquireNextImageKHR(g_device, g_swap_chain, ulong.max, g_image_available_semaphore[g_current_frame], (vk::Fence)0, &imageIndex));
-    if (excuse == vk::VulkanError.ERROR_OUT_OF_DATE_KHR) {
+    if (excuse == vk::VulkanError.ERROR_OUT_OF_DATE_KHR || excuse == vk::VulkanError.SUBOPTIMAL_KHR) {
         recreateSwapchain()!;
         return;
     }
-    if (excuse && excuse != vk::VulkanError.SUBOPTIMAL_KHR) {
+    if (excuse) {
         return excuse?;
     }
     vk::resetFences(g_device, 1, &g_in_flight_fences[g_current_frame])!;
@@ -683,33 +949,49 @@ fn void! render() {
 }
 
 fn void! recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
-    vk::CommandBufferBeginInfo beginInfo = {
+    vk::beginCommandBuffer(commandBuffer, &&vk::CommandBufferBeginInfo {
         .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-    };
-    vk::beginCommandBuffer(commandBuffer, &beginInfo)!;
-    vk::RenderPassBeginInfo renderPassInfo = {
+    })!;
+    vk::cmdBeginRenderPass(commandBuffer, &&vk::RenderPassBeginInfo {
         .s_type = vk::STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
         .render_pass = g_render_pass,
         .framebuffer = g_swap_chain_framebuffers[imageIndex],
         .render_area = { .extent = g_swap_chain_extent },
         .clear_value_count = 1,
         .p_clear_values = &&vk::ClearValue { .color = { .float32 = float[4] { 0.0117, 0.0117, 0.0179, 1.0 } } },
-    };
-    vk::cmdBeginRenderPass(commandBuffer, &renderPassInfo, vk::SUBPASS_CONTENTS_INLINE);
+    }, vk::SUBPASS_CONTENTS_INLINE);
     vk::cmdBindPipeline(commandBuffer, vk::PIPELINE_BIND_POINT_GRAPHICS, g_graphics_pipeline);
-    vk::Viewport viewport = {
+    vk::cmdSetViewport(commandBuffer, 0, 1, &&vk::Viewport {
         .width = g_swap_chain_extent.width,
         .height = g_swap_chain_extent.height,
         .max_depth = 1.0,
-    };
-    vk::Rect2D scissor = {
+    });
+    vk::cmdSetScissor(commandBuffer, 0, 1, &&vk::Rect2D {
         .extent = g_swap_chain_extent,
-    };
-    vk::cmdSetViewport(commandBuffer, 0, 1, &viewport);
-    vk::cmdSetScissor(commandBuffer, 0, 1, &scissor);
-    vk::cmdDraw(commandBuffer, 6, 1, 0, 0);
+    });
+    draw(commandBuffer);
     vk::cmdEndRenderPass(commandBuffer);
     vk::endCommandBuffer(commandBuffer)!;
+}
+
+fn void draw(vk::CommandBuffer commandBuffer) {
+    vk::cmdBindVertexBuffers(commandBuffer, 0, 1, &g_vertex_buffer, &&(vk::DeviceSize)0);
+    vk::cmdBindIndexBuffer(commandBuffer, g_index_buffer, 0, vk::INDEX_TYPE_UINT16);
+    vk::cmdBindDescriptorSets(commandBuffer, vk::PIPELINE_BIND_POINT_GRAPHICS, g_pipeline_layout, 0, 1, &g_descriptor_sets[g_current_frame], 0, null);
+    vk::cmdDrawIndexed(commandBuffer, INDICES.len, 1, 0, 0, 0);
+}
+
+fn void update() {
+    g_ubo.time = (float)time::now().diff_sec(g_start_timestamp);
+    float s = (math::sin(g_ubo.time)+1.0)*0.25 + 0.25;
+    float t = (math::cos(g_ubo.time)+1.0)*0.25 + 0.25;
+    g_ubo.model = MATRIX4F_IDENTITY
+        .scale({s, s, s})
+        .rotate_z((float)g_ubo.time)
+        .translate({t, 0.0, 0.0})
+        .transpose();
+    g_last_frame_timestamp = time::now();
+    updateUniforms();
 }
 
 fn void! recreateSwapchain() {
@@ -718,4 +1000,48 @@ fn void! recreateSwapchain() {
     destroySwapchain();
     createSwapchain()!;
     createFrameBuffers()!;
+}
+
+fn void! init() {
+    g_start_timestamp = time::now();
+    g_last_frame_timestamp = g_start_timestamp;
+    createVulkanInstance()!;
+    createWindowSurface()!;
+    pickPhysicalDevice()!;
+    createLogicalDevice()!;
+    createSwapchain()!;
+    io::printfn("Swap chain created %x", g_swap_chain);
+    createRenderPass()!;
+    io::printfn("Render pass created %x", g_render_pass);
+    createDescriptorSetLayout()!;
+    io::printfn("Descriptor set layout created %x", g_descriptor_set_layout);
+    createFrameBuffers()!;
+    io::printfn("Frame buffers created %x", g_swap_chain_framebuffers.len);
+    createGraphicsPipeline()!;
+    io::print("Graphics pipeline created\n");
+    createCommandPool()!;
+    io::print("Command pool created\n");
+    createBuffers()!;
+    io::print("Buffers created\n");
+    createDescriptorSets()!;
+    io::print("Descriptor sets created\n");
+    createSemaphores()!;
+    io::print("Semaphores created\n");
+    createUBO();
+}
+
+fn void destroy() {
+    vk::deviceWaitIdle(g_device)!!;
+    destroySemaphores();
+    destroyBuffers();
+    destroyCommandPool();
+    destroyGraphicsPipeline();
+    destroyFrameBuffers();
+    destroyDescriptorSetLayout();
+    destroyRenderPass();
+    destroyDescriptorSets();
+    destroySwapchain();
+    destroyDevice();
+    destroySurface();
+    destroyVulkanInstance();
 }
