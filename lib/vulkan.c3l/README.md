@@ -22,6 +22,8 @@ import glfw;
   * Enum values are renamed as follows: `VK_ENUM_VALUE` -> `vk::ENUM_VALUE`
 * Vulkan flags are converted to `bitstruct` and renamed as follows: `VkFlagName` -> `vk::FlagName`
 * All string equivalents (e.g. `char *`) are converted to `ZString`
+* All functions that handle error by returning `VkResult` is now converted to using C3's `fault` system. For example `VkResult vkCreateInstance(const VkInstanceCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkInstance* pInstance)` is converted to `voi! createInstance(InstanceCreateInfo* pCreateInfo, AllocationCallbacks* pAllocator, Instance* pInstance)`
+* All functions that supposed to extract an array values are converted to return a `slice` instead. For example `VkResult VkEnumerateInstanceExtensionProperties(char* pLayerName, int* count, VkExtensionProperties* properties)` is converted to `ExtensionProperties[]! enumerateInstanceExtensionProperties(ZString pLayerName)`
 
 ## Error Handling
 

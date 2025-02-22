@@ -3,7 +3,7 @@
   "warnings": ["no-unused"],
   "dependency-search-paths": ["lib"],
   "dependencies": ["glfw", "vulkan"],
-  "authors": ["John Doe <john.doe@example.com>"],
+  "authors": ["hucancode <hucancode@gmail.com>"],
   "version": "0.1.0",
   "sources": ["src/**"],
   "test-sources": ["test/**"],
@@ -11,13 +11,6 @@
   "targets": {
     "helloc3vk": {
       "type": "executable"
-    },
-    "shaders": {
-      "type": "static-lib",
-      "exec": [
-        "glslc src/shaders/shader.frag -o src/shaders/frag.spv",
-        "glslc src/shaders/shader.vert -o src/shaders/vert.spv"
-      ]
     }
   },
   "cpu": "generic",
