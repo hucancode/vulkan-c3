@@ -2,7 +2,7 @@
 
 This is a Vulkan binding for `C3`. On the details of how to include this library in your project, see [vulkan.c3l](./lib/vulkan.c3l/README.md)
 
-![](./readme/rectangle.png)
+![](./readme/cube.mp4)
 
 # Installation
 
