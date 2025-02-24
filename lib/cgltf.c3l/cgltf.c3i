@@ -1,0 +1,745 @@
+module cgltf;
+
+distinct Size = CInt;
+distinct Bool = CInt;
+
+enum FileType {
+	INVALID,
+	GLTF,
+	GLB,
+}
+
+enum Result {
+	SUCCESS,
+	DATA_TOO_SHORT,
+	UNKNOWN_FORMAT,
+	INVALID_JSON,
+	INVALID_GLTF,
+	INVALID_OPTIONS,
+	FILE_NOT_FOUND,
+	IO_ERROR,
+	OUT_OF_MEMORY,
+	LEGACY_GLTF,
+}
+
+def ProcAllocFunc = fn void* (void* user, Size size);
+def ProcFreeFunc = fn void (void* user, void* ptr);
+struct MemoryOptions {
+	ProcAllocFunc alloc_func;
+	ProcFreeFunc free_func;
+	void* user_data;
+}
+
+def ProcRead = fn Result (MemoryOptions* memory_options, FileOptions* file_options, ZString path, Size* size, void** data);
+def ProcRelease = fn void (MemoryOptions* memory_options, FileOptions* file_options, void* data);
+struct FileOptions {
+    ProcRead read;
+	ProcRelease release;
+	void* user_data;
+}
+
+struct Options {
+	FileType type; /* invalid == auto detect */
+	Size json_token_count; /* 0 == auto */
+	MemoryOptions memory;
+	FileOptions file;
+}
+
+enum BufferViewType {
+	INVALID,
+	INDICES,
+	VERTICES,
+}
+
+enum AttributeType {
+	INVALID,
+	POSITION,
+	NORMAL,
+	TANGENT,
+	TEXCOORD,
+	COLOR,
+	JOINTS,
+	WEIGHTS,
+	CUSTOM,
+}
+
+enum ComponentType {
+	INVALID,
+	R_8, /* byte */
+	R_8U, /* unsigned_byte */
+	R_16, /* short */
+	R_16U, /* unsigned_short */
+	R_32U, /* unsigned_int */
+	R_32F, /* float */
+}
+
+enum Type {
+	INVALID,
+	SCALAR,
+	VEC2,
+	VEC3,
+	VEC4,
+	MAT2,
+	MAT3,
+	MAT4,
+}
+
+enum PrimitiveType {
+	INVALID,
+	POINTS,
+	LINES,
+	LINE_LOOP,
+	LINE_STRIP,
+	TRIANGLES,
+	TRIANGLE_STRIP,
+	TRIANGLE_FAN,
+}
+
+enum AlphaMode {
+	OPAQUE,
+	MASK,
+	BLEND,
+}
+
+enum AnimationPathType {
+	INVALID,
+	TRANSLATION,
+	ROTATION,
+	SCALE,
+	WEIGHTS,
+}
+
+enum InterpolationType {
+	LINEAR,
+	STEP,
+	CUBIC_SPLINE,
+}
+
+enum CameraType {
+	INVALID,
+	PERSPECTIVE,
+	ORTHOGRAPHIC,
+}
+
+enum LightType {
+	INVALID,
+	DIRECTIONAL,
+	POINT,
+	SPOT,
+}
+
+enum DataFreeMethod {
+	NONE,
+	FILE_RELEASE,
+	MEMORY_FREE,
+}
+
+struct Extras {
+	Size start_offset; /* this field is deprecated and will be removed in the future; use data instead */
+	Size end_offset; /* this field is deprecated and will be removed in the future; use data instead */
+
+	ZString data;
+}
+
+struct Extension {
+	Zstring name;
+	Zstring data;
+}
+
+struct Buffer {
+	ZString name;
+	Size size;
+	ZString uri;
+	void* data; /* loaded by load_buffers */
+	DataFreeMethod data_free_method;
+	Extras extras;
+	Size extensions_count;
+	Extension* extensions;
+}
+
+enum MeshoptCompressionMode {
+	INVALID,
+	ATTRIBUTES,
+	TRIANGLES,
+	INDICES,
+}
+
+enum MeshoptCompressionFilter {
+	NONE,
+	OCTAHEDRAL,
+	QUATERNION,
+	EXPONENTIAL,
+}
+
+struct MeshoptCompression {
+	Buffer* buffer;
+	Size offset;
+	Size size;
+	Size stride;
+	Size count;
+	MeshoptCompressionMode mode;
+	MeshoptCompressionFilter filter;
+}
+
+struct BufferView {
+	ZString name;
+	Buffer* buffer;
+	Size offset;
+	Size size;
+	Size stride; /* 0 == automatically determined by accessor */
+	BufferViewType type;
+	void* data; /* overrides buffer->data if present, filled by extensions */
+	Bool has_meshopt_compression;
+	MeshoptCompression meshopt_compression;
+	Extras extras;
+	Size extensions_count;
+	Extension* extensions;
+}
+
+struct AccessorSparse {
+	Size count;
+	BufferView* indices_buffer_view;
+	Size indices_byte_offset;
+	ComponentType indices_component_type;
+	BufferView* values_buffer_view;
+	Size values_byte_offset;
+}
+
+struct Accessor {
+	ZString name;
+	ComponentType component_type;
+	Bool normalized;
+	Type type;
+	Size offset;
+	Size count;
+	Size stride;
+	BufferView* buffer_view;
+	Bool has_min;
+	float[16] min;
+	Bool has_max;
+	float[16] max;
+	Bool is_sparse;
+	AccessorSparse sparse;
+	Extras extras;
+	Size extensions_count;
+	Extension* extensions;
+}
+
+struct Attribute {
+	ZString name;
+	AttributeType type;
+	int index;
+	Accessor* data;
+}
+
+struct Image {
+	ZString name;
+	ZString uri;
+	BufferView* buffer_view;
+	ZString mime_type;
+	Extras extras;
+	Size extensions_count;
+	Extension* extensions;
+}
+
+distinct FilterType = CInt;
+const FilterType FILTER_TYPE_UNDEFINED = 0;
+const FilterType FILTER_TYPE_NEAREST  = 9728;
+const FilterType FILTER_TYPE_LINEAR = 9729;
+const FilterType FILTER_TYPE_NEAREST_MIPMAP_NEAREST = 9984;
+const FilterType FILTER_TYPE_LINEAR_MIPMAP_NEAREST = 9985;
+const FilterType FILTER_TYPE_NEAREST_MIPMAP_LINEAR = 9986;
+const FilterType FILTER_TYPE_LINEAR_MIPMAP_LINEAR = 9987;
+
+distinct WrapMode = CInt;
+const WrapMode WRAP_MODE_CLAMP_TO_EDGE = 33071;
+const WrapMode WRAP_MODE_MIRRORED_REPEAT = 33648;
+const WrapMode WRAP_MODE_REPEAT = 10497;
+
+struct Sampler {
+	ZString name;
+	FilterType mag_filter;
+	FilterType min_filter;
+	WrapMode wrap_s;
+	WrapMode wrap_t;
+	Extras extras;
+	Size extensions_count;
+	Extension* extensions;
+}
+
+struct Texture {
+	ZString name;
+	Image* image;
+	Sampler* sampler;
+	Bool has_basisu;
+	Image* basisu_image;
+	Bool has_webp;
+	Image* webp_image;
+	Extras extras;
+	Size extensions_count;
+	Extension* extensions;
+}
+
+struct TextureTransform {
+	float[2] offset;
+	float rotation;
+	float[2] scale;
+	Bool has_texcoord;
+	int texcoord;
+}
+
+struct TextureView {
+	Texture* texture;
+	int texcoord;
+	float scale; /* equivalent to strength for occlusion_texture */
+	Bool has_transform;
+	TextureTransform transform;
+}
+
+struct PBRMetallicRoughness {
+	TextureView base_color_texture;
+	TextureView metallic_roughness_texture;
+
+	float[4] base_color_factor;
+	float metallic_factor;
+	float roughness_factor;
+}
+
+struct PBRSpecularGlossiness {
+	TextureView diffuse_texture;
+	TextureView specular_glossiness_texture;
+
+	float[4] diffuse_factor;
+	float[3] specular_factor;
+	float glossiness_factor;
+}
+
+struct Clearcoat {
+	TextureView clearcoat_texture;
+	TextureView clearcoat_roughness_texture;
+	TextureView clearcoat_normal_texture;
+
+	float clearcoat_factor;
+	float clearcoat_roughness_factor;
+}
+
+struct Transmission {
+	TextureView transmission_texture;
+	float transmission_factor;
+}
+
+struct Ior {
+	float ior;
+}
+
+struct Specular {
+	TextureView specular_texture;
+	TextureView specular_color_texture;
+	float[3] specular_color_factor;
+	float specular_factor;
+}
+
+struct Volume {
+	TextureView thickness_texture;
+	float thickness_factor;
+	float[3] attenuation_color;
+	float attenuation_distance;
+}
+
+struct Sheen {
+	TextureView sheen_color_texture;
+	float[3] sheen_color_factor;
+	TextureView sheen_roughness_texture;
+	float sheen_roughness_factor;
+}
+
+struct EmissiveStrength {
+	float emissive_strength;
+}
+
+struct Iridescence {
+	float iridescence_factor;
+	TextureView iridescence_texture;
+	float iridescence_ior;
+	float iridescence_thickness_min;
+	float iridescence_thickness_max;
+	TextureView iridescence_thickness_texture;
+}
+
+struct DiffuseTransmission {
+	TextureView diffuse_transmission_texture;
+	float diffuse_transmission_factor;
+	float[3] diffuse_transmission_color_factor;
+	TextureView diffuse_transmission_color_texture;
+}
+
+struct Anisotropy {
+	float anisotropy_strength;
+	float anisotropy_rotation;
+	TextureView anisotropy_texture;
+}
+
+struct Dispersion {
+	float dispersion;
+}
+
+struct Material {
+	ZString name;
+	Bool has_pbr_metallic_roughness;
+	Bool has_pbr_specular_glossiness;
+	Bool has_clearcoat;
+	Bool has_transmission;
+	Bool has_volume;
+	Bool has_ior;
+	Bool has_specular;
+	Bool has_sheen;
+	Bool has_emissive_strength;
+	Bool has_iridescence;
+	Bool has_diffuse_transmission;
+	Bool has_anisotropy;
+	Bool has_dispersion;
+	PBRMetallicRoughness pbr_metallic_roughness;
+	PBRSpecularGlossiness pbr_specular_glossiness;
+	Clearcoat clearcoat;
+	Ior ior;
+	Specular specular;
+	Sheen sheen;
+	Transmission transmission;
+	Volume volume;
+	Emissive_strength emissive_strength;
+	Iridescence iridescence;
+	DiffuseTransmission diffuse_transmission;
+	Anisotropy anisotropy;
+	Dispersion dispersion;
+	TextureView normal_texture;
+	TextureView occlusion_texture;
+	TextureView emissive_texture;
+	float[3] emissive_factor;
+	AlphaMode alpha_mode;
+	float alpha_cutoff;
+	Bool double_sided;
+	Bool unlit;
+	Extras extras;
+	Size extensions_count;
+	Extension* extensions;
+}
+
+struct MaterialMapping {
+	Size variant;
+	Material* material;
+	Extras extras;
+}
+
+struct MorphTarget {
+	Attribute* attributes;
+	Size attributes_count;
+}
+
+struct DracoMeshCompression {
+	BufferView* buffer_view;
+	Attribute* attributes;
+	Size attributes_count;
+}
+
+struct MeshGPUInstancing {
+	Attribute* attributes;
+	Size attributes_count;
+}
+
+struct Primitive {
+	PrimitiveType type;
+	Accessor* indices;
+	Material* material;
+	Attribute* attributes;
+	Size attributes_count;
+	Morph_target* targets;
+	Size targets_count;
+	Extras extras;
+	Bool has_draco_mesh_compression;
+	DracoMeshCompression draco_mesh_compression;
+	MaterialMapping* mappings;
+	Size mappings_count;
+	Size extensions_count;
+	Extension* extensions;
+}
+
+struct Mesh {
+	ZString name;
+	Primitive* primitives;
+	Size primitives_count;
+	float* weights;
+	Size weights_count;
+	ZString* target_names;
+	Size target_names_count;
+	Extras extras;
+	Size extensions_count;
+	Extension* extensions;
+}
+
+struct Skin {
+	ZString name;
+	Node** joints;
+	Size joints_count;
+	Node* skeleton;
+	Accessor* inverse_bind_matrices;
+	Extras extras;
+	Size extensions_count;
+	Extension* extensions;
+}
+
+struct CameraPerspective {
+	Bool has_aspect_ratio;
+	float aspect_ratio;
+	float yfov;
+	Bool has_zfar;
+	float zfar;
+	float znear;
+	Extras extras;
+}
+
+struct CameraOrthographic {
+	float xmag;
+	float ymag;
+	float zfar;
+	float znear;
+	Extras extras;
+}
+
+struct Camera {
+	ZString name;
+	CameraType type;
+	union {
+		CameraPerspective perspective;
+		CameraOrthographic orthographic;
+	}
+	Extras extras;
+	Size extensions_count;
+	Extension* extensions;
+}
+
+struct Light {
+	ZString name;
+	float[3] color;
+	float intensity;
+	LightType type;
+	float range;
+	float spot_inner_cone_angle;
+	float spot_outer_cone_angle;
+	Extras extras;
+}
+
+struct Node {
+	ZString name;
+	Node* parent;
+	Node** children;
+	Size children_count;
+	Skin* skin;
+	Mesh* mesh;
+	Camera* camera;
+	Light* light;
+	float* weights;
+	Size weights_count;
+	Bool has_translation;
+	Bool has_rotation;
+	Bool has_scale;
+	Bool has_matrix;
+	float[3] translation;
+	float[4] rotation;
+	float[3] scale;
+	float[16] matrix;
+	Extras extras;
+	Bool has_mesh_gpu_instancing;
+	MeshGPUInstancing mesh_gpu_instancing;
+	Size extensions_count;
+	Extension* extensions;
+}
+
+struct Scene {
+	ZString name;
+	Node** nodes;
+	Size nodes_count;
+	Extras extras;
+	Size extensions_count;
+	Extension* extensions;
+}
+
+struct AnimationSampler {
+	Accessor* input;
+	Accessor* output;
+	InterpolationType interpolation;
+	Extras extras;
+	Size extensions_count;
+	Extension* extensions;
+}
+
+struct AnimationChannel {
+	AnimationSampler* sampler;
+	Node* target_node;
+	AnimationPathType target_path;
+	Extras extras;
+	Size extensions_count;
+	Extension* extensions;
+}
+
+struct Animation {
+	ZString name;
+	AnimationSampler* samplers;
+	Size samplers_count;
+	AnimationChannel* channels;
+	Size channels_count;
+	Extras extras;
+	Size extensions_count;
+	Extension* extensions;
+}
+
+struct MaterialVariant {
+	ZString name;
+	Extras extras;
+}
+
+struct Asset {
+	ZString copyright;
+	ZString generator;
+	ZString version;
+	ZString min_version;
+	Extras extras;
+	Size extensions_count;
+	Extension* extensions;
+}
+
+struct Data {
+	FileType file_type;
+	void* file_data;
+
+	Asset asset;
+
+	Mesh* meshes;
+	Size meshes_count;
+
+	Material* materials;
+	Size materials_count;
+
+	Accessor* accessors;
+	Size accessors_count;
+
+	BufferView* buffer_views;
+	Size buffer_views_count;
+
+	Buffer* buffers;
+	Size buffers_count;
+
+	Image* images;
+	Size images_count;
+
+	Texture* textures;
+	Size textures_count;
+
+	Sampler* samplers;
+	Size samplers_count;
+
+	Skin* skins;
+	Size skins_count;
+
+	Camera* cameras;
+	Size cameras_count;
+
+	Light* lights;
+	Size lights_count;
+
+	Node* nodes;
+	Size nodes_count;
+
+	Scene* scenes;
+	Size scenes_count;
+
+	Scene* scene;
+
+	Animation* animations;
+	Size animations_count;
+
+	MaterialVariant* variants;
+	Size variants_count;
+
+	Extras extras;
+
+	Size data_extensions_count;
+	Extension* data_extensions;
+
+	ZString* extensions_used;
+	Size extensions_used_count;
+
+	ZString* extensions_required;
+	Size extensions_required_count;
+
+	ZString json;
+	Size json_size;
+
+	void* bin;
+	Size bin_size;
+
+	MemoryOptions memory;
+	FileOptions file;
+}
+
+fn Result parse(
+		Options* options,
+		void* data,
+		Size size,
+		Data** out_data);
+
+fn Result parse_file(
+		Options* options,
+		ZString path,
+		Data** out_data);
+
+fn Result load_buffers(
+		Options* options,
+		Data* data,
+		ZString gltf_path);
+
+fn Result load_buffer_base64(Options* options, Size size, ZString base64, void** out_data);
+
+fn Size decode_string(ZString string);
+fn Size decode_uri(ZString uri);
+
+fn Result validate(Data* data);
+
+fn void free(Data* data);
+
+fn void node_transform_local(Node* node, float* out_matrix);
+fn void node_transform_world(Node* node, float* out_matrix);
+
+fn ushort* buffer_view_data(BufferView* view);
+
+fn Accessor* find_accessor(Primitive* prim, AttributeType type, int index);
+
+fn Bool accessor_read_float(Accessor* accessor, Size index, float* out, Size element_size);
+fn Bool accessor_read_uint(Accessor* accessor, Size index, uint* out, Size element_size);
+fn Size accessor_read_index(Accessor* accessor, Size index);
+
+fn Size num_components(Type type);
+fn Size component_size(ComponentType component_type);
+fn Size calc_size(Type type, ComponentType component_type);
+
+fn Size accessor_unpack_floats(Accessor* accessor, float* out, Size float_count);
+fn Size accessor_unpack_indices(Accessor* accessor, void* out, Size out_component_size, Size index_count);
+
+/* this function is deprecated and will be removed in the future; use extras::data instead */
+fn Result copy_extras_json(Data* data, Extras* extras, ZString dest, Size* dest_size);
+
+fn Size mesh_index(Data* data, Mesh* object);
+fn Size material_index(Data* data, Material* object);
+fn Size accessor_index(Data* data, Accessor* object);
+fn Size buffer_view_index(Data* data, BufferView* object);
+fn Size buffer_index(Data* data, Buffer* object);
+fn Size image_index(Data* data, Image* object);
+fn Size texture_index(Data* data, Texture* object);
+fn Size sampler_index(Data* data, Sampler* object);
+fn Size skin_index(Data* data, Skin* object);
+fn Size camera_index(Data* data, Camera* object);
+fn Size light_index(Data* data, Light* object);
+fn Size node_index(Data* data, Node* object);
+fn Size scene_index(Data* data, Scene* object);
+fn Size animation_index(Data* data, Animation* object);
+fn Size animation_sampler_index(Animation* animation, AnimationSampler* object);
+fn Size animation_channel_index(Animation* animation, AnimationChannel* object);
