@@ -1,2 +1,3 @@
 /build
 /src/shaders/*.spv
+.DS_Store

@@ -7,7 +7,7 @@
       "linked-libraries": ["glfw"]
     },
     "macos-aarch64": {
-      "link-args": ["-L/opt/homebrew/lib"],
+      "link-args": [],
       "dependencies": [],
       "linked-libraries": ["glfw"]
     },

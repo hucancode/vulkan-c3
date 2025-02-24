@@ -17,7 +17,7 @@ const ENGINE_NAME = "Soreal Engine";
 const ZString[*] REQUIRED_EXTENSIONS = {
     vk::KHR_SWAPCHAIN_EXTENSION_NAME,
 };
-const ENABLE_VALIDATION_LAYERS = true;
+const ENABLE_VALIDATION_LAYERS = false;
 const ZString[*] VALIDATION_LAYERS @if(ENABLE_VALIDATION_LAYERS) = {
     "VK_LAYER_KHRONOS_validation",
 };
@@ -25,7 +25,7 @@ const char[*] VERTEX_CODE = $embed("shaders/vert.spv");
 const char[*] FRAGMENT_CODE = $embed("shaders/frag.spv");
 
 const MAX_FRAMES_IN_FLIGHT = 2;
-const Vertex[] VERTICES = {
+const Vertex[*] VERTICES = {
 	// Front-top-left
 	{.position = {-1.0, 1.0, 1.0, 1.0}, .color = {0.25, 0.25, 0.5, 1.0}},
 	// Front-top-right
@@ -44,7 +44,7 @@ const Vertex[] VERTICES = {
 	{.position = {-1.0, -1.0, -1.0, 1.0}, .color = {0.25, 0.25, 1.0, 1.0}},
 };
 
-const ushort[] INDICES = {
+const ushort[*] INDICES = {
 	// Front face
 	0,
 	2,
@@ -541,7 +541,6 @@ fn void! createRenderPass() {
             .dependency_flags = vk::DependencyFlags { .by_region },
         },
     };
-    io::printfn("PipelineStageFlags::color_attachment_output = 0x%x", (uint)vk::PipelineStageFlags { .color_attachment_output });
     vk::createRenderPass(g_device, &createInfo, null, &g_render_pass)!;
 }
 
@@ -636,8 +635,6 @@ fn void! createGraphicsPipeline() {
 	}, {
 	   .binding = 0, .location = 3, .format = vk::FORMAT_R32G32_SFLOAT, .offset = Vertex.texCoord.offsetof
 	}};
-	io::printfn("vertex size %d, position offset %d, color offset %d, normal offset %d, texcoord offset %d",
-	Vertex.sizeof, Vertex.position.offsetof, Vertex.color.offsetof, Vertex.normal.offsetof, Vertex.texCoord.offsetof);
     vk::PipelineVertexInputStateCreateInfo vertexInputInfo = {
         .s_type = vk::STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
         .vertex_binding_description_count   = 1,
@@ -825,9 +822,8 @@ fn void! createBufferInit(void* data, vk::DeviceSize size, vk::BufferUsageFlags 
 }
 
 fn void! createBuffers() {
-    io::printfn("Vertex size: %d, Indices size: %d", Vertex.sizeof*VERTICES.len, ushort.sizeof*INDICES.len);
-    createBufferInit(VERTICES.ptr, (vk::DeviceSize)(Vertex.sizeof*VERTICES.len), vk::BufferUsageFlags { .vertex_buffer }, vk::MemoryPropertyFlags { .device_local }, &g_vertex_buffer, &g_vertex_memory)!;
-    createBufferInit(INDICES.ptr, (vk::DeviceSize)(ushort.sizeof*INDICES.len), vk::BufferUsageFlags { .index_buffer }, vk::MemoryPropertyFlags { .device_local }, &g_index_buffer, &g_index_memory)!;
+    createBufferInit(&VERTICES, (vk::DeviceSize)($sizeof(VERTICES)), vk::BufferUsageFlags { .vertex_buffer }, vk::MemoryPropertyFlags { .device_local }, &g_vertex_buffer, &g_vertex_memory)!;
+    createBufferInit(&INDICES, (vk::DeviceSize)($sizeof(INDICES)), vk::BufferUsageFlags { .index_buffer }, vk::MemoryPropertyFlags { .device_local }, &g_index_buffer, &g_index_memory)!;
     for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         createBufferInit(&g_ubo, UniformBufferObject.sizeof, vk::BufferUsageFlags { .uniform_buffer }, vk::MemoryPropertyFlags { .host_visible, .host_coherent }, &g_uniform_buffers[i], &g_uniform_memory[i])!;
         vk::mapMemory(g_device, g_uniform_memory[i], 0, UniformBufferObject.sizeof, vk::MemoryMapFlags{}, &g_uniform_buffer_mapped[i])!;
