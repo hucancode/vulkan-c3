@@ -1,6 +1,7 @@
 # Vulkan C3 Binding
 
-This is a Vulkan binding for `C3`. On the details of how to include this library in your project, see [vulkan.c3l](./lib/vulkan.c3l/README.md)
+This is a Vulkan binding for `C3`.
+On the details of how to include this library in your project, see [vulkan.c3l](./lib/vulkan.c3l/README.md)
 
 ![](./readme/cube.gif)
 
@@ -21,7 +22,8 @@ sudo pacman -S c3c glfw vulkan-devel make
 
 ## Nix
 
-Alternately you can use [Nix](https://nixos.org) to simplify the installation process and keep your system clean.
+Alternately you can use [Nix](https://nixos.org) to simplify
+the installation process and keep your system clean. *On Mac there is still a need to install Vulkan SDK manually.*
 After install Nix, run the following command to enter development environment
 ```sh
 nix develop
