@@ -17,10 +17,12 @@
             packages = with pkgs; [
               # c3c
               glfw
+              freetype
               vulkan-loader
               gnumake
               shaderc
-            ] ++ (if system == "aarch64-darwin" then [ moltenvk ] else [  ]);
+              tracy
+            ] ++ (if system == "x86_64-darwin" || system == "aarch64-darwin" then [ moltenvk ] else [ vulkan-validation-layers ]);
           };
       });
     };
