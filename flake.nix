@@ -1,6 +1,5 @@
 {
   description = "A Nix-flake-based C/C++ development environment";
-
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
   outputs = { self, nixpkgs }:
@@ -20,6 +19,7 @@
               glfw
               vulkan-loader
               gnumake
+              shaderc
             ] ++ (if system == "aarch64-darwin" then [ moltenvk ] else [  ]);
           };
       });
