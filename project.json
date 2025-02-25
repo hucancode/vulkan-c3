@@ -2,20 +2,13 @@
   "langrev": "1",
   "warnings": ["no-unused"],
   "dependency-search-paths": ["lib"],
-  "dependencies": ["glfw", "vulkan", "cgltf"],
+  "dependencies": ["glfw", "vulkan", "cgltf", "stbimage"],
   "authors": ["hucancode <hucancode@gmail.com>"],
   "version": "0.1.0",
   "sources": ["src/**"],
   "test-sources": ["test/**"],
   "output": "build",
   "targets": {
-    "shader": {
-      "type": "prepare",
-      "exec": [
-        "glslc -c ../src/shaders/shader.frag -o ../src/shaders/vert.spv",
-        "glslc -c ../src/shaders/shader.vert -o ../src/shaders/frag.spv"
-      ]
-    },
     "helloc3vk": {
       "type": "executable"
     }

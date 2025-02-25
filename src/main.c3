@@ -252,17 +252,20 @@ fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
         }
     $endif
     {
-        vk::ExtensionProperties[]! extensions = vk::enumerateInstanceExtensionProperties(null);
+        vk::ExtensionProperties[]! extensions = vk::enumerateDeviceExtensionProperties(device, null);
         if (catch excuse = extensions) {
             io::printfn("Cound not get extension list for %s", deviceName);
             return 0;
         }
         defer free(extensions);
+        foreach (e:extensions) {
+            io::printfn("Extension %s", (ZString)e.extension_name[0..]);
+        }
         foreach (required: REQUIRED_EXTENSIONS) {
             bool found = false;
             foreach (e : extensions) {
                 ZString name = (ZString)e.extension_name[0..];
-                if (name == required) {
+                if (name.len() == required.len() && mem::equals(name,required, name.len())) {
                     found = true;
                     break;
                 }

@@ -29,5 +29,9 @@ nix develop
 ```
 
 # Running
-`c3c build shader --trust=full` to compile GLSL shader to SPIRV if you haven't done so.
+First compile GLSL shader to SPIRV if you haven't done so
+```sh
+glslc -c src/shaders/shader.frag -o src/shaders/frag.spv
+glslc -c src/shaders/shader.vert -o src/shaders/vert.spv
+```
 Simply run `c3c run` to run the program.

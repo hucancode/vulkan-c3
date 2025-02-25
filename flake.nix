@@ -22,7 +22,6 @@
               glfw
               freetype
               vulkan-loader
-              gnumake
               shaderc
               tracy
             ] ++ (if system == "x86_64-darwin" || system == "aarch64-darwin" then [ moltenvk ] else [ vulkan-validation-layers ])
