@@ -13,11 +13,10 @@ To build example program we need
 - [C3](https://c3-lang.org)
 - [GLFW](https://www.glfw.org)
 - [Vulkan SDK](https://vulkan.lunarg.com/sdk/home)
-- [make](https://www.gnu.org/software/make) (optional)
 
 If you are on Arch Linux you can install them all using
 ```sh
-sudo pacman -S c3c glfw vulkan-devel make
+sudo pacman -S c3c glfw vulkan-devel
 ```
 
 ## Nix
@@ -30,5 +29,5 @@ nix develop
 ```
 
 # Running
-`make shader` to compile GLSL shader to SPIRV if you haven't done so.
+`c3c build shader --trust=full` to compile GLSL shader to SPIRV if you haven't done so.
 Simply run `c3c run` to run the program.
