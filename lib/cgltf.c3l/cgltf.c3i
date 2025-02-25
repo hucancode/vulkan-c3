@@ -135,9 +135,6 @@ enum DataFreeMethod {
 }
 
 struct Extras {
-	Size start_offset; /* this field is deprecated and will be removed in the future; use data instead */
-	Size end_offset; /* this field is deprecated and will be removed in the future; use data instead */
-
 	ZString data;
 }
 
@@ -723,9 +720,6 @@ fn Size calc_size(Type type, ComponentType component_type);
 
 fn Size accessor_unpack_floats(Accessor* accessor, float* out, Size float_count);
 fn Size accessor_unpack_indices(Accessor* accessor, void* out, Size out_component_size, Size index_count);
-
-/* this function is deprecated and will be removed in the future; use extras::data instead */
-fn Result copy_extras_json(Data* data, Extras* extras, ZString dest, Size* dest_size);
 
 fn Size mesh_index(Data* data, Mesh* object);
 fn Size material_index(Data* data, Material* object);
