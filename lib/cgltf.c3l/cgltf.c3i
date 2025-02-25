@@ -142,8 +142,8 @@ struct Extras {
 }
 
 struct Extension {
-	Zstring name;
-	Zstring data;
+	ZString name;
+	ZString data;
 }
 
 struct Buffer {
@@ -406,7 +406,7 @@ struct Material {
 	Sheen sheen;
 	Transmission transmission;
 	Volume volume;
-	Emissive_strength emissive_strength;
+	EmissiveStrength emissive_strength;
 	Iridescence iridescence;
 	DiffuseTransmission diffuse_transmission;
 	Anisotropy anisotropy;
@@ -452,7 +452,7 @@ struct Primitive {
 	Material* material;
 	Attribute* attributes;
 	Size attributes_count;
-	Morph_target* targets;
+	MorphTarget* targets;
 	Size targets_count;
 	Extras extras;
 	Bool has_draco_mesh_compression;
