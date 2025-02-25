@@ -1,0 +1,47 @@
+{
+  "provides": "stbimage",
+  "execs": ["cc -o tmp.o -c stb_image.h; ar rcs libstbimage.a tmp.o; rm tmp.o"],
+  "targets": {
+    "macos-x64": {
+      "link-args": [],
+      "dependencies": [],
+      "linked-libraries": ["stbimage"]
+    },
+    "macos-aarch64": {
+      "link-args": [],
+      "dependencies": [],
+      "linked-libraries": ["stbimage"]
+    },
+    "linux-x86": {
+      "link-args": [],
+      "dependencies": [],
+      "linked-libraries": ["stbimage"]
+    },
+    "linux-x64": {
+      "link-args": [],
+      "dependencies": [],
+      "linked-libraries": ["stbimage"]
+    },
+    "linux-aarch64": {
+      "link-args": [],
+      "dependencies": [],
+      "linked-libraries": ["stbimage"]
+    },
+    "windows-x64": {
+      "linked-libraries": ["stbimage"]
+    },
+    "windows-aarch64": {
+      "linked-libraries": ["stbimage"]
+    },
+    "wasm32": {
+      "link-args": [],
+      "dependencies": [],
+      "linked-libraries": ["stbimage"]
+    },
+    "wasm64": {
+      "link-args": [],
+      "dependencies": [],
+      "linked-libraries": ["stbimage"]
+    }
+  }
+}
