@@ -1,6 +1,6 @@
 {
   "provides": "stbimage",
-  "execs": ["cc -o tmp.o -c stb_image.h; ar rcs libstbimage.a tmp.o; rm tmp.o"],
+  "execs": ["cc -o tmp.o -c stb_image.c; ar rcs libstbimage.a tmp.o; rm tmp.o"],
   "targets": {
     "macos-x64": {
       "link-args": [],

@@ -1,6 +1,6 @@
 {
   "provides": "cgltf",
-  "execs": ["cc -o tmp.o -c cgltf.h; ar rcs libcgltf.a tmp.o; rm tmp.o"],
+  "execs": ["cc -o tmp.o -c cgltf.c && ar rcs libcgltf.a tmp.o && rm tmp.o"],
   "targets": {
     "macos-x64": {
       "link-args": [],
