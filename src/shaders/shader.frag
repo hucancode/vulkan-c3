@@ -10,6 +10,6 @@ void main() {
     vec4 lightDir = normalize(vec4(1.0, 1.0, 1.0, 1.0));
     float brightness = max(dot(normalize(fragNormal), lightDir), 0.0);
     vec4 albedo = texture(texSampler, fragTexCoord);
-    vec4 shadedColor = fragColor * brightness * albedo;
-    outColor = albedo;
+    vec4 shadedColor = brightness * brightness * albedo;
+    outColor = shadedColor;
 }
