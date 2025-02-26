@@ -26,67 +26,56 @@ const char[*] FRAGMENT_CODE = $embed("shaders/frag.spv");
 
 const MAX_FRAMES_IN_FLIGHT = 2;
 const Vertex[*] VERTICES = {
-	// Front-top-left
-	{.position = {-1.0, 1.0, 1.0, 1.0}, .color = {0.25, 0.25, 0.5, 1.0}},
-	// Front-top-right
-	{.position = {1.0, 1.0, 1.0, 1.0}, .color = {0.5, 0.5, 0.0, 1.0}},
-	// Front-bottom-right
-	{.position = {1.0, -1.0, 1.0, 1.0}, .color = {0.0, 0.5, 0.5, 1.0}},
-	// Front-bottom-left
-	{.position = {-1.0, -1.0, 1.0, 1.0}, .color = {0.5, 1.0, 0.5, 1.0}},
-	// Back-top-left
-	{.position = {-1.0, 1.0, -1.0, 1.0}, .color = {1.0, 0.5, 0.0, 1.0}},
-	// Back-top-right
-	{.position = {1.0, 1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}},
-	// Back-bottom-right
-	{.position = {1.0, -1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}},
-	// Back-bottom-left
-	{.position = {-1.0, -1.0, -1.0, 1.0}, .color = {0.25, 0.25, 1.0, 1.0}},
+    // Front face
+    {.position = {-1.0, -1.0, 1.0, 1.0}, .color = {0.25, 0.25, 0.5, 1.0}, .normal = {0.0, 0.0, 1.0, 1.0}, .texCoord = {0.0, 1.0}},
+    {.position = {1.0, -1.0, 1.0, 1.0}, .color = {0.5, 0.5, 0.0, 1.0}, .normal = {0.0, 0.0, 1.0, 1.0}, .texCoord = {1.0, 1.0}},
+    {.position = {1.0, 1.0, 1.0, 1.0}, .color = {0.0, 0.5, 0.5, 1.0}, .normal = {0.0, 0.0, 1.0, 1.0}, .texCoord = {1.0, 0.0}},
+    {.position = {-1.0, 1.0, 1.0, 1.0}, .color = {0.5, 1.0, 0.5, 1.0}, .normal = {0.0, 0.0, 1.0, 1.0}, .texCoord = {0.0, 0.0}},
+
+    // Back face
+    {.position = {-1.0, 1.0, -1.0, 1.0}, .color = {1.0, 0.5, 0.0, 1.0}, .normal = {0.0, 0.0, -1.0, 1.0}, .texCoord = {1.0, 1.0}},
+    {.position = {1.0, 1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}, .normal = {0.0, 0.0, -1.0, 1.0}, .texCoord = {0.0, 1.0}},
+    {.position = {1.0, -1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}, .normal = {0.0, 0.0, -1.0, 1.0}, .texCoord = {0.0, 0.0}},
+    {.position = {-1.0, -1.0, -1.0, 1.0}, .color = {0.25, 0.25, 1.0, 1.0}, .normal = {0.0, 0.0, -1.0, 1.0}, .texCoord = {1.0, 0.0}},
+
+    // Top face
+    {.position = {1.0, 1.0, -1.0, 1.0}, .color = {1.0, 0.5, 0.0, 1.0}, .normal = {0.0, 1.0, 0.0, 1.0}, .texCoord = {0.0, 1.0}},
+    {.position = {-1.0, 1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}, .normal = {0.0, 1.0, 0.0, 1.0}, .texCoord = {1.0, 1.0}},
+    {.position = {-1.0, 1.0, 1.0, 1.0}, .color = {0.5, 0.5, 0.0, 1.0}, .normal = {0.0, 1.0, 0.0, 1.0}, .texCoord = {1.0, 0.0}},
+    {.position = {1.0, 1.0, 1.0, 1.0}, .color = {0.25, 0.25, 0.5, 1.0}, .normal = {0.0, 1.0, 0.0, 1.0}, .texCoord = {0.0, 0.0}},
+
+    // Bottom face
+    {.position = {1.0, -1.0, 1.0, 1.0}, .color = {0.5, 1.0, 0.5, 1.0}, .normal = {0.0, -1.0, 0.0, 1.0}, .texCoord = {0.0, 1.0}},
+    {.position = {-1.0, -1.0, 1.0, 1.0}, .color = {0.0, 0.5, 0.5, 1.0}, .normal = {0.0, -1.0, 0.0, 1.0}, .texCoord = {1.0, 1.0}},
+    {.position = {-1.0, -1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}, .normal = {0.0, -1.0, 0.0, 1.0}, .texCoord = {1.0, 0.0}},
+    {.position = {1.0, -1.0, -1.0, 1.0}, .color = {0.25, 0.25, 1.0, 1.0}, .normal = {0.0, -1.0, 0.0, 1.0}, .texCoord = {0.0, 0.0}},
+
+    // Right face
+    {.position = {1.0, -1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.0, 1.0}, .normal = {1.0, 0.0, 0.0, 1.0}, .texCoord = {0.0, 1.0}},
+    {.position = {1.0, 1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}, .normal = {1.0, 0.0, 0.0, 1.0}, .texCoord = {1.0, 1.0}},
+    {.position = {1.0, 1.0, 1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}, .normal = {1.0, 0.0, 0.0, 1.0}, .texCoord = {1.0, 0.0}},
+    {.position = {1.0, -1.0, 1.0, 1.0}, .color = {0.0, 0.5, 0.5, 1.0}, .normal = {1.0, 0.0, 0.0, 1.0}, .texCoord = {0.0, 0.0}},
+
+    // Left face
+    {.position = {-1.0, -1.0, 1.0, 1.0}, .color = {1.0, 0.5, 0.0, 1.0}, .normal = {-1.0, 0.0, 0.0, 1.0}, .texCoord = {0.0, 1.0}},
+    {.position = {-1.0, 1.0, 1.0, 1.0}, .color = {0.25, 0.25, 0.5, 1.0}, .normal = {-1.0, 0.0, 0.0, 1.0}, .texCoord = {1.0, 1.0}},
+    {.position = {-1.0, 1.0, -1.0, 1.0}, .color = {0.5, 1.0, 0.5, 1.0}, .normal = {-1.0, 0.0, 0.0, 1.0}, .texCoord = {1.0, 0.0}},
+    {.position = {-1.0, -1.0, -1.0, 1.0}, .color = {0.25, 0.25, 1.0, 1.0}, .normal = {-1.0, 0.0, 0.0, 1.0}, .texCoord = {0.0, 0.0}},
 };
 
 const ushort[*] INDICES = {
-	// Front face
-	0,
-	2,
-	1,
-	0,
-	3,
-	2,
-	// Right face
-	1,
-	6,
-	5,
-	1,
-	2,
-	6,
-	// Back face
-	5,
-	7,
-	4,
-	5,
-	6,
-	7,
-	// Left face
-	4,
-	3,
-	0,
-	4,
-	7,
-	3,
-	// Top face
-	4,
-	1,
-	5,
-	4,
-	0,
-	1,
-	// Bottom face
-	3,
-	6,
-	2,
-	3,
-	7,
-	6,
+    // Front face
+    0, 1, 2, 2, 3, 0,
+    // Back face
+    4, 5, 6, 6, 7, 4,
+    // Top face
+    8, 9, 10, 10, 11, 8,
+    // Bottom face
+    12, 13, 14, 14, 15, 12,
+    // Right face
+    16, 17, 18, 18, 19, 16,
+    // Left face
+    20, 21, 22, 22, 23, 20
 };
 
 glfw::Window* g_window;
