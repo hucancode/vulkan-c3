@@ -1,4 +1,4 @@
-module stb;
+module stbimage;
 import libc;
 
 const int STBI_VERSION = 1;
