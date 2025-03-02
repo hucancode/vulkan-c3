@@ -682,58 +682,94 @@ fn Result parse(
 		Options* options,
 		void* data,
 		Size size,
-		Data** out_data);
+		Data** out_data)
+@extern("cgltf_parse");
 
 fn Result parse_file(
 		Options* options,
 		ZString path,
-		Data** out_data);
+		Data** out_data)
+@extern("cgltf_parse_file");
 
 fn Result load_buffers(
 		Options* options,
 		Data* data,
-		ZString gltf_path);
+		ZString gltf_path)
+@extern("cgltf_load_buffers");
 
-fn Result load_buffer_base64(Options* options, Size size, ZString base64, void** out_data);
+fn Result load_buffer_base64(Options* options, Size size, ZString base64, void** out_data)
+@extern("cgltf_load_buffer_base64");
 
-fn Size decode_string(ZString string);
-fn Size decode_uri(ZString uri);
+fn Size decode_string(ZString string)
+@extern("cgltf_decode_string");
+fn Size decode_uri(ZString uri)
+@extern("cgltf_decode_uri");
 
-fn Result validate(Data* data);
+fn Result validate(Data* data)
+@extern("cgltf_validate");
 
-fn void free(Data* data);
+fn void free(Data* data)
+@extern("cgltf_free");
 
-fn void node_transform_local(Node* node, float* out_matrix);
-fn void node_transform_world(Node* node, float* out_matrix);
+fn void node_transform_local(Node* node, float* out_matrix)
+@extern("cgltf_node_transform_local");
+fn void node_transform_world(Node* node, float* out_matrix)
+@extern("cgltf_node_transform_world");
 
-fn ushort* buffer_view_data(BufferView* view);
+fn ushort* buffer_view_data(BufferView* view)
+@extern("cgltf_buffer_view_data");
 
-fn Accessor* find_accessor(Primitive* prim, AttributeType type, int index);
+fn Accessor* find_accessor(Primitive* prim, AttributeType type, int index)
+@extern("cgltf_find_accessor");
 
-fn Bool accessor_read_float(Accessor* accessor, Size index, float* out, Size element_size);
-fn Bool accessor_read_uint(Accessor* accessor, Size index, uint* out, Size element_size);
-fn Size accessor_read_index(Accessor* accessor, Size index);
+fn Bool accessor_read_float(Accessor* accessor, Size index, float* out, Size element_size)
+@extern("cgltf_accessor_read_float");
+fn Bool accessor_read_uint(Accessor* accessor, Size index, uint* out, Size element_size)
+@extern("cgltf_accessor_read_uint");
+fn Size accessor_read_index(Accessor* accessor, Size index)
+@extern("cgltf_accessor_read_index");
 
-fn Size num_components(Type type);
-fn Size component_size(ComponentType component_type);
-fn Size calc_size(Type type, ComponentType component_type);
+fn Size num_components(Type type)
+@extern("cgltf_num_components");
+fn Size component_size(ComponentType component_type)
+@extern("cgltf_component_size");
+fn Size calc_size(Type type, ComponentType component_type)
+@extern("cgltf_calc_size");
 
-fn Size accessor_unpack_floats(Accessor* accessor, float* out, Size float_count);
-fn Size accessor_unpack_indices(Accessor* accessor, void* out, Size out_component_size, Size index_count);
+fn Size accessor_unpack_floats(Accessor* accessor, float* out, Size float_count)
+@extern("cgltf_accessor_unpack_floats");
+fn Size accessor_unpack_indices(Accessor* accessor, void* out, Size out_component_size, Size index_count)
+@extern("cgltf_accessor_unpack_indices");
 
-fn Size mesh_index(Data* data, Mesh* object);
-fn Size material_index(Data* data, Material* object);
-fn Size accessor_index(Data* data, Accessor* object);
-fn Size buffer_view_index(Data* data, BufferView* object);
-fn Size buffer_index(Data* data, Buffer* object);
-fn Size image_index(Data* data, Image* object);
-fn Size texture_index(Data* data, Texture* object);
-fn Size sampler_index(Data* data, Sampler* object);
-fn Size skin_index(Data* data, Skin* object);
-fn Size camera_index(Data* data, Camera* object);
-fn Size light_index(Data* data, Light* object);
-fn Size node_index(Data* data, Node* object);
-fn Size scene_index(Data* data, Scene* object);
-fn Size animation_index(Data* data, Animation* object);
-fn Size animation_sampler_index(Animation* animation, AnimationSampler* object);
-fn Size animation_channel_index(Animation* animation, AnimationChannel* object);
+fn Size mesh_index(Data* data, Mesh* object)
+@extern("cgltf_mesh_index");
+fn Size material_index(Data* data, Material* object)
+@extern("cgltf_material_index");
+fn Size accessor_index(Data* data, Accessor* object)
+@extern("cgltf_accessor_index");
+fn Size buffer_view_index(Data* data, BufferView* object)
+@extern("cgltf_buffer_view_index");
+fn Size buffer_index(Data* data, Buffer* object)
+@extern("cgltf_buffer_index");
+fn Size image_index(Data* data, Image* object)
+@extern("cgltf_image_index");
+fn Size texture_index(Data* data, Texture* object)
+@extern("cgltf_texture_index");
+fn Size sampler_index(Data* data, Sampler* object)
+@extern("cgltf_sampler_index");
+fn Size skin_index(Data* data, Skin* object)
+@extern("cgltf_skin_index");
+fn Size camera_index(Data* data, Camera* object)
+@extern("cgltf_camera_index");
+fn Size light_index(Data* data, Light* object)
+@extern("cgltf_light_index");
+fn Size node_index(Data* data, Node* object)
+@extern("cgltf_node_index");
+fn Size scene_index(Data* data, Scene* object)
+@extern("cgltf_scene_index");
+fn Size animation_index(Data* data, Animation* object)
+@extern("cgltf_animation_index");
+fn Size animation_sampler_index(Animation* animation, AnimationSampler* object)
+@extern("cgltf_animation_sampler_index");
+fn Size animation_channel_index(Animation* animation, AnimationChannel* object)
+@extern("cgltf_animation_channel_index");
