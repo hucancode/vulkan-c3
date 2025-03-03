@@ -1,8 +1,5 @@
 {
   "provides": "stbimage",
-  "execs": [
-    "cc -c -O2 -arch arm64 stb_image.c; ar rcs libstbimage.a stb_image.o; rm stb_image.o"
-  ],
   "targets": {
     "macos-x64": {
       "link-args": [],
@@ -12,7 +9,12 @@
     "macos-aarch64": {
       "link-args": [],
       "dependencies": [],
-      "linked-libraries": ["stbimage"]
+      "linked-libraries": ["stbimage"],
+      "execs": [
+        "cc -c -O2 -arch arm64 stb_image.c",
+        "ar rcs macos-aarch64/libstbimage.a stb_image.o",
+        "rm stb_image.o"
+      ]
     },
     "linux-x86": {
       "link-args": [],

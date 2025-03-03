@@ -1,13 +1,15 @@
 {
   "provides": "cgltf",
-  "execs": [
-    "cc -c -O2 -arch arm64 cgltf.c && ar rcs libcgltf.a cgltf.o && rm cgltf.o"
-  ],
   "targets": {
     "macos-x64": {
       "link-args": [],
       "dependencies": [],
-      "linked-libraries": ["cgltf"]
+      "linked-libraries": ["cgltf"],
+      "execs": [
+        "cc -c -O2 -arch arm64 cgltf.c",
+        "ar rcs libcgltf.a cgltf.o",
+        "rm cgltf.o"
+      ]
     },
     "macos-aarch64": {
       "link-args": [],
