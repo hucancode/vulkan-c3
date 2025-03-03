@@ -17,6 +17,7 @@ const TITLE = "Hello Vulkan!";
 const ENGINE_NAME = "Soreal Engine";
 const ZString[*] REQUIRED_EXTENSIONS = {
     vk::KHR_SWAPCHAIN_EXTENSION_NAME,
+    vk::KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
 };
 const ENABLE_VALIDATION_LAYERS = false;
 const ZString[*] VALIDATION_LAYERS @if(ENABLE_VALIDATION_LAYERS) = {
@@ -95,9 +96,7 @@ vk::Extent2D g_swap_chain_extent;
 vk::SwapchainKHR g_swap_chain;
 vk::Image[] g_swap_chain_images;
 vk::ImageView[] g_swap_chain_image_views;
-vk::Framebuffer[] g_swap_chain_framebuffers;
 
-vk::RenderPass g_render_pass;
 vk::DescriptorSetLayout g_descriptor_set_layout;
 vk::PipelineLayout g_pipeline_layout;
 vk::Pipeline g_graphics_pipeline;
@@ -496,72 +495,6 @@ fn vk::ShaderModule! createShaderModule(char[] code) {
     return ret;
 }
 
-fn void! createRenderPass() {
-    vk::RenderPassCreateInfo createInfo = {
-        .s_type = vk::STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-        .attachment_count = 1,
-        .p_attachments = &&vk::AttachmentDescription {
-            .format = g_swap_chain_format.format,
-            .samples = vk::SampleCountFlags { .n_1 },
-            .load_op = vk::ATTACHMENT_LOAD_OP_CLEAR,
-            .store_op = vk::ATTACHMENT_STORE_OP_STORE,
-            .stencil_load_op = vk::ATTACHMENT_LOAD_OP_DONT_CARE,
-            .stencil_store_op = vk::ATTACHMENT_STORE_OP_DONT_CARE,
-            .initial_layout = vk::IMAGE_LAYOUT_UNDEFINED,
-            .final_layout = vk::IMAGE_LAYOUT_PRESENT_SRC_KHR,
-        },
-        .subpass_count = 1,
-        .p_subpasses = &&vk::SubpassDescription {
-            .pipeline_bind_point = vk::PIPELINE_BIND_POINT_GRAPHICS,
-            .color_attachment_count = 1,
-            .p_color_attachments = &&vk::AttachmentReference {
-                .attachment = 0,
-                .layout = vk::IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-            },
-        },
-        .dependency_count = 1,
-        .p_dependencies = &&vk::SubpassDependency {
-            .src_subpass = vk::SUBPASS_EXTERNAL,
-            .dst_subpass = 0,
-            .src_stage_mask = vk::PipelineStageFlags { .color_attachment_output },
-            .src_access_mask = vk::AccessFlags { .color_attachment_write },
-            .dst_stage_mask = vk::PipelineStageFlags { .color_attachment_output },
-            .dst_access_mask = vk::AccessFlags { .color_attachment_write },
-            .dependency_flags = vk::DependencyFlags { .by_region },
-        },
-    };
-    vk::createRenderPass(g_device, &createInfo, null, &g_render_pass)!;
-}
-
-fn void destroyRenderPass() {
-    vk::destroyRenderPass(g_device, g_render_pass, null);
-}
-
-fn void! createFrameBuffers() {
-    uint n = g_swap_chain_image_views.len;
-    vk::Framebuffer* buffers = (vk::Framebuffer*)malloc(n * vk::Framebuffer.sizeof);
-    g_swap_chain_framebuffers = buffers[:n];
-    for (uint i = 0; i < n; i++) {
-        vk::FramebufferCreateInfo info = {
-            .s_type = vk::STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-            .render_pass = g_render_pass,
-            .attachment_count = 1,
-            .p_attachments = &g_swap_chain_image_views[i],
-            .width = g_swap_chain_extent.width,
-            .height = g_swap_chain_extent.height,
-            .layers = 1,
-        };
-        vk::createFramebuffer(g_device, &info, null, &g_swap_chain_framebuffers[i])!;
-    }
-}
-
-fn void destroyFrameBuffers() {
-    foreach (buffer : g_swap_chain_framebuffers) {
-        vk::destroyFramebuffer(g_device, buffer, null);
-    }
-    free(g_swap_chain_framebuffers);
-}
-
 fn void! createDescriptorSetLayout() {
     vk::DescriptorSetLayoutBinding ubo_binding = {
         .binding = 0,
@@ -679,6 +612,11 @@ fn void! createGraphicsPipeline() {
         },
         null,
         &g_pipeline_layout)!;
+    vk::PipelineRenderingCreateInfoKHR dynamic_rendering_info = {
+        .s_type = vk::STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,
+        .color_attachment_count = 1,
+        .p_color_attachment_formats = &g_swap_chain_format.format,
+    };
     vk::GraphicsPipelineCreateInfo pipelineInfo = {
         .s_type = vk::STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
         .stage_count = shader_stages.len,
@@ -691,9 +629,8 @@ fn void! createGraphicsPipeline() {
         .p_color_blend_state = &colorBlending,
         .p_dynamic_state = &dynamicState,
         .layout = g_pipeline_layout,
-        .render_pass = g_render_pass,
-        .subpass = 0,
         .base_pipeline_index = -1,
+        .p_next = &dynamic_rendering_info,
     };
     vk::createGraphicsPipelines(g_device, (vk::PipelineCache)0, 1, &pipelineInfo, null, &g_graphics_pipeline)!;
 }
@@ -1127,14 +1064,53 @@ fn void! recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
     vk::beginCommandBuffer(commandBuffer, &&vk::CommandBufferBeginInfo {
         .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
     })!;
-    vk::cmdBeginRenderPass(commandBuffer, &&vk::RenderPassBeginInfo {
-        .s_type = vk::STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-        .render_pass = g_render_pass,
-        .framebuffer = g_swap_chain_framebuffers[imageIndex],
-        .render_area = { .extent = g_swap_chain_extent },
-        .clear_value_count = 1,
-        .p_clear_values = &&vk::ClearValue { .color = { .float32 = float[4] { 0.0117, 0.0117, 0.0179, 1.0 } } },
-    }, vk::SUBPASS_CONTENTS_INLINE);
+    vk::ImageMemoryBarrier barrier_before = {
+        .s_type = vk::STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+        .old_layout = vk::IMAGE_LAYOUT_UNDEFINED,
+        .new_layout = vk::IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        .src_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
+        .dst_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
+        .image = g_swap_chain_images[imageIndex],
+        .subresource_range = {
+            .aspect_mask = vk::ImageAspectFlags {.color},
+            .base_mip_level = 0,
+            .level_count = 1,
+            .base_array_layer = 0,
+            .layer_count = 1
+        },
+        .src_access_mask = vk::AccessFlags{},
+        .dst_access_mask = vk::AccessFlags{.color_attachment_write},
+    };
+
+    vk::cmdPipelineBarrier(
+        commandBuffer,
+        vk::PipelineStageFlags{.top_of_pipe},
+        vk::PipelineStageFlags{.color_attachment_output},
+        vk::DependencyFlags{},
+        0, null,
+        0, null,
+        1, &barrier_before
+    );
+
+    // Begin dynamic rendering
+    vk::RenderingAttachmentInfoKHR color_attachment = {
+        .s_type = vk::STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
+        .image_view = g_swap_chain_image_views[imageIndex],
+        .image_layout = vk::IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        .load_op = vk::ATTACHMENT_LOAD_OP_CLEAR,
+        .store_op = vk::ATTACHMENT_STORE_OP_STORE,
+        .clear_value = { .color = { .float32 = {0.0117, 0.0117, 0.0179, 1.0} } }
+    };
+
+    vk::RenderingInfoKHR render_info = {
+        .s_type = vk::STRUCTURE_TYPE_RENDERING_INFO_KHR,
+        .render_area = {.extent = g_swap_chain_extent},
+        .layer_count = 1,
+        .color_attachment_count = 1,
+        .p_color_attachments = &color_attachment
+    };
+
+    vk::cmdBeginRenderingKHR(commandBuffer, &render_info);
     vk::cmdBindPipeline(commandBuffer, vk::PIPELINE_BIND_POINT_GRAPHICS, g_graphics_pipeline);
     vk::cmdSetViewport(commandBuffer, 0, 1, &&vk::Viewport {
         .width = g_swap_chain_extent.width,
@@ -1145,7 +1121,35 @@ fn void! recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
         .extent = g_swap_chain_extent,
     });
     draw(commandBuffer);
-    vk::cmdEndRenderPass(commandBuffer);
+    vk::cmdEndRenderingKHR(commandBuffer);
+    // Transition to PRESENT_SRC_KHR
+    vk::ImageMemoryBarrier barrier_after = {
+        .s_type = vk::STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+        .old_layout = vk::IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        .new_layout = vk::IMAGE_LAYOUT_PRESENT_SRC_KHR,
+        .src_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
+        .dst_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
+        .image = g_swap_chain_images[imageIndex],
+        .subresource_range = {
+            .aspect_mask = vk::ImageAspectFlags{.color},
+            .base_mip_level = 0,
+            .level_count = 1,
+            .base_array_layer = 0,
+            .layer_count = 1
+        },
+        .src_access_mask = vk::AccessFlags{.color_attachment_write},
+        .dst_access_mask = vk::AccessFlags{}
+    };
+
+    vk::cmdPipelineBarrier(
+        commandBuffer,
+        vk::PipelineStageFlags{.color_attachment_output},
+        vk::PipelineStageFlags{.bottom_of_pipe},
+        vk::DependencyFlags{},
+        0, null,
+        0, null,
+        1, &barrier_after
+    );
     vk::endCommandBuffer(commandBuffer)!;
 }
 
@@ -1169,10 +1173,8 @@ fn void update() {
 
 fn void! recreateSwapchain() {
     vk::deviceWaitIdle(g_device)!;
-    destroyFrameBuffers();
     destroySwapchain();
     createSwapchain()!;
-    createFrameBuffers()!;
 }
 
 fn void! init() {
@@ -1184,12 +1186,8 @@ fn void! init() {
     createLogicalDevice()!;
     createSwapchain()!;
     io::printfn("Swap chain created %x", g_swap_chain);
-    createRenderPass()!;
-    io::printfn("Render pass created %x", g_render_pass);
     createDescriptorSetLayout()!;
     io::printfn("Descriptor set layout created %x", g_descriptor_set_layout);
-    createFrameBuffers()!;
-    io::printfn("Frame buffers created %x", g_swap_chain_framebuffers.len);
     createGraphicsPipeline()!;
     io::print("Graphics pipeline created\n");
     createCommandPool()!;
@@ -1209,9 +1207,7 @@ fn void destroy() {
     destroyBuffers();
     destroyCommandPool();
     destroyGraphicsPipeline();
-    destroyFrameBuffers();
     destroyDescriptorSetLayout();
-    destroyRenderPass();
     destroyDescriptorSets();
     destroySwapchain();
     destroyDevice();
