@@ -29,40 +29,40 @@ const char[*] FRAGMENT_CODE = $embed("shaders/frag.spv");
 const MAX_FRAMES_IN_FLIGHT = 2;
 const Vertex[*] VERTICES = {
     // Front face
-    {.position = {-1.0, -1.0, 1.0, 1.0}, .color = {0.25, 0.25, 0.5, 1.0}, .normal = {0.0, 0.0, 1.0, 1.0}, .texCoord = {0.0, 1.0}},
-    {.position = {1.0, -1.0, 1.0, 1.0}, .color = {0.5, 0.5, 0.0, 1.0}, .normal = {0.0, 0.0, 1.0, 1.0}, .texCoord = {1.0, 1.0}},
-    {.position = {1.0, 1.0, 1.0, 1.0}, .color = {0.0, 0.5, 0.5, 1.0}, .normal = {0.0, 0.0, 1.0, 1.0}, .texCoord = {1.0, 0.0}},
-    {.position = {-1.0, 1.0, 1.0, 1.0}, .color = {0.5, 1.0, 0.5, 1.0}, .normal = {0.0, 0.0, 1.0, 1.0}, .texCoord = {0.0, 0.0}},
+    {.position = {-1.0, -1.0, 1.0, 1.0}, .color = {0.25, 0.25, 0.5, 1.0}, .normal = {0.0, 0.0, 1.0, 1.0}, .uv = {0.0, 1.0}},
+    {.position = {1.0, -1.0, 1.0, 1.0}, .color = {0.5, 0.5, 0.0, 1.0}, .normal = {0.0, 0.0, 1.0, 1.0}, .uv = {1.0, 1.0}},
+    {.position = {1.0, 1.0, 1.0, 1.0}, .color = {0.0, 0.5, 0.5, 1.0}, .normal = {0.0, 0.0, 1.0, 1.0}, .uv = {1.0, 0.0}},
+    {.position = {-1.0, 1.0, 1.0, 1.0}, .color = {0.5, 1.0, 0.5, 1.0}, .normal = {0.0, 0.0, 1.0, 1.0}, .uv = {0.0, 0.0}},
 
     // Back face
-    {.position = {-1.0, 1.0, -1.0, 1.0}, .color = {1.0, 0.5, 0.0, 1.0}, .normal = {0.0, 0.0, -1.0, 1.0}, .texCoord = {1.0, 1.0}},
-    {.position = {1.0, 1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}, .normal = {0.0, 0.0, -1.0, 1.0}, .texCoord = {0.0, 1.0}},
-    {.position = {1.0, -1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}, .normal = {0.0, 0.0, -1.0, 1.0}, .texCoord = {0.0, 0.0}},
-    {.position = {-1.0, -1.0, -1.0, 1.0}, .color = {0.25, 0.25, 1.0, 1.0}, .normal = {0.0, 0.0, -1.0, 1.0}, .texCoord = {1.0, 0.0}},
+    {.position = {-1.0, 1.0, -1.0, 1.0}, .color = {1.0, 0.5, 0.0, 1.0}, .normal = {0.0, 0.0, -1.0, 1.0}, .uv = {1.0, 1.0}},
+    {.position = {1.0, 1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}, .normal = {0.0, 0.0, -1.0, 1.0}, .uv = {0.0, 1.0}},
+    {.position = {1.0, -1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}, .normal = {0.0, 0.0, -1.0, 1.0}, .uv = {0.0, 0.0}},
+    {.position = {-1.0, -1.0, -1.0, 1.0}, .color = {0.25, 0.25, 1.0, 1.0}, .normal = {0.0, 0.0, -1.0, 1.0}, .uv = {1.0, 0.0}},
 
     // Top face
-    {.position = {1.0, 1.0, -1.0, 1.0}, .color = {1.0, 0.5, 0.0, 1.0}, .normal = {0.0, 1.0, 0.0, 1.0}, .texCoord = {0.0, 1.0}},
-    {.position = {-1.0, 1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}, .normal = {0.0, 1.0, 0.0, 1.0}, .texCoord = {1.0, 1.0}},
-    {.position = {-1.0, 1.0, 1.0, 1.0}, .color = {0.5, 0.5, 0.0, 1.0}, .normal = {0.0, 1.0, 0.0, 1.0}, .texCoord = {1.0, 0.0}},
-    {.position = {1.0, 1.0, 1.0, 1.0}, .color = {0.25, 0.25, 0.5, 1.0}, .normal = {0.0, 1.0, 0.0, 1.0}, .texCoord = {0.0, 0.0}},
+    {.position = {1.0, 1.0, -1.0, 1.0}, .color = {1.0, 0.5, 0.0, 1.0}, .normal = {0.0, 1.0, 0.0, 1.0}, .uv = {0.0, 1.0}},
+    {.position = {-1.0, 1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}, .normal = {0.0, 1.0, 0.0, 1.0}, .uv = {1.0, 1.0}},
+    {.position = {-1.0, 1.0, 1.0, 1.0}, .color = {0.5, 0.5, 0.0, 1.0}, .normal = {0.0, 1.0, 0.0, 1.0}, .uv = {1.0, 0.0}},
+    {.position = {1.0, 1.0, 1.0, 1.0}, .color = {0.25, 0.25, 0.5, 1.0}, .normal = {0.0, 1.0, 0.0, 1.0}, .uv = {0.0, 0.0}},
 
     // Bottom face
-    {.position = {1.0, -1.0, 1.0, 1.0}, .color = {0.5, 1.0, 0.5, 1.0}, .normal = {0.0, -1.0, 0.0, 1.0}, .texCoord = {0.0, 1.0}},
-    {.position = {-1.0, -1.0, 1.0, 1.0}, .color = {0.0, 0.5, 0.5, 1.0}, .normal = {0.0, -1.0, 0.0, 1.0}, .texCoord = {1.0, 1.0}},
-    {.position = {-1.0, -1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}, .normal = {0.0, -1.0, 0.0, 1.0}, .texCoord = {1.0, 0.0}},
-    {.position = {1.0, -1.0, -1.0, 1.0}, .color = {0.25, 0.25, 1.0, 1.0}, .normal = {0.0, -1.0, 0.0, 1.0}, .texCoord = {0.0, 0.0}},
+    {.position = {1.0, -1.0, 1.0, 1.0}, .color = {0.5, 1.0, 0.5, 1.0}, .normal = {0.0, -1.0, 0.0, 1.0}, .uv = {0.0, 1.0}},
+    {.position = {-1.0, -1.0, 1.0, 1.0}, .color = {0.0, 0.5, 0.5, 1.0}, .normal = {0.0, -1.0, 0.0, 1.0}, .uv = {1.0, 1.0}},
+    {.position = {-1.0, -1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}, .normal = {0.0, -1.0, 0.0, 1.0}, .uv = {1.0, 0.0}},
+    {.position = {1.0, -1.0, -1.0, 1.0}, .color = {0.25, 0.25, 1.0, 1.0}, .normal = {0.0, -1.0, 0.0, 1.0}, .uv = {0.0, 0.0}},
 
     // Right face
-    {.position = {1.0, -1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.0, 1.0}, .normal = {1.0, 0.0, 0.0, 1.0}, .texCoord = {0.0, 1.0}},
-    {.position = {1.0, 1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}, .normal = {1.0, 0.0, 0.0, 1.0}, .texCoord = {1.0, 1.0}},
-    {.position = {1.0, 1.0, 1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}, .normal = {1.0, 0.0, 0.0, 1.0}, .texCoord = {1.0, 0.0}},
-    {.position = {1.0, -1.0, 1.0, 1.0}, .color = {0.0, 0.5, 0.5, 1.0}, .normal = {1.0, 0.0, 0.0, 1.0}, .texCoord = {0.0, 0.0}},
+    {.position = {1.0, -1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.0, 1.0}, .normal = {1.0, 0.0, 0.0, 1.0}, .uv = {0.0, 1.0}},
+    {.position = {1.0, 1.0, -1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}, .normal = {1.0, 0.0, 0.0, 1.0}, .uv = {1.0, 1.0}},
+    {.position = {1.0, 1.0, 1.0, 1.0}, .color = {0.5, 0.5, 0.5, 1.0}, .normal = {1.0, 0.0, 0.0, 1.0}, .uv = {1.0, 0.0}},
+    {.position = {1.0, -1.0, 1.0, 1.0}, .color = {0.0, 0.5, 0.5, 1.0}, .normal = {1.0, 0.0, 0.0, 1.0}, .uv = {0.0, 0.0}},
 
     // Left face
-    {.position = {-1.0, -1.0, 1.0, 1.0}, .color = {1.0, 0.5, 0.0, 1.0}, .normal = {-1.0, 0.0, 0.0, 1.0}, .texCoord = {0.0, 1.0}},
-    {.position = {-1.0, 1.0, 1.0, 1.0}, .color = {0.25, 0.25, 0.5, 1.0}, .normal = {-1.0, 0.0, 0.0, 1.0}, .texCoord = {1.0, 1.0}},
-    {.position = {-1.0, 1.0, -1.0, 1.0}, .color = {0.5, 1.0, 0.5, 1.0}, .normal = {-1.0, 0.0, 0.0, 1.0}, .texCoord = {1.0, 0.0}},
-    {.position = {-1.0, -1.0, -1.0, 1.0}, .color = {0.25, 0.25, 1.0, 1.0}, .normal = {-1.0, 0.0, 0.0, 1.0}, .texCoord = {0.0, 0.0}},
+    {.position = {-1.0, -1.0, 1.0, 1.0}, .color = {1.0, 0.5, 0.0, 1.0}, .normal = {-1.0, 0.0, 0.0, 1.0}, .uv = {0.0, 1.0}},
+    {.position = {-1.0, 1.0, 1.0, 1.0}, .color = {0.25, 0.25, 0.5, 1.0}, .normal = {-1.0, 0.0, 0.0, 1.0}, .uv = {1.0, 1.0}},
+    {.position = {-1.0, 1.0, -1.0, 1.0}, .color = {0.5, 1.0, 0.5, 1.0}, .normal = {-1.0, 0.0, 0.0, 1.0}, .uv = {1.0, 0.0}},
+    {.position = {-1.0, -1.0, -1.0, 1.0}, .color = {0.25, 0.25, 1.0, 1.0}, .normal = {-1.0, 0.0, 0.0, 1.0}, .uv = {0.0, 0.0}},
 };
 
 const ushort[*] INDICES = {
@@ -123,7 +123,7 @@ vk::DeviceMemory g_texture_image_memory;
 
 time::Time g_last_frame_timestamp;
 time::Time g_start_timestamp;
-UniformBufferObject g_ubo;
+UniformBuffer g_ubo;
 
 uint g_current_frame;
 
@@ -565,7 +565,7 @@ fn void! createGraphicsPipeline() {
 	}, {
 	   .binding = 0, .location = 2, .format = vk::FORMAT_R32G32B32A32_SFLOAT, .offset = Vertex.normal.offsetof
 	}, {
-	   .binding = 0, .location = 3, .format = vk::FORMAT_R32G32_SFLOAT, .offset = Vertex.texCoord.offsetof
+	   .binding = 0, .location = 3, .format = vk::FORMAT_R32G32_SFLOAT, .offset = Vertex.uv.offsetof
 	}};
     vk::PipelineVertexInputStateCreateInfo vertexInputInfo = {
         .s_type = vk::STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
@@ -770,8 +770,8 @@ fn void! createBuffers() {
     createBufferInit(&VERTICES, (vk::DeviceSize)($sizeof(VERTICES)), vk::BufferUsageFlags { .vertex_buffer }, vk::MemoryPropertyFlags { .device_local }, &g_vertex_buffer, &g_vertex_memory)!;
     createBufferInit(&INDICES, (vk::DeviceSize)($sizeof(INDICES)), vk::BufferUsageFlags { .index_buffer }, vk::MemoryPropertyFlags { .device_local }, &g_index_buffer, &g_index_memory)!;
     for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        createBufferInit(&g_ubo, UniformBufferObject.sizeof, vk::BufferUsageFlags { .uniform_buffer }, vk::MemoryPropertyFlags { .host_visible, .host_coherent }, &g_uniform_buffers[i], &g_uniform_memory[i])!;
-        vk::mapMemory(g_device, g_uniform_memory[i], 0, UniformBufferObject.sizeof, vk::MemoryMapFlags{}, &g_uniform_buffer_mapped[i])!;
+        createBufferInit(&g_ubo, UniformBuffer.sizeof, vk::BufferUsageFlags { .uniform_buffer }, vk::MemoryPropertyFlags { .host_visible, .host_coherent }, &g_uniform_buffers[i], &g_uniform_memory[i])!;
+        vk::mapMemory(g_device, g_uniform_memory[i], 0, UniformBuffer.sizeof, vk::MemoryMapFlags{}, &g_uniform_buffer_mapped[i])!;
     }
     createTextures()!;
 }
@@ -938,7 +938,7 @@ fn void createUBO() {
     if(height <= 0) {
         return;
     }
-    g_ubo.model = MATRIX4F_IDENTITY;
+    g_ubo.model = matrix::IDENTITY4(<float>);
     g_ubo.view = matrix::look_at(<float>)({0.0, 5.0, 5.0}, {}, {0.0, 1.0, 0.0}).transpose();
     g_ubo.projection = matrix::perspective(<float>)((float)math::deg_to_rad(45), (float)width/(float)height, 0.1, 10000.0).transpose();
     g_ubo.time = 0.0;
@@ -986,7 +986,7 @@ fn void! createDescriptorSets() {
     		.p_buffer_info     = &&vk::DescriptorBufferInfo {
     			.buffer = g_uniform_buffers[i],
     			.offset = 0,
-    			.range = UniformBufferObject.sizeof,
+    			.range = UniformBuffer.sizeof,
 			},
 		};
 		vk::WriteDescriptorSet sampler_desc = {
@@ -1014,7 +1014,7 @@ fn void destroyDescriptorSets() {
 }
 
 fn void updateUniforms() {
-    mem::copy(g_uniform_buffer_mapped[g_current_frame], &g_ubo, UniformBufferObject.sizeof);
+    mem::copy(g_uniform_buffer_mapped[g_current_frame], &g_ubo, UniformBuffer.sizeof);
 }
 
 fn void! render() {
@@ -1162,10 +1162,10 @@ fn void draw(vk::CommandBuffer commandBuffer) {
 
 fn void update() {
     g_ubo.time = (float)time::now().diff_sec(g_start_timestamp);
-    g_ubo.model = MATRIX4F_IDENTITY
-        .rotate_x((float)math::sin((float)g_ubo.time*0.53))
-        .rotate_y((float)math::sin((float)g_ubo.time*0.97))
-        .rotate_z((float)math::sin((float)g_ubo.time*1.17))
+    g_ubo.model = matrix::IDENTITY4(<float>)
+        .rotate_x((float)math::sin(g_ubo.time*0.53))
+        .rotate_y((float)math::sin(g_ubo.time*0.97))
+        .rotate_z((float)math::sin(g_ubo.time*1.17))
         .transpose();
     g_last_frame_timestamp = time::now();
     updateUniforms();
@@ -1185,19 +1185,12 @@ fn void! init() {
     pickPhysicalDevice()!;
     createLogicalDevice()!;
     createSwapchain()!;
-    io::printfn("Swap chain created %x", g_swap_chain);
     createDescriptorSetLayout()!;
-    io::printfn("Descriptor set layout created %x", g_descriptor_set_layout);
     createGraphicsPipeline()!;
-    io::print("Graphics pipeline created\n");
     createCommandPool()!;
-    io::print("Command pool created\n");
     createBuffers()!;
-    io::print("Buffers created\n");
     createDescriptorSets()!;
-    io::print("Descriptor sets created\n");
     createSemaphores()!;
-    io::print("Semaphores created\n");
     createUBO();
 }
 
