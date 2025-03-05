@@ -1,5 +1,6 @@
-module mj::vk;
+module mj::vkbe;
 import vk;
+import glfw;
 
 vk::Buffer[MAX_FRAMES_IN_FLIGHT] g_uniform_buffers;
 vk::DeviceMemory[MAX_FRAMES_IN_FLIGHT] g_uniform_memory;

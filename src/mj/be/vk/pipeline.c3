@@ -1,6 +1,10 @@
-module mj::vk;
+module mj::vkbe;
 import std::core::mem;
+import std::io;
+import std::math::matrix;
+import glfw;
 import vk;
+import mj;
 
 const char[*] VERTEX_CODE = $embed("shaders/vert.spv");
 const char[*] FRAGMENT_CODE = $embed("shaders/frag.spv");

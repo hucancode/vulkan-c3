@@ -1,4 +1,4 @@
-module mj::vk;
+module mj::vkbe;
 import vk;
 
 vk::Semaphore[MAX_FRAMES_IN_FLIGHT] g_image_available_semaphore;

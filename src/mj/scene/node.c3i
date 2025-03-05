@@ -1,6 +1,6 @@
 module mj;
 import std::math::matrix;
-
+import std::collections::list;
 def NodeHandle = usz;
 
 enum NodeType {
@@ -25,4 +25,4 @@ struct Node {
         LightHandle light;
     }
     Transform transform;
-};
+}

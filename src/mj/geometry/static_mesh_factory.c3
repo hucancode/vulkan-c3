@@ -9,7 +9,7 @@ fn StaticMesh make_cube(float[<4>] color = {0.125, 0.25, 0.5, 1.0}) {
     const float[<4>] F =  {1.0, 1.0, -1.0, 1.0};
     const float[<4>] G =  {1.0, -1.0, -1.0, 1.0};
     const float[<4>] H =  {-1.0, -1.0, -1.0, 1.0};
-    const Vertex[] VERTICES = {
+    Vertex[] vertices = {
         // Front face
         {.position = A, .color = color, .normal = VEC_FORWARD, .uv = {0.0, 1.0}},
         {.position = B, .color = color, .normal = VEC_FORWARD, .uv = {1.0, 1.0}},
@@ -47,7 +47,7 @@ fn StaticMesh make_cube(float[<4>] color = {0.125, 0.25, 0.5, 1.0}) {
         {.position = H, .color = color, .normal = VEC_LEFT, .uv = {0.0, 0.0}},
     };
 
-    const uint[] INDICES = {
+    uint[] indices = {
         // Front face
         0, 1, 2, 2, 3, 0,
         // Back face
@@ -61,13 +61,13 @@ fn StaticMesh make_cube(float[<4>] color = {0.125, 0.25, 0.5, 1.0}) {
         // Left face
         20, 21, 22, 22, 23, 20
     };
-    const Primitive[] PRIMITIVES = {{
+    Primitive[] primitives = {{
         .first_index = 0,
-        .count = INDICES.length,
+        .count = indices.len,
     }};
     return StaticMesh {
-        .primitives = PRIMITIVES,
-        .vertices = VERTICES,
-        .indices = INDICES,
+        .primitives = primitives,
+        .vertices = vertices,
+        .indices = indices,
     };
 }

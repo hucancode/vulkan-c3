@@ -1,5 +1,3 @@
-module std::core::env;
-const bool GLFW_INCLUDE_VULKAN = true;
 module hellovk;
 import std::io;
 import glfw;
@@ -17,18 +15,18 @@ fn int main(String[] args) {
     }
     defer glfw::terminate();
     glfw::windowHint(glfw::CLIENT_API, glfw::NO_API);
-    mj::be::vk::g_window = glfw::createWindow(WIDTH, HEIGHT, TITLE, null, null);
-    if (mj::be::vk::g_window == null) {
+    vkbe::g_window = glfw::createWindow(WIDTH, HEIGHT, TITLE, null, null);
+    if (vkbe::g_window == null) {
         return -1;
     }
-    io::printfn("Window created %x", mj::be::vk::g_window);
-    defer glfw::destroyWindow(mj::be::vk::g_window);
+    io::printfn("Window created %x", vkbe::g_window);
+    defer glfw::destroyWindow(vkbe::g_window);
     mj::init()!!;
     defer mj::destroy();
-    while (!glfw::windowShouldClose(mj::be::vk::g_window)) {
+    while (!glfw::windowShouldClose(vkbe::g_window)) {
         glfw::pollEvents();
         mj::update();
-        anyfault excuse = @catch(mj::be::vk::render());
+        anyfault excuse = @catch(vkbe::render());
         if (excuse) {
             io::printfn("Error: while rendering");
         };

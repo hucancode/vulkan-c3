@@ -1,5 +1,4 @@
 module mj;
-import std::collections::map;
 import std::math::quaternion;
 
 struct BoneAnimation {

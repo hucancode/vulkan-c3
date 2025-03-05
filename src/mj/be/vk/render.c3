@@ -1,5 +1,8 @@
-module mj::vk;
+module mj::vkbe;
 import vk;
+import mj;
+
+uint g_current_frame;
 
 fn void! render() {
     vk::waitForFences(g_device, 1, &g_in_flight_fences[g_current_frame], vk::TRUE, ulong.max)!;

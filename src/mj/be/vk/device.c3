@@ -1,5 +1,9 @@
-module mj::vk;
+module std::core::env;
+const bool GLFW_INCLUDE_VULKAN = true;
+module mj::vkbe;
+import std::io;
 import vk;
+import glfw;
 
 const ZString[*] REQUIRED_EXTENSIONS = {
     vk::KHR_SWAPCHAIN_EXTENSION_NAME,

@@ -1,4 +1,4 @@
-module mj::vk;
+module mj::vkbe;
 import vk;
 
 vk::CommandPool g_command_pool;

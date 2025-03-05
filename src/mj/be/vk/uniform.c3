@@ -1,7 +1,5 @@
-module hellovk;
+module mj::vkbe;
 import std::math::matrix;
-import std::math;
-import std::math::vector;
 
 struct UniformBuffer @align(16) {
 	Matrix4x4(<float>) projection;

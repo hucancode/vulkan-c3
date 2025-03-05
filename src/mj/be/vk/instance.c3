@@ -1,6 +1,9 @@
-module mj::vk;
+module mj::vkbe;
 import std::core::mem;
+import std::io;
 import vk;
+import glfw;
+
 
 fn void! createVulkanInstance() {
     vk::loadProcAddressesGlobal(&glfw::getInstanceProcAddress);
