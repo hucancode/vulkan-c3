@@ -1,0 +1,30 @@
+module mj;
+import std::collections::map;
+import std::math::quaternion;
+
+struct BoneAnimation {
+    BoneHandle bone;
+    AnimationChannel channels;
+}
+def Animation = BoneAnimation[];
+
+struct AnimationChannel {
+    PositionKeyframe[] positions;
+    RotationKeyframe[] rotations;
+    ScaleKeyframe[] scales;
+}
+
+struct PositionKeyframe {
+    float time;
+    float[<3>] value;
+}
+
+struct RotationKeyframe {
+    float time;
+    Quaternion value;
+}
+
+struct ScaleKeyframe {
+    float time;
+    float[<3>] value;
+}

@@ -1,0 +1,9 @@
+module mj;
+
+struct Material {
+    float[<3>] color;
+    TextureHandle albedo;
+    TextureHandle normal;
+    TextureHandle roughness;
+    TextureHandle metallic;
+}

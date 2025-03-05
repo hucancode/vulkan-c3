@@ -1,9 +1,0 @@
-module hellovk;
-import std::math::vector;
-
-struct Vertex {
-	float[<4>] position;
-	float[<4>] color;
-	float[<4>] normal;
-	float[<2>] uv;
-}

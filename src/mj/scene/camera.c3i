@@ -1,0 +1,15 @@
+module mj;
+
+enum CameraProjection {
+    PERSPECTIVE,
+    ORTHOGRAPHIC
+}
+
+struct Camera {
+    CameraProjection projection;
+    float fov;
+    float aspect_ratio;
+    float near;
+    float far;
+    float[<4>] up;
+};

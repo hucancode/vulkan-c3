@@ -1,0 +1,31 @@
+module mj;
+import std::math::vector;
+
+struct Vertex {
+	float[<4>] position;
+	float[<4>] normal;
+	float[<4>] color;
+	float[<2>] uv;
+}
+
+struct SkinnedVertex {
+	float[<4>] position;
+	float[<4>] normal;
+	float[<4>] color;
+	float[<2>] uv;
+	float[<4>] joints;
+	float[<4>] weights;
+}
+
+const VEC_UP = float[<4>] {0.0, 1.0, 0.0, 1.0};
+const VEC_DOWN = float[<4>] {0.0, -1.0, 0.0, 1.0};
+const VEC_RIGHT = float[<4>] {1.0, 0.0, 0.0, 1.0};
+const VEC_LEFT = float[<4>] {-1.0, 0.0, 0.0, 1.0};
+const VEC_FORWARD = float[<4>] {0.0, 0.0, 1.0, 1.0};
+const VEC_BACKWARD = float[<4>] {0.0, 0.0, -1.0, 1.0};
+const VEC_Y = VEC_UP;
+const VEC_Y_NEG = VEC_DOWN;
+const VEC_X = VEC_RIGHT;
+const VEC_X_NEG = VEC_LEFT;
+const VEC_Z = VEC_FORWARD;
+const VEC_Z_NEG = VEC_BACKWARD;

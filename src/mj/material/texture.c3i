@@ -1,0 +1,6 @@
+module mj;
+
+def TextureHandle = usz;
+struct Texture {
+    void* pixels;
+}

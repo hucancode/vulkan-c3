@@ -1,0 +1,18 @@
+module mj;
+import std::collections::map;
+
+def SkeletalMeshHandle = usz;
+def BoneHandle = usz;
+
+struct Bone {
+    Transform transform;
+    BoneHandle[] children;
+}
+
+struct SkeletalMesh {
+    Primitive[] primitives;
+    SkinnedVertex[] vertices;
+    uint[] indices;
+    Bone[] bones;
+    Map(<String, Animation>) animations;
+}

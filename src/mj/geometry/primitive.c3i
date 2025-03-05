@@ -1,0 +1,7 @@
+module mj;
+
+struct Primitive {
+    uint first_index;
+    uint count;
+    uint material_index;
+}
