@@ -1,7 +1,0 @@
-module mj;
-import std::collections::list;
-
-struct Scene {
-    Node root;
-    Camera camera;
-}

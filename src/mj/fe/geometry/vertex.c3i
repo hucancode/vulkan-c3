@@ -13,7 +13,7 @@ struct SkinnedVertex {
 	float[<4>] normal;
 	float[<4>] color;
 	float[<2>] uv;
-	float[<4>] joints;
+	uint[<4>] joints;
 	float[<4>] weights;
 }
 

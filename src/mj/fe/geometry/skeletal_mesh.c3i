@@ -1,4 +1,5 @@
 module mj;
+import std::collections::map;
 
 def SkeletalMeshHandle = usz;
 def BoneHandle = usz;
@@ -9,9 +10,8 @@ struct Bone {
 }
 
 struct SkeletalMesh {
-    Primitive[] primitives;
     SkinnedVertex[] vertices;
     uint[] indices;
     Bone[] bones;
-    Animation[] animations;
+    HashMap(<String, AnimationTrack>) animations;
 }

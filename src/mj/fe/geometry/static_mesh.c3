@@ -1,5 +1,12 @@
 module mj;
 
+def StaticMeshHandle = usz;
+
+struct StaticMesh {
+    Vertex[] vertices;
+    uint[] indices;
+}
+
 fn StaticMesh make_cube(float[<4>] color = {0.125, 0.25, 0.5, 1.0}) {
     const float[<4>] A =  {-1.0, -1.0, 1.0, 1.0};
     const float[<4>] B =  {1.0, -1.0, 1.0, 1.0};
@@ -61,12 +68,7 @@ fn StaticMesh make_cube(float[<4>] color = {0.125, 0.25, 0.5, 1.0}) {
         // Left face
         20, 21, 22, 22, 23, 20
     };
-    Primitive[] primitives = {{
-        .first_index = 0,
-        .count = indices.len,
-    }};
     return StaticMesh {
-        .primitives = primitives,
         .vertices = vertices,
         .indices = indices,
     };

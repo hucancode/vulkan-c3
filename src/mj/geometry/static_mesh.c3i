@@ -1,9 +1,0 @@
-module mj;
-
-def StaticMeshHandle = usz;
-
-struct StaticMesh {
-    Primitive[] primitives;
-    Vertex[] vertices;
-    uint[] indices;
-}

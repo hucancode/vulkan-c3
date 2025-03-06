@@ -1,6 +1,10 @@
 module mj;
 import std::collections::list;
 
+struct GenerationalIndex {
+    uint generation;
+    uint index;
+}
 struct StaticMeshPool {
     List(<StaticMesh>) meshes;
 }

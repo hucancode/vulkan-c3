@@ -7,24 +7,30 @@ import mj::vkbe;
 
 const ENGINE_NAME = "Mjolnir";
 const TITLE = "Vulkan C3";
-time::Time g_last_frame_timestamp;
-time::Time g_start_timestamp;
+struct Engine {
+    Time last_frame_timestamp;
+    Time start_timestamp;
+    uint current_frame;
+}
 
 fn void! init() {
     g_start_timestamp = time::now();
     g_last_frame_timestamp = g_start_timestamp;
+    // engine
     vkbe::createVulkanInstance()!;
     vkbe::createWindowSurface()!;
     vkbe::pickPhysicalDevice()!;
     vkbe::createLogicalDevice()!;
     vkbe::createSwapchain()!;
+    vkbe::createSemaphores()!;
+    // material
     vkbe::createDescriptorSetLayout()!;
+    vkbe::createDescriptorSets()!;
     vkbe::createGraphicsPipeline()!;
     vkbe::createCommandPool()!;
-    vkbe::createBuffers()!;
-    vkbe::createDescriptorSets()!;
-    vkbe::createSemaphores()!;
     vkbe::createUBO();
+    // mesh
+    vkbe::createBuffers()!;
 }
 
 fn void destroy() {
