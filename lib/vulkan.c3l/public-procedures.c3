@@ -189,12 +189,16 @@ fn DisplayModePropertiesKHR[]! getDisplayModePropertiesKHR(PhysicalDevice physic
 	return ret[:n];
 }
 
-fn void! getDisplayPlaneCapabilities2KHR(PhysicalDevice physicalDevice, DisplayPlaneInfo2KHR* pDisplayPlaneInfo, DisplayPlaneCapabilities2KHR* pCapabilities) @inline {
-	vk::check(internal::getDisplayPlaneCapabilities2KHR(physicalDevice, pDisplayPlaneInfo, pCapabilities))!;
+fn DisplayPlaneCapabilities2KHR! getDisplayPlaneCapabilities2KHR(PhysicalDevice physicalDevice, DisplayPlaneInfo2KHR* pDisplayPlaneInfo) @inline {
+    DisplayPlaneCapabilities2KHR ret;
+	vk::check(internal::getDisplayPlaneCapabilities2KHR(physicalDevice, pDisplayPlaneInfo, &ret))!;
+	return ret;
 }
 
-fn void! getDisplayPlaneCapabilitiesKHR(PhysicalDevice physicalDevice, DisplayModeKHR mode, uint planeIndex, DisplayPlaneCapabilitiesKHR* pCapabilities) @inline {
-	vk::check(internal::getDisplayPlaneCapabilitiesKHR(physicalDevice, mode, planeIndex, pCapabilities))!;
+fn DisplayPlaneCapabilitiesKHR! getDisplayPlaneCapabilitiesKHR(PhysicalDevice physicalDevice, DisplayModeKHR mode, uint planeIndex) @inline {
+    DisplayPlaneCapabilitiesKHR ret;
+	vk::check(internal::getDisplayPlaneCapabilitiesKHR(physicalDevice, mode, planeIndex, &ret))!;
+	return ret;
 }
 
 fn DisplayKHR[]! getDisplayPlaneSupportedDisplaysKHR(PhysicalDevice physicalDevice, uint planeIndex) {
@@ -205,8 +209,10 @@ fn DisplayKHR[]! getDisplayPlaneSupportedDisplaysKHR(PhysicalDevice physicalDevi
 	return ret[:n];
 }
 
-fn void! getDrmDisplayEXT(PhysicalDevice physicalDevice, int drmFd, uint connectorId, DisplayKHR* display) @inline {
-	vk::check(internal::getDrmDisplayEXT(physicalDevice, drmFd, connectorId, display))!;
+fn DisplayKHR! getDrmDisplayEXT(PhysicalDevice physicalDevice, int drmFd, uint connectorId) @inline {
+    DisplayKHR ret;
+	vk::check(internal::getDrmDisplayEXT(physicalDevice, drmFd, connectorId, &ret))!;
+	return ret;
 }
 
 fn ProcVoidFunction getInstanceProcAddrLUNARG(Instance instance, ZString pName) @inline {
@@ -293,56 +299,82 @@ fn DisplayPropertiesKHR[]! getPhysicalDeviceDisplayPropertiesKHR(PhysicalDevice 
 	return ret[:n];
 }
 
-fn void getPhysicalDeviceExternalBufferProperties(PhysicalDevice physicalDevice, PhysicalDeviceExternalBufferInfo* pExternalBufferInfo, ExternalBufferProperties* pExternalBufferProperties) @inline {
-	internal::getPhysicalDeviceExternalBufferProperties(physicalDevice, pExternalBufferInfo, pExternalBufferProperties);
+fn ExternalBufferProperties getPhysicalDeviceExternalBufferProperties(PhysicalDevice physicalDevice, PhysicalDeviceExternalBufferInfo* pExternalBufferInfo) @inline {
+    ExternalBufferProperties ret;
+	internal::getPhysicalDeviceExternalBufferProperties(physicalDevice, pExternalBufferInfo, &ret);
+	return ret;
 }
 
-fn void getPhysicalDeviceExternalBufferPropertiesKHR(PhysicalDevice physicalDevice, PhysicalDeviceExternalBufferInfo* pExternalBufferInfo, ExternalBufferProperties* pExternalBufferProperties) @inline {
-	internal::getPhysicalDeviceExternalBufferPropertiesKHR(physicalDevice, pExternalBufferInfo, pExternalBufferProperties);
+fn ExternalBufferProperties getPhysicalDeviceExternalBufferPropertiesKHR(PhysicalDevice physicalDevice, PhysicalDeviceExternalBufferInfo* pExternalBufferInfo) @inline {
+    ExternalBufferProperties ret;
+	internal::getPhysicalDeviceExternalBufferPropertiesKHR(physicalDevice, pExternalBufferInfo, &ret);
+	return ret;
 }
 
-fn void getPhysicalDeviceExternalFenceProperties(PhysicalDevice physicalDevice, PhysicalDeviceExternalFenceInfo* pExternalFenceInfo, ExternalFenceProperties* pExternalFenceProperties) @inline {
-	internal::getPhysicalDeviceExternalFenceProperties(physicalDevice, pExternalFenceInfo, pExternalFenceProperties);
+fn ExternalFenceProperties getPhysicalDeviceExternalFenceProperties(PhysicalDevice physicalDevice, PhysicalDeviceExternalFenceInfo* pExternalFenceInfo) @inline {
+    ExternalFenceProperties ret;
+	internal::getPhysicalDeviceExternalFenceProperties(physicalDevice, pExternalFenceInfo, &ret);
+	return ret;
 }
 
-fn void getPhysicalDeviceExternalFencePropertiesKHR(PhysicalDevice physicalDevice, PhysicalDeviceExternalFenceInfo* pExternalFenceInfo, ExternalFenceProperties* pExternalFenceProperties) @inline {
-	internal::getPhysicalDeviceExternalFencePropertiesKHR(physicalDevice, pExternalFenceInfo, pExternalFenceProperties);
+fn ExternalFenceProperties  getPhysicalDeviceExternalFencePropertiesKHR(PhysicalDevice physicalDevice, PhysicalDeviceExternalFenceInfo* pExternalFenceInfo) @inline {
+    ExternalFenceProperties ret;
+	internal::getPhysicalDeviceExternalFencePropertiesKHR(physicalDevice, pExternalFenceInfo, &ret);
+	return ret;
 }
 
-fn void! getPhysicalDeviceExternalImageFormatPropertiesNV(PhysicalDevice physicalDevice, Format format, ImageType type, ImageTiling tiling, ImageUsageFlags usage, ImageCreateFlags flags, ExternalMemoryHandleTypeFlagsNV externalHandleType, ExternalImageFormatPropertiesNV* pExternalImageFormatProperties) @inline {
-	vk::check(internal::getPhysicalDeviceExternalImageFormatPropertiesNV(physicalDevice, format, type, tiling, usage, flags, externalHandleType, pExternalImageFormatProperties))!;
+fn ExternalImageFormatPropertiesNV! getPhysicalDeviceExternalImageFormatPropertiesNV(PhysicalDevice physicalDevice, Format format, ImageType type, ImageTiling tiling, ImageUsageFlags usage, ImageCreateFlags flags, ExternalMemoryHandleTypeFlagsNV externalHandleType) @inline {
+    ExternalImageFormatPropertiesNV ret;
+	vk::check(internal::getPhysicalDeviceExternalImageFormatPropertiesNV(physicalDevice, format, type, tiling, usage, flags, externalHandleType, &ret))!;
+	return ret;
 }
 
-fn void getPhysicalDeviceExternalSemaphoreProperties(PhysicalDevice physicalDevice, PhysicalDeviceExternalSemaphoreInfo* pExternalSemaphoreInfo, ExternalSemaphoreProperties* pExternalSemaphoreProperties) @inline {
-	internal::getPhysicalDeviceExternalSemaphoreProperties(physicalDevice, pExternalSemaphoreInfo, pExternalSemaphoreProperties);
+fn ExternalSemaphoreProperties getPhysicalDeviceExternalSemaphoreProperties(PhysicalDevice physicalDevice, PhysicalDeviceExternalSemaphoreInfo* pExternalSemaphoreInfo) @inline {
+    ExternalSemaphoreProperties ret;
+	internal::getPhysicalDeviceExternalSemaphoreProperties(physicalDevice, pExternalSemaphoreInfo, &ret);
+	return ret;
 }
 
-fn void getPhysicalDeviceExternalSemaphorePropertiesKHR(PhysicalDevice physicalDevice, PhysicalDeviceExternalSemaphoreInfo* pExternalSemaphoreInfo, ExternalSemaphoreProperties* pExternalSemaphoreProperties) @inline {
-	internal::getPhysicalDeviceExternalSemaphorePropertiesKHR(physicalDevice, pExternalSemaphoreInfo, pExternalSemaphoreProperties);
+fn ExternalSemaphoreProperties getPhysicalDeviceExternalSemaphorePropertiesKHR(PhysicalDevice physicalDevice, PhysicalDeviceExternalSemaphoreInfo* pExternalSemaphoreInfo) @inline {
+    ExternalSemaphoreProperties ret;
+	internal::getPhysicalDeviceExternalSemaphorePropertiesKHR(physicalDevice, pExternalSemaphoreInfo, &ret);
+	return ret;
 }
 
-fn void getPhysicalDeviceFeatures(PhysicalDevice physicalDevice, PhysicalDeviceFeatures* pFeatures) @inline {
-	internal::getPhysicalDeviceFeatures(physicalDevice, pFeatures);
+fn PhysicalDeviceFeatures getPhysicalDeviceFeatures(PhysicalDevice physicalDevice) @inline {
+    PhysicalDeviceFeatures ret;
+	internal::getPhysicalDeviceFeatures(physicalDevice, &ret);
+	return ret;
 }
 
-fn void getPhysicalDeviceFeatures2(PhysicalDevice physicalDevice, PhysicalDeviceFeatures2* pFeatures) @inline {
-	internal::getPhysicalDeviceFeatures2(physicalDevice, pFeatures);
+fn PhysicalDeviceFeatures2 getPhysicalDeviceFeatures2(PhysicalDevice physicalDevice) @inline {
+    PhysicalDeviceFeatures2 ret;
+	internal::getPhysicalDeviceFeatures2(physicalDevice, &ret);
+	return ret;
 }
 
-fn void getPhysicalDeviceFeatures2KHR(PhysicalDevice physicalDevice, PhysicalDeviceFeatures2* pFeatures) @inline {
-	internal::getPhysicalDeviceFeatures2KHR(physicalDevice, pFeatures);
+fn PhysicalDeviceFeatures2 getPhysicalDeviceFeatures2KHR(PhysicalDevice physicalDevice) @inline {
+    PhysicalDeviceFeatures2 ret;
+	internal::getPhysicalDeviceFeatures2KHR(physicalDevice, &ret);
+	return ret;
 }
 
-fn void getPhysicalDeviceFormatProperties(PhysicalDevice physicalDevice, Format format, FormatProperties* pFormatProperties) @inline {
-	internal::getPhysicalDeviceFormatProperties(physicalDevice, format, pFormatProperties);
+fn FormatProperties getPhysicalDeviceFormatProperties(PhysicalDevice physicalDevice, Format format) @inline {
+    FormatProperties ret;
+	internal::getPhysicalDeviceFormatProperties(physicalDevice, format, &ret);
+	return ret;
 }
 
-fn void getPhysicalDeviceFormatProperties2(PhysicalDevice physicalDevice, Format format, FormatProperties2* pFormatProperties) @inline {
-	internal::getPhysicalDeviceFormatProperties2(physicalDevice, format, pFormatProperties);
+fn FormatProperties2 getPhysicalDeviceFormatProperties2(PhysicalDevice physicalDevice, Format format) @inline {
+    FormatProperties2 ret;
+	internal::getPhysicalDeviceFormatProperties2(physicalDevice, format, &ret);
+	return ret;
 }
 
-fn void getPhysicalDeviceFormatProperties2KHR(PhysicalDevice physicalDevice, Format format, FormatProperties2* pFormatProperties) @inline {
-	internal::getPhysicalDeviceFormatProperties2KHR(physicalDevice, format, pFormatProperties);
+fn FormatProperties2 getPhysicalDeviceFormatProperties2KHR(PhysicalDevice physicalDevice, Format format) @inline {
+    FormatProperties2 ret;
+	internal::getPhysicalDeviceFormatProperties2KHR(physicalDevice, format, &ret);
+	return ret;
 }
 
 fn PhysicalDeviceFragmentShadingRateKHR[]! getPhysicalDeviceFragmentShadingRatesKHR(PhysicalDevice physicalDevice) {
@@ -353,32 +385,46 @@ fn PhysicalDeviceFragmentShadingRateKHR[]! getPhysicalDeviceFragmentShadingRates
 	return ret[:n];
 }
 
-fn void! getPhysicalDeviceImageFormatProperties(PhysicalDevice physicalDevice, Format format, ImageType type, ImageTiling tiling, ImageUsageFlags usage, ImageCreateFlags flags, ImageFormatProperties* pImageFormatProperties) @inline {
-	vk::check(internal::getPhysicalDeviceImageFormatProperties(physicalDevice, format, type, tiling, usage, flags, pImageFormatProperties))!;
+fn ImageFormatProperties! getPhysicalDeviceImageFormatProperties(PhysicalDevice physicalDevice, Format format, ImageType type, ImageTiling tiling, ImageUsageFlags usage, ImageCreateFlags flags) @inline {
+    ImageFormatProperties ret;
+	vk::check(internal::getPhysicalDeviceImageFormatProperties(physicalDevice, format, type, tiling, usage, flags, &ret))!;
+	return ret;
 }
 
-fn void! getPhysicalDeviceImageFormatProperties2(PhysicalDevice physicalDevice, PhysicalDeviceImageFormatInfo2* pImageFormatInfo, ImageFormatProperties2* pImageFormatProperties) @inline {
-	vk::check(internal::getPhysicalDeviceImageFormatProperties2(physicalDevice, pImageFormatInfo, pImageFormatProperties))!;
+fn ImageFormatProperties2! getPhysicalDeviceImageFormatProperties2(PhysicalDevice physicalDevice, PhysicalDeviceImageFormatInfo2* pImageFormatInfo) @inline {
+    ImageFormatProperties2 ret;
+	vk::check(internal::getPhysicalDeviceImageFormatProperties2(physicalDevice, pImageFormatInfo, &ret))!;
+	return ret;
 }
 
-fn void! getPhysicalDeviceImageFormatProperties2KHR(PhysicalDevice physicalDevice, PhysicalDeviceImageFormatInfo2* pImageFormatInfo, ImageFormatProperties2* pImageFormatProperties) @inline {
-	vk::check(internal::getPhysicalDeviceImageFormatProperties2KHR(physicalDevice, pImageFormatInfo, pImageFormatProperties))!;
+fn ImageFormatProperties2! getPhysicalDeviceImageFormatProperties2KHR(PhysicalDevice physicalDevice, PhysicalDeviceImageFormatInfo2* pImageFormatInfo) @inline {
+    ImageFormatProperties2 ret;
+	vk::check(internal::getPhysicalDeviceImageFormatProperties2KHR(physicalDevice, pImageFormatInfo, &ret))!;
+	return ret;
 }
 
-fn void getPhysicalDeviceMemoryProperties(PhysicalDevice physicalDevice, PhysicalDeviceMemoryProperties* pMemoryProperties) @inline {
-	internal::getPhysicalDeviceMemoryProperties(physicalDevice, pMemoryProperties);
+fn PhysicalDeviceMemoryProperties getPhysicalDeviceMemoryProperties(PhysicalDevice physicalDevice) @inline {
+    PhysicalDeviceMemoryProperties ret;
+	internal::getPhysicalDeviceMemoryProperties(physicalDevice, &ret);
+	return ret;
 }
 
-fn void getPhysicalDeviceMemoryProperties2(PhysicalDevice physicalDevice, PhysicalDeviceMemoryProperties2* pMemoryProperties) @inline {
-	internal::getPhysicalDeviceMemoryProperties2(physicalDevice, pMemoryProperties);
+fn PhysicalDeviceMemoryProperties2 getPhysicalDeviceMemoryProperties2(PhysicalDevice physicalDevice) @inline {
+    PhysicalDeviceMemoryProperties2 ret;
+	internal::getPhysicalDeviceMemoryProperties2(physicalDevice, &ret);
+	return ret;
 }
 
-fn void getPhysicalDeviceMemoryProperties2KHR(PhysicalDevice physicalDevice, PhysicalDeviceMemoryProperties2* pMemoryProperties) @inline {
-	internal::getPhysicalDeviceMemoryProperties2KHR(physicalDevice, pMemoryProperties);
+fn PhysicalDeviceMemoryProperties2 getPhysicalDeviceMemoryProperties2KHR(PhysicalDevice physicalDevice) @inline {
+    PhysicalDeviceMemoryProperties2 ret;
+	internal::getPhysicalDeviceMemoryProperties2KHR(physicalDevice, &ret);
+	return ret;
 }
 
-fn void getPhysicalDeviceMultisamplePropertiesEXT(PhysicalDevice physicalDevice, SampleCountFlags samples, MultisamplePropertiesEXT* pMultisampleProperties) @inline {
-	internal::getPhysicalDeviceMultisamplePropertiesEXT(physicalDevice, samples, pMultisampleProperties);
+fn MultisamplePropertiesEXT getPhysicalDeviceMultisamplePropertiesEXT(PhysicalDevice physicalDevice, SampleCountFlags samples) @inline {
+    MultisamplePropertiesEXT ret;
+	internal::getPhysicalDeviceMultisamplePropertiesEXT(physicalDevice, samples, &ret);
+	return ret;
 }
 
 fn OpticalFlowImageFormatPropertiesNV[]! getPhysicalDeviceOpticalFlowImageFormatsNV(PhysicalDevice physicalDevice, OpticalFlowImageFormatInfoNV* pOpticalFlowImageFormatInfo) {
@@ -397,20 +443,28 @@ fn Rect2D[]! getPhysicalDevicePresentRectanglesKHR(PhysicalDevice physicalDevice
 	return ret[:n];
 }
 
-fn void getPhysicalDeviceProperties(PhysicalDevice physicalDevice, PhysicalDeviceProperties* pProperties) @inline {
-	internal::getPhysicalDeviceProperties(physicalDevice, pProperties);
+fn PhysicalDeviceProperties getPhysicalDeviceProperties(PhysicalDevice physicalDevice) @inline {
+    PhysicalDeviceProperties ret;
+	internal::getPhysicalDeviceProperties(physicalDevice, &ret);
+	return ret;
 }
 
-fn void getPhysicalDeviceProperties2(PhysicalDevice physicalDevice, PhysicalDeviceProperties2* pProperties) @inline {
-	internal::getPhysicalDeviceProperties2(physicalDevice, pProperties);
+fn PhysicalDeviceProperties2 getPhysicalDeviceProperties2(PhysicalDevice physicalDevice) @inline {
+    PhysicalDeviceProperties2 ret;
+	internal::getPhysicalDeviceProperties2(physicalDevice, &ret);
+	return ret;
 }
 
-fn void getPhysicalDeviceProperties2KHR(PhysicalDevice physicalDevice, PhysicalDeviceProperties2* pProperties) @inline {
-	internal::getPhysicalDeviceProperties2KHR(physicalDevice, pProperties);
+fn PhysicalDeviceProperties2 getPhysicalDeviceProperties2KHR(PhysicalDevice physicalDevice) @inline {
+    PhysicalDeviceProperties2 ret;
+	internal::getPhysicalDeviceProperties2KHR(physicalDevice, &ret);
+	return ret;
 }
 
-fn void getPhysicalDeviceQueueFamilyPerformanceQueryPassesKHR(PhysicalDevice physicalDevice, QueryPoolPerformanceCreateInfoKHR* pPerformanceQueryCreateInfo, uint* pNumPasses) @inline {
-	internal::getPhysicalDeviceQueueFamilyPerformanceQueryPassesKHR(physicalDevice, pPerformanceQueryCreateInfo, pNumPasses);
+fn uint getPhysicalDeviceQueueFamilyPerformanceQueryPassesKHR(PhysicalDevice physicalDevice, QueryPoolPerformanceCreateInfoKHR* pPerformanceQueryCreateInfo) @inline {
+    uint ret;
+	internal::getPhysicalDeviceQueueFamilyPerformanceQueryPassesKHR(physicalDevice, pPerformanceQueryCreateInfo, &ret);
+	return ret;
 }
 
 fn QueueFamilyProperties[] getPhysicalDeviceQueueFamilyProperties(PhysicalDevice physicalDevice) {
@@ -469,16 +523,22 @@ fn FramebufferMixedSamplesCombinationNV[]! getPhysicalDeviceSupportedFramebuffer
 	return ret[:n];
 }
 
-fn void! getPhysicalDeviceSurfaceCapabilities2EXT(PhysicalDevice physicalDevice, SurfaceKHR surface, SurfaceCapabilities2EXT* pSurfaceCapabilities) @inline {
-	vk::check(internal::getPhysicalDeviceSurfaceCapabilities2EXT(physicalDevice, surface, pSurfaceCapabilities))!;
+fn SurfaceCapabilities2EXT! getPhysicalDeviceSurfaceCapabilities2EXT(PhysicalDevice physicalDevice, SurfaceKHR surface) @inline {
+    SurfaceCapabilities2EXT ret;
+	vk::check(internal::getPhysicalDeviceSurfaceCapabilities2EXT(physicalDevice, surface, &ret))!;
+	return ret;
 }
 
-fn void! getPhysicalDeviceSurfaceCapabilities2KHR(PhysicalDevice physicalDevice, PhysicalDeviceSurfaceInfo2KHR* pSurfaceInfo, SurfaceCapabilities2KHR* pSurfaceCapabilities) @inline {
-	vk::check(internal::getPhysicalDeviceSurfaceCapabilities2KHR(physicalDevice, pSurfaceInfo, pSurfaceCapabilities))!;
+fn SurfaceCapabilities2KHR! getPhysicalDeviceSurfaceCapabilities2KHR(PhysicalDevice physicalDevice, PhysicalDeviceSurfaceInfo2KHR* pSurfaceInfo) @inline {
+    SurfaceCapabilities2KHR ret;
+	vk::check(internal::getPhysicalDeviceSurfaceCapabilities2KHR(physicalDevice, pSurfaceInfo, &ret))!;
+	return ret;
 }
 
-fn void! getPhysicalDeviceSurfaceCapabilitiesKHR(PhysicalDevice physicalDevice, SurfaceKHR surface, SurfaceCapabilitiesKHR* pSurfaceCapabilities) @inline {
-	vk::check(internal::getPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, pSurfaceCapabilities))!;
+fn SurfaceCapabilitiesKHR! getPhysicalDeviceSurfaceCapabilitiesKHR(PhysicalDevice physicalDevice, SurfaceKHR surface) @inline {
+    SurfaceCapabilitiesKHR ret;
+	vk::check(internal::getPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &ret))!;
+	return ret;
 }
 
 fn SurfaceFormat2KHR[]! getPhysicalDeviceSurfaceFormats2KHR(PhysicalDevice physicalDevice, PhysicalDeviceSurfaceInfo2KHR* pSurfaceInfo) {
@@ -513,8 +573,10 @@ fn PresentModeKHR[]! getPhysicalDeviceSurfacePresentModesKHR(PhysicalDevice phys
 	return ret[:n];
 }
 
-fn void! getPhysicalDeviceSurfaceSupportKHR(PhysicalDevice physicalDevice, uint queueFamilyIndex, SurfaceKHR surface, uint* pSupported) @inline {
-	vk::check(internal::getPhysicalDeviceSurfaceSupportKHR(physicalDevice, queueFamilyIndex, surface, pSupported))!;
+fn uint! getPhysicalDeviceSurfaceSupportKHR(PhysicalDevice physicalDevice, uint queueFamilyIndex, SurfaceKHR surface) @inline {
+    uint ret;
+	vk::check(internal::getPhysicalDeviceSurfaceSupportKHR(physicalDevice, queueFamilyIndex, surface, &ret))!;
+	return ret;
 }
 
 fn PhysicalDeviceToolProperties[]! getPhysicalDeviceToolProperties(PhysicalDevice physicalDevice) {
@@ -533,12 +595,16 @@ fn PhysicalDeviceToolProperties[]! getPhysicalDeviceToolPropertiesEXT(PhysicalDe
 	return ret[:n];
 }
 
-fn void! getPhysicalDeviceVideoCapabilitiesKHR(PhysicalDevice physicalDevice, VideoProfileInfoKHR* pVideoProfile, VideoCapabilitiesKHR* pCapabilities) @inline {
-	vk::check(internal::getPhysicalDeviceVideoCapabilitiesKHR(physicalDevice, pVideoProfile, pCapabilities))!;
+fn VideoCapabilitiesKHR! getPhysicalDeviceVideoCapabilitiesKHR(PhysicalDevice physicalDevice, VideoProfileInfoKHR* pVideoProfile) @inline {
+    VideoCapabilitiesKHR ret;
+	vk::check(internal::getPhysicalDeviceVideoCapabilitiesKHR(physicalDevice, pVideoProfile, &ret))!;
+	return ret;
 }
 
-fn void! getPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR(PhysicalDevice physicalDevice, PhysicalDeviceVideoEncodeQualityLevelInfoKHR* pQualityLevelInfo, VideoEncodeQualityLevelPropertiesKHR* pQualityLevelProperties) @inline {
-	vk::check(internal::getPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR(physicalDevice, pQualityLevelInfo, pQualityLevelProperties))!;
+fn VideoEncodeQualityLevelPropertiesKHR! getPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR(PhysicalDevice physicalDevice, PhysicalDeviceVideoEncodeQualityLevelInfoKHR* pQualityLevelInfo) @inline {
+    VideoEncodeQualityLevelPropertiesKHR ret;
+	vk::check(internal::getPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR(physicalDevice, pQualityLevelInfo, &ret))!;
+	return ret;
 }
 
 fn VideoFormatPropertiesKHR[]! getPhysicalDeviceVideoFormatPropertiesKHR(PhysicalDevice physicalDevice, PhysicalDeviceVideoFormatInfoKHR* pVideoFormatInfo) {
@@ -565,8 +631,10 @@ fn uint getPhysicalDeviceXlibPresentationSupportKHR(PhysicalDevice physicalDevic
 	return internal::getPhysicalDeviceXlibPresentationSupportKHR(physicalDevice, queueFamilyIndex, dpy, visualID);
 }
 
-fn void! getWinrtDisplayNV(PhysicalDevice physicalDevice, uint deviceRelativeId, DisplayKHR* pDisplay) @inline {
-	vk::check(internal::getWinrtDisplayNV(physicalDevice, deviceRelativeId, pDisplay))!;
+fn DisplayKHR! getWinrtDisplayNV(PhysicalDevice physicalDevice, uint deviceRelativeId) @inline {
+    DisplayKHR ret;
+	vk::check(internal::getWinrtDisplayNV(physicalDevice, deviceRelativeId, &ret))!;
+	return ret;
 }
 
 fn void! releaseDisplayEXT(PhysicalDevice physicalDevice, DisplayKHR display) @inline {
@@ -2181,8 +2249,10 @@ fn void freeMemory(Device device, DeviceMemory memory, AllocationCallbacks* pAll
 	internal::freeMemory(device, memory, pAllocator);
 }
 
-fn void getAccelerationStructureBuildSizesKHR(Device device, AccelerationStructureBuildTypeKHR buildType, AccelerationStructureBuildGeometryInfoKHR* pBuildInfo, uint* pMaxPrimitiveCounts, AccelerationStructureBuildSizesInfoKHR* pSizeInfo) @inline {
-	internal::getAccelerationStructureBuildSizesKHR(device, buildType, pBuildInfo, pMaxPrimitiveCounts, pSizeInfo);
+fn AccelerationStructureBuildSizesInfoKHR getAccelerationStructureBuildSizesKHR(Device device, AccelerationStructureBuildTypeKHR buildType, AccelerationStructureBuildGeometryInfoKHR* pBuildInfo, uint* pMaxPrimitiveCounts) @inline {
+    AccelerationStructureBuildSizesInfoKHR ret;
+	internal::getAccelerationStructureBuildSizesKHR(device, buildType, pBuildInfo, pMaxPrimitiveCounts, &ret);
+	return ret;
 }
 
 fn DeviceAddress getAccelerationStructureDeviceAddressKHR(Device device, AccelerationStructureDeviceAddressInfoKHR* pInfo) @inline {
@@ -2193,8 +2263,10 @@ fn void! getAccelerationStructureHandleNV(Device device, AccelerationStructureNV
 	vk::check(internal::getAccelerationStructureHandleNV(device, accelerationStructure, dataSize, pData))!;
 }
 
-fn void getAccelerationStructureMemoryRequirementsNV(Device device, AccelerationStructureMemoryRequirementsInfoNV* pInfo, MemoryRequirements2KHR* pMemoryRequirements) @inline {
-	internal::getAccelerationStructureMemoryRequirementsNV(device, pInfo, pMemoryRequirements);
+fn MemoryRequirements2KHR getAccelerationStructureMemoryRequirementsNV(Device device, AccelerationStructureMemoryRequirementsInfoNV* pInfo) @inline {
+    MemoryRequirements2KHR ret;
+	internal::getAccelerationStructureMemoryRequirementsNV(device, pInfo, &ret);
+	return ret;
 }
 
 fn void! getAccelerationStructureOpaqueCaptureDescriptorDataEXT(Device device, AccelerationStructureCaptureDescriptorDataInfoEXT* pInfo, void* pData) @inline {
@@ -2213,16 +2285,22 @@ fn DeviceAddress getBufferDeviceAddressKHR(Device device, BufferDeviceAddressInf
 	return internal::getBufferDeviceAddressKHR(device, pInfo);
 }
 
-fn void getBufferMemoryRequirements(Device device, Buffer buffer, MemoryRequirements* pMemoryRequirements) @inline {
-	internal::getBufferMemoryRequirements(device, buffer, pMemoryRequirements);
+fn MemoryRequirements getBufferMemoryRequirements(Device device, Buffer buffer) @inline {
+    MemoryRequirements ret;
+	internal::getBufferMemoryRequirements(device, buffer, &ret);
+	return ret;
 }
 
-fn void getBufferMemoryRequirements2(Device device, BufferMemoryRequirementsInfo2* pInfo, MemoryRequirements2* pMemoryRequirements) @inline {
-	internal::getBufferMemoryRequirements2(device, pInfo, pMemoryRequirements);
+fn MemoryRequirements2 getBufferMemoryRequirements2(Device device, BufferMemoryRequirementsInfo2* pInfo) @inline {
+    MemoryRequirements2 ret;
+	internal::getBufferMemoryRequirements2(device, pInfo, &ret);
+	return ret;
 }
 
-fn void getBufferMemoryRequirements2KHR(Device device, BufferMemoryRequirementsInfo2* pInfo, MemoryRequirements2* pMemoryRequirements) @inline {
-	internal::getBufferMemoryRequirements2KHR(device, pInfo, pMemoryRequirements);
+fn MemoryRequirements2 getBufferMemoryRequirements2KHR(Device device, BufferMemoryRequirementsInfo2* pInfo) @inline {
+    MemoryRequirements2 ret;
+	internal::getBufferMemoryRequirements2KHR(device, pInfo, &ret);
+	return ret;
 }
 
 fn ulong getBufferOpaqueCaptureAddress(Device device, BufferDeviceAddressInfo* pInfo) @inline {
@@ -2245,8 +2323,10 @@ fn void! getCalibratedTimestampsKHR(Device device, uint timestampCount, Calibrat
 	vk::check(internal::getCalibratedTimestampsKHR(device, timestampCount, pTimestampInfos, pTimestamps, pMaxDeviation))!;
 }
 
-fn void getClusterAccelerationStructureBuildSizesNV(Device device, ClusterAccelerationStructureInputInfoNV* pInfo, AccelerationStructureBuildSizesInfoKHR* pSizeInfo) @inline {
-	internal::getClusterAccelerationStructureBuildSizesNV(device, pInfo, pSizeInfo);
+fn AccelerationStructureBuildSizesInfoKHR getClusterAccelerationStructureBuildSizesNV(Device device, ClusterAccelerationStructureInputInfoNV* pInfo) @inline {
+    AccelerationStructureBuildSizesInfoKHR ret;
+	internal::getClusterAccelerationStructureBuildSizesNV(device, pInfo, &ret);
+	return ret;
 }
 
 fn void! getCudaModuleCacheNV(Device device, CudaModuleNV module_, usz* pCacheSize, void* pCacheData) @inline {
@@ -2261,7 +2341,7 @@ fn void! getDeferredOperationResultKHR(Device device, DeferredOperationKHR opera
 	vk::check(internal::getDeferredOperationResultKHR(device, operation))!;
 }
 
-fn void getDescriptorEXT(Device device, DescriptorGetInfoEXT* pDescriptorInfo, usz dataSize, void* pDescriptor) @inline {
+fn void* getDescriptorEXT(Device device, DescriptorGetInfoEXT* pDescriptorInfo, usz dataSize, void* pDescriptor) @inline {
 	internal::getDescriptorEXT(device, pDescriptorInfo, dataSize, pDescriptor);
 }
 
@@ -2269,60 +2349,88 @@ fn void getDescriptorSetHostMappingVALVE(Device device, DescriptorSet descriptor
 	internal::getDescriptorSetHostMappingVALVE(device, descriptorSet, ppData);
 }
 
-fn void getDescriptorSetLayoutBindingOffsetEXT(Device device, DescriptorSetLayout layout, uint binding, DeviceSize* pOffset) @inline {
-	internal::getDescriptorSetLayoutBindingOffsetEXT(device, layout, binding, pOffset);
+fn DeviceSize getDescriptorSetLayoutBindingOffsetEXT(Device device, DescriptorSetLayout layout, uint binding) @inline {
+    DeviceSize ret;
+	internal::getDescriptorSetLayoutBindingOffsetEXT(device, layout, binding, &ret);
+	return ret;
 }
 
-fn void getDescriptorSetLayoutHostMappingInfoVALVE(Device device, DescriptorSetBindingReferenceVALVE* pBindingReference, DescriptorSetLayoutHostMappingInfoVALVE* pHostMapping) @inline {
-	internal::getDescriptorSetLayoutHostMappingInfoVALVE(device, pBindingReference, pHostMapping);
+fn DescriptorSetLayoutHostMappingInfoVALVE getDescriptorSetLayoutHostMappingInfoVALVE(Device device, DescriptorSetBindingReferenceVALVE* pBindingReference) @inline {
+    DescriptorSetLayoutHostMappingInfoVALVE ret;
+	internal::getDescriptorSetLayoutHostMappingInfoVALVE(device, pBindingReference, &ret);
+	return ret;
 }
 
-fn void getDescriptorSetLayoutSizeEXT(Device device, DescriptorSetLayout layout, DeviceSize* pLayoutSizeInBytes) @inline {
-	internal::getDescriptorSetLayoutSizeEXT(device, layout, pLayoutSizeInBytes);
+fn DeviceSize getDescriptorSetLayoutSizeEXT(Device device, DescriptorSetLayout layout) @inline {
+    DeviceSize ret;
+	internal::getDescriptorSetLayoutSizeEXT(device, layout, &ret);
+	return ret;
 }
 
-fn void getDescriptorSetLayoutSupport(Device device, DescriptorSetLayoutCreateInfo* pCreateInfo, DescriptorSetLayoutSupport* pSupport) @inline {
-	internal::getDescriptorSetLayoutSupport(device, pCreateInfo, pSupport);
+fn DescriptorSetLayoutSupport getDescriptorSetLayoutSupport(Device device, DescriptorSetLayoutCreateInfo* pCreateInfo) @inline {
+    DescriptorSetLayoutSupport ret;
+	internal::getDescriptorSetLayoutSupport(device, pCreateInfo, &ret);
+	return ret;
 }
 
-fn void getDescriptorSetLayoutSupportKHR(Device device, DescriptorSetLayoutCreateInfo* pCreateInfo, DescriptorSetLayoutSupport* pSupport) @inline {
-	internal::getDescriptorSetLayoutSupportKHR(device, pCreateInfo, pSupport);
+fn DescriptorSetLayoutSupport getDescriptorSetLayoutSupportKHR(Device device, DescriptorSetLayoutCreateInfo* pCreateInfo) @inline {
+    DescriptorSetLayoutSupport ret;
+	internal::getDescriptorSetLayoutSupportKHR(device, pCreateInfo, &ret);
+	return ret;
 }
 
-fn void getDeviceAccelerationStructureCompatibilityKHR(Device device, AccelerationStructureVersionInfoKHR* pVersionInfo, AccelerationStructureCompatibilityKHR* pCompatibility) @inline {
-	internal::getDeviceAccelerationStructureCompatibilityKHR(device, pVersionInfo, pCompatibility);
+fn AccelerationStructureCompatibilityKHR getDeviceAccelerationStructureCompatibilityKHR(Device device, AccelerationStructureVersionInfoKHR* pVersionInfo) @inline {
+    AccelerationStructureCompatibilityKHR ret;
+	internal::getDeviceAccelerationStructureCompatibilityKHR(device, pVersionInfo, &ret);
+	return ret;
 }
 
-fn void getDeviceBufferMemoryRequirements(Device device, DeviceBufferMemoryRequirements* pInfo, MemoryRequirements2* pMemoryRequirements) @inline {
-	internal::getDeviceBufferMemoryRequirements(device, pInfo, pMemoryRequirements);
+fn MemoryRequirements2 getDeviceBufferMemoryRequirements(Device device, DeviceBufferMemoryRequirements* pInfo) @inline {
+    MemoryRequirements2 ret;
+	internal::getDeviceBufferMemoryRequirements(device, pInfo, &ret);
+	return ret;
 }
 
-fn void getDeviceBufferMemoryRequirementsKHR(Device device, DeviceBufferMemoryRequirements* pInfo, MemoryRequirements2* pMemoryRequirements) @inline {
-	internal::getDeviceBufferMemoryRequirementsKHR(device, pInfo, pMemoryRequirements);
+fn MemoryRequirements2 getDeviceBufferMemoryRequirementsKHR(Device device, DeviceBufferMemoryRequirements* pInfo) @inline {
+    MemoryRequirements2 ret;
+	internal::getDeviceBufferMemoryRequirementsKHR(device, pInfo, &ret);
+	return ret;
 }
 
-fn void! getDeviceFaultInfoEXT(Device device, DeviceFaultCountsEXT* pFaultCounts, DeviceFaultInfoEXT* pFaultInfo) @inline {
-	vk::check(internal::getDeviceFaultInfoEXT(device, pFaultCounts, pFaultInfo))!;
+fn DeviceFaultInfoEXT! getDeviceFaultInfoEXT(Device device, DeviceFaultCountsEXT* pFaultCounts) @inline {
+    DeviceFaultInfoEXT ret;
+	vk::check(internal::getDeviceFaultInfoEXT(device, pFaultCounts, &ret))!;
+	return ret;
 }
 
-fn void getDeviceGroupPeerMemoryFeatures(Device device, uint heapIndex, uint localDeviceIndex, uint remoteDeviceIndex, PeerMemoryFeatureFlags* pPeerMemoryFeatures) @inline {
-	internal::getDeviceGroupPeerMemoryFeatures(device, heapIndex, localDeviceIndex, remoteDeviceIndex, pPeerMemoryFeatures);
+fn PeerMemoryFeatureFlags getDeviceGroupPeerMemoryFeatures(Device device, uint heapIndex, uint localDeviceIndex, uint remoteDeviceIndex) @inline {
+    PeerMemoryFeatureFlags ret;
+	internal::getDeviceGroupPeerMemoryFeatures(device, heapIndex, localDeviceIndex, remoteDeviceIndex, &ret);
+	return ret;
 }
 
-fn void getDeviceGroupPeerMemoryFeaturesKHR(Device device, uint heapIndex, uint localDeviceIndex, uint remoteDeviceIndex, PeerMemoryFeatureFlags* pPeerMemoryFeatures) @inline {
-	internal::getDeviceGroupPeerMemoryFeaturesKHR(device, heapIndex, localDeviceIndex, remoteDeviceIndex, pPeerMemoryFeatures);
+fn PeerMemoryFeatureFlags getDeviceGroupPeerMemoryFeaturesKHR(Device device, uint heapIndex, uint localDeviceIndex, uint remoteDeviceIndex) @inline {
+    PeerMemoryFeatureFlags ret;
+	internal::getDeviceGroupPeerMemoryFeaturesKHR(device, heapIndex, localDeviceIndex, remoteDeviceIndex, &ret);
+	return ret;
 }
 
-fn void! getDeviceGroupPresentCapabilitiesKHR(Device device, DeviceGroupPresentCapabilitiesKHR* pDeviceGroupPresentCapabilities) @inline {
-	vk::check(internal::getDeviceGroupPresentCapabilitiesKHR(device, pDeviceGroupPresentCapabilities))!;
+fn DeviceGroupPresentCapabilitiesKHR! getDeviceGroupPresentCapabilitiesKHR(Device device) @inline {
+    DeviceGroupPresentCapabilitiesKHR ret;
+	vk::check(internal::getDeviceGroupPresentCapabilitiesKHR(device, &ret))!;
+	return ret;
 }
 
-fn void! getDeviceGroupSurfacePresentModes2EXT(Device device, PhysicalDeviceSurfaceInfo2KHR* pSurfaceInfo, DeviceGroupPresentModeFlagsKHR* pModes) @inline {
-	vk::check(internal::getDeviceGroupSurfacePresentModes2EXT(device, pSurfaceInfo, pModes))!;
+fn DeviceGroupPresentModeFlagsKHR! getDeviceGroupSurfacePresentModes2EXT(Device device, PhysicalDeviceSurfaceInfo2KHR* pSurfaceInfo) @inline {
+    DeviceGroupPresentModeFlagsKHR ret;
+	vk::check(internal::getDeviceGroupSurfacePresentModes2EXT(device, pSurfaceInfo, &ret))!;
+	return ret;
 }
 
-fn void! getDeviceGroupSurfacePresentModesKHR(Device device, SurfaceKHR surface, DeviceGroupPresentModeFlagsKHR* pModes) @inline {
-	vk::check(internal::getDeviceGroupSurfacePresentModesKHR(device, surface, pModes))!;
+fn DeviceGroupPresentModeFlagsKHR! getDeviceGroupSurfacePresentModesKHR(Device device, SurfaceKHR surface) @inline {
+    DeviceGroupPresentModeFlagsKHR ret;
+	vk::check(internal::getDeviceGroupSurfacePresentModesKHR(device, surface, &ret))!;
+	return ret;
 }
 
 fn void getDeviceImageMemoryRequirements(Device device, DeviceImageMemoryRequirements* pInfo, MemoryRequirements2* pMemoryRequirements) @inline {
@@ -2349,16 +2457,22 @@ fn SparseImageMemoryRequirements2[] getDeviceImageSparseMemoryRequirementsKHR(De
 	return ret[:n];
 }
 
-fn void getDeviceImageSubresourceLayout(Device device, DeviceImageSubresourceInfo* pInfo, SubresourceLayout2* pLayout) @inline {
-	internal::getDeviceImageSubresourceLayout(device, pInfo, pLayout);
+fn SubresourceLayout2 getDeviceImageSubresourceLayout(Device device, DeviceImageSubresourceInfo* pInfo) @inline {
+    SubresourceLayout2 ret;
+	internal::getDeviceImageSubresourceLayout(device, pInfo, &ret);
+	return ret;
 }
 
-fn void getDeviceImageSubresourceLayoutKHR(Device device, DeviceImageSubresourceInfo* pInfo, SubresourceLayout2* pLayout) @inline {
-	internal::getDeviceImageSubresourceLayoutKHR(device, pInfo, pLayout);
+fn SubresourceLayout2 getDeviceImageSubresourceLayoutKHR(Device device, DeviceImageSubresourceInfo* pInfo) @inline {
+    SubresourceLayout2 ret;
+	internal::getDeviceImageSubresourceLayoutKHR(device, pInfo, &ret);
+	return ret;
 }
 
-fn void getDeviceMemoryCommitment(Device device, DeviceMemory memory, DeviceSize* pCommittedMemoryInBytes) @inline {
-	internal::getDeviceMemoryCommitment(device, memory, pCommittedMemoryInBytes);
+fn DeviceSize getDeviceMemoryCommitment(Device device, DeviceMemory memory) @inline {
+    DeviceSize ret;
+	internal::getDeviceMemoryCommitment(device, memory, &ret);
+	return ret;
 }
 
 fn ulong getDeviceMemoryOpaqueCaptureAddress(Device device, DeviceMemoryOpaqueCaptureAddressInfo* pInfo) @inline {
@@ -2369,28 +2483,38 @@ fn ulong getDeviceMemoryOpaqueCaptureAddressKHR(Device device, DeviceMemoryOpaqu
 	return internal::getDeviceMemoryOpaqueCaptureAddressKHR(device, pInfo);
 }
 
-fn void getDeviceMicromapCompatibilityEXT(Device device, MicromapVersionInfoEXT* pVersionInfo, AccelerationStructureCompatibilityKHR* pCompatibility) @inline {
-	internal::getDeviceMicromapCompatibilityEXT(device, pVersionInfo, pCompatibility);
+fn AccelerationStructureCompatibilityKHR getDeviceMicromapCompatibilityEXT(Device device, MicromapVersionInfoEXT* pVersionInfo) @inline {
+    AccelerationStructureCompatibilityKHR ret;
+	internal::getDeviceMicromapCompatibilityEXT(device, pVersionInfo, &ret);
+	return ret;
 }
 
 fn ProcVoidFunction getDeviceProcAddr(Device device, ZString pName) @inline {
 	return internal::getDeviceProcAddr(device, pName);
 }
 
-fn void getDeviceQueue(Device device, uint queueFamilyIndex, uint queueIndex, Queue* pQueue) @inline {
-	internal::getDeviceQueue(device, queueFamilyIndex, queueIndex, pQueue);
+fn Queue getDeviceQueue(Device device, uint queueFamilyIndex, uint queueIndex) @inline {
+    Queue ret;
+	internal::getDeviceQueue(device, queueFamilyIndex, queueIndex, &ret);
+	return ret;
 }
 
-fn void getDeviceQueue2(Device device, DeviceQueueInfo2* pQueueInfo, Queue* pQueue) @inline {
-	internal::getDeviceQueue2(device, pQueueInfo, pQueue);
+fn Queue getDeviceQueue2(Device device, DeviceQueueInfo2* pQueueInfo) @inline {
+    Queue ret;
+	internal::getDeviceQueue2(device, pQueueInfo, &ret);
+	return ret;
 }
 
-fn void! getDeviceSubpassShadingMaxWorkgroupSizeHUAWEI(Device device, RenderPass renderpass, Extent2D* pMaxWorkgroupSize) @inline {
-	vk::check(internal::getDeviceSubpassShadingMaxWorkgroupSizeHUAWEI(device, renderpass, pMaxWorkgroupSize))!;
+fn Extent2D! getDeviceSubpassShadingMaxWorkgroupSizeHUAWEI(Device device, RenderPass renderpass) @inline {
+    Extent2D ret;
+	vk::check(internal::getDeviceSubpassShadingMaxWorkgroupSizeHUAWEI(device, renderpass, &ret))!;
+	return ret;
 }
 
-fn void! getDynamicRenderingTilePropertiesQCOM(Device device, RenderingInfo* pRenderingInfo, TilePropertiesQCOM* pProperties) @inline {
-	vk::check(internal::getDynamicRenderingTilePropertiesQCOM(device, pRenderingInfo, pProperties))!;
+fn TilePropertiesQCOM! getDynamicRenderingTilePropertiesQCOM(Device device, RenderingInfo* pRenderingInfo) @inline {
+    TilePropertiesQCOM ret;
+	vk::check(internal::getDynamicRenderingTilePropertiesQCOM(device, pRenderingInfo, &ret))!;
+	return ret;
 }
 
 fn void! getEncodedVideoSessionParametersKHR(Device device, VideoEncodeSessionParametersGetInfoKHR* pVideoSessionParametersInfo, VideoEncodeSessionParametersFeedbackInfoKHR* pFeedbackInfo, usz* pDataSize, void* pData) @inline {
@@ -2401,16 +2525,20 @@ fn void! getEventStatus(Device device, Event event) @inline {
 	vk::check(internal::getEventStatus(device, event))!;
 }
 
-fn void! getFenceFdKHR(Device device, FenceGetFdInfoKHR* pGetFdInfo, CInt* pFd) @inline {
-	vk::check(internal::getFenceFdKHR(device, pGetFdInfo, pFd))!;
+fn CInt! getFenceFdKHR(Device device, FenceGetFdInfoKHR* pGetFdInfo) @inline {
+    CInt ret;
+	vk::check(internal::getFenceFdKHR(device, pGetFdInfo, &ret))!;
+	return ret;
 }
 
 fn void! getFenceStatus(Device device, Fence fence) @inline {
 	vk::check(internal::getFenceStatus(device, fence))!;
 }
 
-fn void! getFenceWin32HandleKHR(Device device, FenceGetWin32HandleInfoKHR* pGetWin32HandleInfo, Win32_HANDLE* pHandle) @inline {
-	vk::check(internal::getFenceWin32HandleKHR(device, pGetWin32HandleInfo, pHandle))!;
+fn Win32_HANDLE! getFenceWin32HandleKHR(Device device, FenceGetWin32HandleInfoKHR* pGetWin32HandleInfo) @inline {
+    Win32_HANDLE ret;
+	vk::check(internal::getFenceWin32HandleKHR(device, pGetWin32HandleInfo, &ret))!;
+	return ret;
 }
 
 fn TilePropertiesQCOM[]! getFramebufferTilePropertiesQCOM(Device device, Framebuffer framebuffer) {
@@ -2421,28 +2549,40 @@ fn TilePropertiesQCOM[]! getFramebufferTilePropertiesQCOM(Device device, Framebu
 	return ret[:n];
 }
 
-fn void getGeneratedCommandsMemoryRequirementsEXT(Device device, GeneratedCommandsMemoryRequirementsInfoEXT* pInfo, MemoryRequirements2* pMemoryRequirements) @inline {
-	internal::getGeneratedCommandsMemoryRequirementsEXT(device, pInfo, pMemoryRequirements);
+fn MemoryRequirements2 getGeneratedCommandsMemoryRequirementsEXT(Device device, GeneratedCommandsMemoryRequirementsInfoEXT* pInfo) @inline {
+    MemoryRequirements2 ret;
+	internal::getGeneratedCommandsMemoryRequirementsEXT(device, pInfo, &ret);
+	return ret;
 }
 
-fn void getGeneratedCommandsMemoryRequirementsNV(Device device, GeneratedCommandsMemoryRequirementsInfoNV* pInfo, MemoryRequirements2* pMemoryRequirements) @inline {
-	internal::getGeneratedCommandsMemoryRequirementsNV(device, pInfo, pMemoryRequirements);
+fn MemoryRequirements2 getGeneratedCommandsMemoryRequirementsNV(Device device, GeneratedCommandsMemoryRequirementsInfoNV* pInfo) @inline {
+    MemoryRequirements2 ret;
+	internal::getGeneratedCommandsMemoryRequirementsNV(device, pInfo, &ret);
+	return ret;
 }
 
-fn void! getImageDrmFormatModifierPropertiesEXT(Device device, Image image, ImageDrmFormatModifierPropertiesEXT* pProperties) @inline {
-	vk::check(internal::getImageDrmFormatModifierPropertiesEXT(device, image, pProperties))!;
+fn ImageDrmFormatModifierPropertiesEXT! getImageDrmFormatModifierPropertiesEXT(Device device, Image image) @inline {
+    ImageDrmFormatModifierPropertiesEXT ret;
+	vk::check(internal::getImageDrmFormatModifierPropertiesEXT(device, image, &ret))!;
+	return ret;
 }
 
-fn void getImageMemoryRequirements(Device device, Image image, MemoryRequirements* pMemoryRequirements) @inline {
-	internal::getImageMemoryRequirements(device, image, pMemoryRequirements);
+fn MemoryRequirements getImageMemoryRequirements(Device device, Image image) @inline {
+    MemoryRequirements ret;
+	internal::getImageMemoryRequirements(device, image, &ret);
+	return ret;
 }
 
-fn void getImageMemoryRequirements2(Device device, ImageMemoryRequirementsInfo2* pInfo, MemoryRequirements2* pMemoryRequirements) @inline {
-	internal::getImageMemoryRequirements2(device, pInfo, pMemoryRequirements);
+fn MemoryRequirements2 getImageMemoryRequirements2(Device device, ImageMemoryRequirementsInfo2* pInfo) @inline {
+    MemoryRequirements2 ret;
+	internal::getImageMemoryRequirements2(device, pInfo, &ret);
+	return ret;
 }
 
-fn void getImageMemoryRequirements2KHR(Device device, ImageMemoryRequirementsInfo2* pInfo, MemoryRequirements2* pMemoryRequirements) @inline {
-	internal::getImageMemoryRequirements2KHR(device, pInfo, pMemoryRequirements);
+fn MemoryRequirements2 getImageMemoryRequirements2KHR(Device device, ImageMemoryRequirementsInfo2* pInfo) @inline {
+    MemoryRequirements2 ret;
+	internal::getImageMemoryRequirements2KHR(device, pInfo, &ret);
+	return ret;
 }
 
 fn void! getImageOpaqueCaptureDescriptorDataEXT(Device device, ImageCaptureDescriptorDataInfoEXT* pInfo, void* pData) @inline {
@@ -2473,24 +2613,34 @@ fn SparseImageMemoryRequirements2[] getImageSparseMemoryRequirements2KHR(Device 
 	return ret[:n];
 }
 
-fn void getImageSubresourceLayout(Device device, Image image, ImageSubresource* pSubresource, SubresourceLayout* pLayout) @inline {
-	internal::getImageSubresourceLayout(device, image, pSubresource, pLayout);
+fn SubresourceLayout getImageSubresourceLayout(Device device, Image image, ImageSubresource* pSubresource) @inline {
+    SubresourceLayout ret;
+	internal::getImageSubresourceLayout(device, image, pSubresource, &ret);
+	return ret;
 }
 
-fn void getImageSubresourceLayout2(Device device, Image image, ImageSubresource2* pSubresource, SubresourceLayout2* pLayout) @inline {
-	internal::getImageSubresourceLayout2(device, image, pSubresource, pLayout);
+fn SubresourceLayout2 getImageSubresourceLayout2(Device device, Image image, ImageSubresource2* pSubresource) @inline {
+    SubresourceLayout2 ret;
+	internal::getImageSubresourceLayout2(device, image, pSubresource, &ret);
+    return ret;
 }
 
-fn void getImageSubresourceLayout2EXT(Device device, Image image, ImageSubresource2* pSubresource, SubresourceLayout2* pLayout) @inline {
-	internal::getImageSubresourceLayout2EXT(device, image, pSubresource, pLayout);
+fn SubresourceLayout2 getImageSubresourceLayout2EXT(Device device, Image image, ImageSubresource2* pSubresource) @inline {
+    SubresourceLayout2 ret;
+	internal::getImageSubresourceLayout2EXT(device, image, pSubresource, &ret);
+    return ret;
 }
 
-fn void getImageSubresourceLayout2KHR(Device device, Image image, ImageSubresource2* pSubresource, SubresourceLayout2* pLayout) @inline {
-	internal::getImageSubresourceLayout2KHR(device, image, pSubresource, pLayout);
+fn SubresourceLayout2 getImageSubresourceLayout2KHR(Device device, Image image, ImageSubresource2* pSubresource) @inline {
+    SubresourceLayout2 ret;
+	internal::getImageSubresourceLayout2KHR(device, image, pSubresource, &ret);
+    return ret;
 }
 
-fn void! getImageViewAddressNVX(Device device, ImageView imageView, ImageViewAddressPropertiesNVX* pProperties) @inline {
-	vk::check(internal::getImageViewAddressNVX(device, imageView, pProperties))!;
+fn ImageViewAddressPropertiesNVX! getImageViewAddressNVX(Device device, ImageView imageView) @inline {
+    ImageViewAddressPropertiesNVX ret;
+	internal::getImageViewAddressNVX(device, imageView, &ret);
+    return ret;
 }
 
 fn ulong getImageViewHandle64NVX(Device device, ImageViewHandleInfoNVX* pInfo) @inline {
@@ -2505,52 +2655,74 @@ fn void! getImageViewOpaqueCaptureDescriptorDataEXT(Device device, ImageViewCapt
 	vk::check(internal::getImageViewOpaqueCaptureDescriptorDataEXT(device, pInfo, pData))!;
 }
 
-fn void getLatencyTimingsNV(Device device, SwapchainKHR swapchain, GetLatencyMarkerInfoNV* pLatencyMarkerInfo) @inline {
-	internal::getLatencyTimingsNV(device, swapchain, pLatencyMarkerInfo);
+fn GetLatencyMarkerInfoNV getLatencyTimingsNV(Device device, SwapchainKHR swapchain) @inline {
+    GetLatencyMarkerInfoNV ret;
+	internal::getLatencyTimingsNV(device, swapchain, &ret);
+	return ret;
 }
 
-fn void! getMemoryFdKHR(Device device, MemoryGetFdInfoKHR* pGetFdInfo, CInt* pFd) @inline {
-	vk::check(internal::getMemoryFdKHR(device, pGetFdInfo, pFd))!;
+fn CInt! getMemoryFdKHR(Device device, MemoryGetFdInfoKHR* pGetFdInfo) @inline {
+    CInt ret;
+	vk::check(internal::getMemoryFdKHR(device, pGetFdInfo, &ret))!;
+	return ret;
 }
 
-fn void! getMemoryFdPropertiesKHR(Device device, ExternalMemoryHandleTypeFlags handleType, CInt fd, MemoryFdPropertiesKHR* pMemoryFdProperties) @inline {
-	vk::check(internal::getMemoryFdPropertiesKHR(device, handleType, fd, pMemoryFdProperties))!;
+fn MemoryFdPropertiesKHR! getMemoryFdPropertiesKHR(Device device, ExternalMemoryHandleTypeFlags handleType, CInt fd) @inline {
+    MemoryFdPropertiesKHR ret;
+	vk::check(internal::getMemoryFdPropertiesKHR(device, handleType, fd, &ret))!;
+	return ret;
 }
 
-fn void! getMemoryHostPointerPropertiesEXT(Device device, ExternalMemoryHandleTypeFlags handleType, void* pHostPointer, MemoryHostPointerPropertiesEXT* pMemoryHostPointerProperties) @inline {
-	vk::check(internal::getMemoryHostPointerPropertiesEXT(device, handleType, pHostPointer, pMemoryHostPointerProperties))!;
+fn MemoryHostPointerPropertiesEXT! getMemoryHostPointerPropertiesEXT(Device device, ExternalMemoryHandleTypeFlags handleType, void* pHostPointer) @inline {
+    MemoryHostPointerPropertiesEXT ret;
+	vk::check(internal::getMemoryHostPointerPropertiesEXT(device, handleType, pHostPointer, &ret))!;
+	return ret;
 }
 
 fn void! getMemoryMetalHandleEXT(Device device, MemoryGetMetalHandleInfoEXT* pGetMetalHandleInfo, void** pHandle) @inline {
 	vk::check(internal::getMemoryMetalHandleEXT(device, pGetMetalHandleInfo, pHandle))!;
 }
 
-fn void! getMemoryMetalHandlePropertiesEXT(Device device, ExternalMemoryHandleTypeFlags handleType, void* pHandle, MemoryMetalHandlePropertiesEXT* pMemoryMetalHandleProperties) @inline {
-	vk::check(internal::getMemoryMetalHandlePropertiesEXT(device, handleType, pHandle, pMemoryMetalHandleProperties))!;
+fn MemoryMetalHandlePropertiesEXT! getMemoryMetalHandlePropertiesEXT(Device device, ExternalMemoryHandleTypeFlags handleType, void* pHandle) @inline {
+    MemoryMetalHandlePropertiesEXT ret;
+	vk::check(internal::getMemoryMetalHandlePropertiesEXT(device, handleType, pHandle, &ret))!;
+	return ret;
 }
 
-fn void! getMemoryRemoteAddressNV(Device device, MemoryGetRemoteAddressInfoNV* pMemoryGetRemoteAddressInfo, RemoteAddressNV* pAddress) @inline {
-	vk::check(internal::getMemoryRemoteAddressNV(device, pMemoryGetRemoteAddressInfo, pAddress))!;
+fn RemoteAddressNV! getMemoryRemoteAddressNV(Device device, MemoryGetRemoteAddressInfoNV* pMemoryGetRemoteAddressInfo) @inline {
+    RemoteAddressNV ret;
+	vk::check(internal::getMemoryRemoteAddressNV(device, pMemoryGetRemoteAddressInfo, &ret))!;
+	return ret;
 }
 
-fn void! getMemoryWin32HandleKHR(Device device, MemoryGetWin32HandleInfoKHR* pGetWin32HandleInfo, Win32_HANDLE* pHandle) @inline {
-	vk::check(internal::getMemoryWin32HandleKHR(device, pGetWin32HandleInfo, pHandle))!;
+fn Win32_HANDLE! getMemoryWin32HandleKHR(Device device, MemoryGetWin32HandleInfoKHR* pGetWin32HandleInfo) @inline {
+    Win32_HANDLE ret;
+	vk::check(internal::getMemoryWin32HandleKHR(device, pGetWin32HandleInfo, &ret))!;
+	return ret;
 }
 
-fn void! getMemoryWin32HandleNV(Device device, DeviceMemory memory, ExternalMemoryHandleTypeFlagsNV handleType, Win32_HANDLE* pHandle) @inline {
-	vk::check(internal::getMemoryWin32HandleNV(device, memory, handleType, pHandle))!;
+fn Win32_HANDLE! getMemoryWin32HandleNV(Device device, DeviceMemory memory, ExternalMemoryHandleTypeFlagsNV handleType) @inline {
+    Win32_HANDLE ret;
+	vk::check(internal::getMemoryWin32HandleNV(device, memory, handleType, &ret))!;
+	return ret;
 }
 
-fn void! getMemoryWin32HandlePropertiesKHR(Device device, ExternalMemoryHandleTypeFlags handleType, Win32_HANDLE handle, MemoryWin32HandlePropertiesKHR* pMemoryWin32HandleProperties) @inline {
-	vk::check(internal::getMemoryWin32HandlePropertiesKHR(device, handleType, handle, pMemoryWin32HandleProperties))!;
+fn MemoryWin32HandlePropertiesKHR! getMemoryWin32HandlePropertiesKHR(Device device, ExternalMemoryHandleTypeFlags handleType, Win32_HANDLE handle) @inline {
+    MemoryWin32HandlePropertiesKHR ret;
+	vk::check(internal::getMemoryWin32HandlePropertiesKHR(device, handleType, handle, &ret))!;
+	return ret;
 }
 
-fn void getMicromapBuildSizesEXT(Device device, AccelerationStructureBuildTypeKHR buildType, MicromapBuildInfoEXT* pBuildInfo, MicromapBuildSizesInfoEXT* pSizeInfo) @inline {
-	internal::getMicromapBuildSizesEXT(device, buildType, pBuildInfo, pSizeInfo);
+fn MicromapBuildSizesInfoEXT getMicromapBuildSizesEXT(Device device, AccelerationStructureBuildTypeKHR buildType, MicromapBuildInfoEXT* pBuildInfo, MicromapBuildSizesInfoEXT* pSizeInfo) @inline {
+    MicromapBuildSizesInfoEXT ret;
+    internal::getMicromapBuildSizesEXT(device, buildType, pBuildInfo, &ret);
+    return ret;
 }
 
-fn void getPartitionedAccelerationStructuresBuildSizesNV(Device device, PartitionedAccelerationStructureInstancesInputNV* pInfo, AccelerationStructureBuildSizesInfoKHR* pSizeInfo) @inline {
-	internal::getPartitionedAccelerationStructuresBuildSizesNV(device, pInfo, pSizeInfo);
+fn AccelerationStructureBuildSizesInfoKHR getPartitionedAccelerationStructuresBuildSizesNV(Device device, PartitionedAccelerationStructureInstancesInputNV* pInfo) @inline {
+    AccelerationStructureBuildSizesInfoKHR ret;
+    internal::getPartitionedAccelerationStructuresBuildSizesNV(device, pInfo, &ret);
+    return ret;
 }
 
 fn PastPresentationTimingGOOGLE[]! getPastPresentationTimingGOOGLE(Device device, SwapchainKHR swapchain) {
@@ -2561,8 +2733,10 @@ fn PastPresentationTimingGOOGLE[]! getPastPresentationTimingGOOGLE(Device device
 	return ret[:n];
 }
 
-fn void! getPerformanceParameterINTEL(Device device, PerformanceParameterTypeINTEL parameter, PerformanceValueINTEL* pValue) @inline {
-	vk::check(internal::getPerformanceParameterINTEL(device, parameter, pValue))!;
+fn PerformanceValueINTEL! getPerformanceParameterINTEL(Device device, PerformanceParameterTypeINTEL parameter) @inline {
+    PerformanceValueINTEL ret;
+	vk::check(internal::getPerformanceParameterINTEL(device, parameter, &ret))!;
+	return ret;
 }
 
 fn void! getPipelineBinaryDataKHR(Device device, PipelineBinaryDataInfoKHR* pInfo, PipelineBinaryKeyKHR* pPipelineBinaryKey, usz* pPipelineBinaryDataSize, void* pPipelineBinaryData) @inline {
@@ -2601,36 +2775,48 @@ fn DeviceAddress getPipelineIndirectDeviceAddressNV(Device device, PipelineIndir
 	return internal::getPipelineIndirectDeviceAddressNV(device, pInfo);
 }
 
-fn void getPipelineIndirectMemoryRequirementsNV(Device device, ComputePipelineCreateInfo* pCreateInfo, MemoryRequirements2* pMemoryRequirements) @inline {
-	internal::getPipelineIndirectMemoryRequirementsNV(device, pCreateInfo, pMemoryRequirements);
+fn MemoryRequirements2 getPipelineIndirectMemoryRequirementsNV(Device device, ComputePipelineCreateInfo* pCreateInfo) @inline {
+    MemoryRequirements2 ret;
+	internal::getPipelineIndirectMemoryRequirementsNV(device, pCreateInfo, &ret);
+	return ret;
 }
 
-fn void! getPipelineKeyKHR(Device device, PipelineCreateInfoKHR* pPipelineCreateInfo, PipelineBinaryKeyKHR* pPipelineKey) @inline {
-	vk::check(internal::getPipelineKeyKHR(device, pPipelineCreateInfo, pPipelineKey))!;
+fn PipelineBinaryKeyKHR! getPipelineKeyKHR(Device device, PipelineCreateInfoKHR* pPipelineCreateInfo) @inline {
+    PipelineBinaryKeyKHR ret;
+	vk::check(internal::getPipelineKeyKHR(device, pPipelineCreateInfo, &ret))!;
+	return ret;
 }
 
 fn void! getPipelinePropertiesEXT(Device device, PipelineInfoEXT* pPipelineInfo, BaseOutStructure* pPipelineProperties) @inline {
 	vk::check(internal::getPipelinePropertiesEXT(device, pPipelineInfo, pPipelineProperties))!;
 }
 
-fn void getPrivateData(Device device, ObjectType objectType, ulong objectHandle, PrivateDataSlot privateDataSlot, ulong* pData) @inline {
-	internal::getPrivateData(device, objectType, objectHandle, privateDataSlot, pData);
+fn ulong getPrivateData(Device device, ObjectType objectType, ulong objectHandle, PrivateDataSlot privateDataSlot) @inline {
+    ulong ret;
+	internal::getPrivateData(device, objectType, objectHandle, privateDataSlot, &ret);
+	return ret;
 }
 
-fn void getPrivateDataEXT(Device device, ObjectType objectType, ulong objectHandle, PrivateDataSlot privateDataSlot, ulong* pData) @inline {
-	internal::getPrivateDataEXT(device, objectType, objectHandle, privateDataSlot, pData);
+fn ulong getPrivateDataEXT(Device device, ObjectType objectType, ulong objectHandle, PrivateDataSlot privateDataSlot) @inline {
+    ulong ret;
+	internal::getPrivateDataEXT(device, objectType, objectHandle, privateDataSlot, &ret);
+	return ret;
 }
 
 fn void! getQueryPoolResults(Device device, QueryPool queryPool, uint firstQuery, uint queryCount, usz dataSize, void* pData, DeviceSize stride, QueryResultFlags flags) @inline {
 	vk::check(internal::getQueryPoolResults(device, queryPool, firstQuery, queryCount, dataSize, pData, stride, flags))!;
 }
 
-fn void getQueueCheckpointData2NV(Queue queue, uint* pCheckpointDataCount, CheckpointData2NV* pCheckpointData) @inline {
-	internal::getQueueCheckpointData2NV(queue, pCheckpointDataCount, pCheckpointData);
+fn CheckpointData2NV getQueueCheckpointData2NV(Queue queue, uint* pCheckpointDataCount) @inline {
+    CheckpointData2NV ret;
+	internal::getQueueCheckpointData2NV(queue, pCheckpointDataCount, &ret);
+    return ret;
 }
 
-fn void getQueueCheckpointDataNV(Queue queue, uint* pCheckpointDataCount, CheckpointDataNV* pCheckpointData) @inline {
-	internal::getQueueCheckpointDataNV(queue, pCheckpointDataCount, pCheckpointData);
+fn CheckpointDataNV getQueueCheckpointDataNV(Queue queue, uint* pCheckpointDataCount) @inline {
+    CheckpointDataNV ret;
+	internal::getQueueCheckpointDataNV(queue, pCheckpointDataCount, ret);
+	return ret;
 }
 
 fn void! getRayTracingCaptureReplayShaderGroupHandlesKHR(Device device, Pipeline pipeline, uint firstGroup, uint groupCount, usz dataSize, void* pData) @inline {
@@ -2649,40 +2835,54 @@ fn DeviceSize getRayTracingShaderGroupStackSizeKHR(Device device, Pipeline pipel
 	return internal::getRayTracingShaderGroupStackSizeKHR(device, pipeline, group, groupShader);
 }
 
-fn void! getRefreshCycleDurationGOOGLE(Device device, SwapchainKHR swapchain, RefreshCycleDurationGOOGLE* pDisplayTimingProperties) @inline {
-	vk::check(internal::getRefreshCycleDurationGOOGLE(device, swapchain, pDisplayTimingProperties))!;
+fn RefreshCycleDurationGOOGLE! getRefreshCycleDurationGOOGLE(Device device, SwapchainKHR swapchain) @inline {
+RefreshCycleDurationGOOGLE ret;
+vk::check(internal::getRefreshCycleDurationGOOGLE(device, swapchain, &ret))!;
+return ret;
 }
 
-fn void getRenderAreaGranularity(Device device, RenderPass renderPass, Extent2D* pGranularity) @inline {
-	internal::getRenderAreaGranularity(device, renderPass, pGranularity);
+fn Extent2D getRenderAreaGranularity(Device device, RenderPass renderPass) @inline {
+    Extent2D ret;
+	internal::getRenderAreaGranularity(device, renderPass, &ret);
+	return ret;
 }
 
-fn void getRenderingAreaGranularity(Device device, RenderingAreaInfo* pRenderingAreaInfo, Extent2D* pGranularity) @inline {
-	internal::getRenderingAreaGranularity(device, pRenderingAreaInfo, pGranularity);
+fn Extent2D getRenderingAreaGranularity(Device device, RenderingAreaInfo* pRenderingAreaInfo) @inline {
+    Extent2D ret;
+	internal::getRenderingAreaGranularity(device, pRenderingAreaInfo, ret);
+	return ret;
 }
 
-fn void getRenderingAreaGranularityKHR(Device device, RenderingAreaInfo* pRenderingAreaInfo, Extent2D* pGranularity) @inline {
-	internal::getRenderingAreaGranularityKHR(device, pRenderingAreaInfo, pGranularity);
+fn Extent2D getRenderingAreaGranularityKHR(Device device, RenderingAreaInfo* pRenderingAreaInfo) @inline {
+    Extent2D ret;
+	internal::getRenderingAreaGranularityKHR(device, pRenderingAreaInfo, ret);
+	return ret;
 }
 
 fn void! getSamplerOpaqueCaptureDescriptorDataEXT(Device device, SamplerCaptureDescriptorDataInfoEXT* pInfo, void* pData) @inline {
 	vk::check(internal::getSamplerOpaqueCaptureDescriptorDataEXT(device, pInfo, pData))!;
 }
 
-fn void! getSemaphoreCounterValue(Device device, Semaphore semaphore, ulong* pValue) @inline {
-	vk::check(internal::getSemaphoreCounterValue(device, semaphore, pValue))!;
+fn ulong! getSemaphoreCounterValue(Device device, Semaphore semaphore) @inline {
+    ulong ret;
+	vk::check(internal::getSemaphoreCounterValue(device, semaphore, &ret))!;
+	return ret;
 }
 
-fn void! getSemaphoreCounterValueKHR(Device device, Semaphore semaphore, ulong* pValue) @inline {
-	vk::check(internal::getSemaphoreCounterValueKHR(device, semaphore, pValue))!;
+fn ulong! getSemaphoreCounterValueKHR(Device device, Semaphore semaphore) @inline {
+    ulong ret;
+	vk::check(internal::getSemaphoreCounterValueKHR(device, semaphore, &ret))!;
+	return ret;
 }
 
 fn void! getSemaphoreFdKHR(Device device, SemaphoreGetFdInfoKHR* pGetFdInfo, CInt* pFd) @inline {
 	vk::check(internal::getSemaphoreFdKHR(device, pGetFdInfo, pFd))!;
 }
 
-fn void! getSemaphoreWin32HandleKHR(Device device, SemaphoreGetWin32HandleInfoKHR* pGetWin32HandleInfo, Win32_HANDLE* pHandle) @inline {
-	vk::check(internal::getSemaphoreWin32HandleKHR(device, pGetWin32HandleInfo, pHandle))!;
+fn Win32_HANDLE! getSemaphoreWin32HandleKHR(Device device, SemaphoreGetWin32HandleInfoKHR* pGetWin32HandleInfo) @inline {
+    Win32_HANDLE ret;
+	vk::check(internal::getSemaphoreWin32HandleKHR(device, pGetWin32HandleInfo, &ret))!;
+	return ret;
 }
 
 fn void! getShaderBinaryDataEXT(Device device, ShaderEXT shader, usz* pDataSize, void* pData) @inline {
@@ -2693,16 +2893,22 @@ fn void! getShaderInfoAMD(Device device, Pipeline pipeline, ShaderStageFlags sha
 	vk::check(internal::getShaderInfoAMD(device, pipeline, shaderStage, infoType, pInfoSize, pInfo))!;
 }
 
-fn void getShaderModuleCreateInfoIdentifierEXT(Device device, ShaderModuleCreateInfo* pCreateInfo, ShaderModuleIdentifierEXT* pIdentifier) @inline {
-	internal::getShaderModuleCreateInfoIdentifierEXT(device, pCreateInfo, pIdentifier);
+fn ShaderModuleIdentifierEXT getShaderModuleCreateInfoIdentifierEXT(Device device, ShaderModuleCreateInfo* pCreateInfo) @inline {
+    ShaderModuleIdentifierEXT ret;
+	internal::getShaderModuleCreateInfoIdentifierEXT(device, pCreateInfo, &ret);
+	return ret;
 }
 
-fn void getShaderModuleIdentifierEXT(Device device, ShaderModule shaderModule, ShaderModuleIdentifierEXT* pIdentifier) @inline {
-	internal::getShaderModuleIdentifierEXT(device, shaderModule, pIdentifier);
+fn ShaderModuleIdentifierEXT getShaderModuleIdentifierEXT(Device device, ShaderModule shaderModule) @inline {
+    ShaderModuleIdentifierEXT ret;
+	internal::getShaderModuleIdentifierEXT(device, shaderModule, &ret);
+	return ret;
 }
 
-fn void! getSwapchainCounterEXT(Device device, SwapchainKHR swapchain, SurfaceCounterFlagsEXT counter, ulong* pCounterValue) @inline {
-	vk::check(internal::getSwapchainCounterEXT(device, swapchain, counter, pCounterValue))!;
+fn ulong! getSwapchainCounterEXT(Device device, SwapchainKHR swapchain, SurfaceCounterFlagsEXT counter) @inline {
+    ulong ret;
+	vk::check(internal::getSwapchainCounterEXT(device, swapchain, counter, &ret))!;
+	return ret;
 }
 
 fn Image[]! getSwapchainImagesKHR(Device device, SwapchainKHR swapchain) {
@@ -2717,8 +2923,10 @@ fn void! getSwapchainStatusKHR(Device device, SwapchainKHR swapchain) @inline {
 	vk::check(internal::getSwapchainStatusKHR(device, swapchain))!;
 }
 
-fn void! getValidationCacheDataEXT(Device device, ValidationCacheEXT validationCache, usz* pDataSize, void* pData) @inline {
-	vk::check(internal::getValidationCacheDataEXT(device, validationCache, pDataSize, pData))!;
+fn void! getValidationCacheDataEXT(Device device, ValidationCacheEXT validationCache, usz* pDataSize) @inline {
+    void ret;
+	vk::check(internal::getValidationCacheDataEXT(device, validationCache, pDataSize, &ret))!;
+	return ret;
 }
 
 fn VideoSessionMemoryRequirementsKHR[]! getVideoSessionMemoryRequirementsKHR(Device device, VideoSessionKHR videoSession) {
