@@ -6,6 +6,15 @@ import vk;
 
 const ENGINE_NAME = "Mjolnir";
 const TITLE = "Vulkan C3";
+const ZString[*] REQUIRED_EXTENSIONS = {
+    vk::KHR_SWAPCHAIN_EXTENSION_NAME,
+    vk::KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
+};
+const ENABLE_VALIDATION_LAYERS = false;
+const ZString[*] VALIDATION_LAYERS @if(ENABLE_VALIDATION_LAYERS) = {
+    "VK_LAYER_KHRONOS_validation",
+};
+const MAX_FRAMES_IN_FLIGHT = 2;
 
 struct Engine {
     vk::Instance instance;
@@ -20,6 +29,11 @@ struct Engine {
     vk::SwapchainKHR swap_chain;
     vk::Image[] swap_chain_images;
     vk::ImageView[] swap_chain_image_views;
+    vk::Semaphore[MAX_FRAMES_IN_FLIGHT] image_available_semaphore;
+    vk::Semaphore[MAX_FRAMES_IN_FLIGHT] render_finished_semaphore;
+    vk::Fence[MAX_FRAMES_IN_FLIGHT] in_flight_fences;
+    vk::CommandPool command_pool;
+    vk::CommandBuffer[] command_buffers;
     Time last_frame_timestamp;
     Time start_timestamp;
     uint current_frame;
@@ -28,7 +42,7 @@ struct Engine {
 fn void! init(Engine* engine, glfw::Window* window) {
     engine.start_timestamp = time::now();
     engine.last_frame_timestamp = engine.start_timestamp;
-    vkbe::createVulkanInstance()!;
+    vkbe::createVulkanInstance(engine)!;
     vkbe::createWindowSurface()!;
     vkbe::pickPhysicalDevice()!;
     vkbe::createLogicalDevice()!;
@@ -61,17 +75,6 @@ fn void update(Engine* engine) {
     engine.last_frame_timestamp = time::now();
     vkbe::updateUniforms();
 }
-
-const ZString[*] REQUIRED_EXTENSIONS = {
-    vk::KHR_SWAPCHAIN_EXTENSION_NAME,
-    vk::KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
-};
-const ENABLE_VALIDATION_LAYERS = false;
-const ZString[*] VALIDATION_LAYERS @if(ENABLE_VALIDATION_LAYERS) = {
-    "VK_LAYER_KHRONOS_validation",
-};
-
-const MAX_FRAMES_IN_FLIGHT = 2;
 
 fn void! createVulkanInstance(Engine* engine) {
     vk::loadProcAddressesGlobal(&glfw::getInstanceProcAddress);
@@ -125,30 +128,25 @@ fn void! createVulkanInstance(Engine* engine) {
     for (uint i = 0; i < extensionCount; i++) {
         io::printfn("Required extension: %s", extensions[i]);
     }
-    vk::createInstance(&createInfo, null, &g_instance)!;
-    vk::loadProcAddressesInstance(g_instance);
+    engine.instance = vk::createInstance(&createInfo)!;
+    vk::loadProcAddressesInstance(engine.instance);
     $if ENABLE_VALIDATION_LAYERS:
-        vk::createDebugUtilsMessengerEXT(
-            g_instance,
-            &debugCreateInfo,
-            null,
-            &g_debug_messenger
-        )!;
+        engine.debug_messenger = vk::createDebugUtilsMessengerEXT(&engine.instance, &debugCreateInfo)!;
     $endif
 }
 
-fn void destroyVulkanInstance() {
+fn void destroyVulkanInstance(Engine* engine) {
     $if ENABLE_VALIDATION_LAYERS:
-        vk::destroyDebugUtilsMessengerEXT(g_instance, g_debug_messenger, null);
+        vk::destroyDebugUtilsMessengerEXT(engine.instance, engine.debug_messenger);
     $endif
-    vk::destroyInstance(g_instance, null);
+    vk::destroyInstance(engine.instance);
 }
-fn void! createWindowSurface() {
-    vk::check(glfw::createWindowSurface(g_instance, g_window, null, &g_surface))!;
+fn void! createWindowSurface(Engine* engine) {
+    vk::check(glfw::createWindowSurface(engine.instance, engine.window, null, &engine.surface))!;
 }
 
-fn void destroySurface() {
-    vk::destroySurfaceKHR(g_instance, g_surface, null);
+fn void destroySurface(Engine* engine) {
+    vk::destroySurfaceKHR(engine.instance, engine.surface);
 }
 
 fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
@@ -165,45 +163,39 @@ fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
             return 0;
         }
     $endif
-    {
-        vk::ExtensionProperties[]! extensions = vk::enumerateDeviceExtensionProperties(device, null);
-        if (catch excuse = extensions) {
-            io::printfn("Cound not get extension list for %s", deviceName);
-            return 0;
-        }
-        defer free(extensions);
-        foreach (e:extensions) {
-            io::printfn("Extension %s", (ZString)e.extension_name[0..]);
-        }
-        foreach (required: REQUIRED_EXTENSIONS) {
-            bool found = false;
-            foreach (e : extensions) {
-                ZString name = (ZString)e.extension_name[0..];
-                if (name.len() == required.len() && mem::equals(name,required, name.len())) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                io::printfn("Extension %s not found in %s", required, deviceName);
-                return 0;
+    vk::ExtensionProperties[]! extensions = vk::enumerateDeviceExtensionProperties(device);
+    if (catch excuse = extensions) {
+        io::printfn("Cound not get extension list for %s", deviceName);
+        return 0;
+    }
+    defer free(extensions);
+    foreach (e:extensions) {
+        io::printfn("Extension %s", (ZString)e.extension_name[0..]);
+    }
+    foreach (required: REQUIRED_EXTENSIONS) {
+        bool found = false;
+        foreach (e : extensions) {
+            ZString name = (ZString)e.extension_name[0..];
+            if (name.len() == required.len() && mem::equals(name, required, name.len())) {
+                found = true;
+                break;
             }
         }
-    }
-    {
-        SwapchainSupportDetails! support = querySwapchainSupport(device);
-        if (catch excuse = support) {
-            io::printfn("Cound not get swapchain support for %s", deviceName);
+        if (!found) {
+            io::printfn("Extension %s not found in %s", required, deviceName);
             return 0;
         }
-        support.free();
     }
-    {
-        QueueFamilyIndices! indices = findQueueFamilies(device);
-        if (catch excuse = indices) {
-            io::printfn("Cound not get queue families for %s", deviceName);
-            return 0;
-        }
+    SwapchainSupportDetails! support = querySwapchainSupport(device);
+    if (catch excuse = support) {
+        io::printfn("Cound not get swapchain support for %s", deviceName);
+        return 0;
+    }
+    support.free();
+    QueueFamilyIndices! indices = findQueueFamilies(device);
+    if (catch excuse = indices) {
+        io::printfn("Cound not get queue families for %s", deviceName);
+        return 0;
     }
     switch (properties.device_type) {
     case vk::PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
@@ -221,24 +213,24 @@ fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
     return score;
 }
 
-fn void! pickPhysicalDevice() {
-    vk::PhysicalDevice[] devices = vk::enumeratePhysicalDevices(g_instance)!;
+fn void! pickPhysicalDevice(Engine* engine) {
+    vk::PhysicalDevice[] devices = vk::enumeratePhysicalDevices(engine.instance)!;
     defer free(devices);
-    g_physical_device = devices[0];
+    engine.physical_device = devices[0];
     uint bestScore = 0;
     foreach (device: devices) {
         int score = scorePhysicalDevice(device);
         io::printfn("Device %x score: %d", device, score);
         if (score > bestScore) {
-            g_physical_device = device;
+            engine.physical_device = device;
             bestScore = score;
         }
     }
-    io::printfn("Selected physical device: %x with score %d", g_physical_device, bestScore);
+    io::printfn("Selected physical device: %x with score %d", engine.physical_device, bestScore);
 }
 
-fn void destroyDevice() {
-    vk::destroyDevice(g_device, null);
+fn void destroyDevice(Engine* engine) {
+    vk::destroyDevice(engine.device);
 }
 
 struct SwapchainSupportDetails {
@@ -251,11 +243,11 @@ fn void SwapchainSupportDetails.free(SwapchainSupportDetails* self) {
     free(self.present_modes);
 }
 
-fn SwapchainSupportDetails! querySwapchainSupport(vk::PhysicalDevice device) {
+fn SwapchainSupportDetails! querySwapchainSupport(vk::PhysicalDevice device, vk::SurfaceKHR surface) {
     SwapchainSupportDetails ret;
-    vk::getPhysicalDeviceSurfaceCapabilitiesKHR(device, g_surface, &ret.capabilities)!;
-    ret.formats = vk::getPhysicalDeviceSurfaceFormatsKHR(device, g_surface)!;
-    ret.present_modes = vk::getPhysicalDeviceSurfacePresentModesKHR(device, g_surface)!;
+    vk::getPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &ret.capabilities)!;
+    ret.formats = vk::getPhysicalDeviceSurfaceFormatsKHR(device, surface)!;
+    ret.present_modes = vk::getPhysicalDeviceSurfacePresentModesKHR(device, surface)!;
     return ret;
 }
 
@@ -264,20 +256,20 @@ struct QueueFamilyIndices {
     uint present_family;
 }
 
-fn QueueFamilyIndices! findQueueFamilies(vk::PhysicalDevice device) {
-    vk::QueueFamilyProperties[] queueFamilies = vk::getPhysicalDeviceQueueFamilyProperties(device);
+fn QueueFamilyIndices! findQueueFamilies(vk::PhysicalDevice device, vk::SurfaceKHR surface) {
+    vk::QueueFamilyProperties[] families = vk::getPhysicalDeviceQueueFamilyProperties(device);
     QueueFamilyIndices indices;
     bool foundGraphics = false;
     bool foundPresent = false;
-    for (uint i = 0; i < queueFamilies.len; i++) {
-        if (queueFamilies[i].queue_flags.graphics) {
+    for (uint i = 0; i < families.len; i++) {
+        if (families[i].queue_flags.graphics) {
             indices.graphics_family = i;
             foundGraphics = true;
             io::printfn("Queue family %d support graphics", i);
         }
-        uint supported = glfw::getPhysicalDevicePresentationSupport(g_instance, device, i);
-        //vk::check(vk::getPhysicalDeviceSurfaceSupportKHR(device, i, g_surface, &supported))!;
-        if (supported) {
+        // uint supported = glfw::getPhysicalDevicePresentationSupport(g_instance, device, i);
+        uint! supported = vk::getPhysicalDeviceSurfaceSupportKHR(device, i, surface);
+        if (try supported) {
             indices.present_family = i;
             foundPresent = true;
             io::printfn("Queue family %d support present", i);
@@ -289,19 +281,20 @@ fn QueueFamilyIndices! findQueueFamilies(vk::PhysicalDevice device) {
     return vk::VulkanError.ERROR_UNKNOWN?;
 }
 
-fn void! createLogicalDevice() {
-    QueueFamilyIndices indices = findQueueFamilies(g_physical_device)!;
+fn void! createLogicalDevice(Engine* engine) {
+    QueueFamilyIndices indices = findQueueFamilies(engine.physical_device)!;
     ZString[] layers;
     $if ENABLE_VALIDATION_LAYERS:
         layers = ZString[*] {
           "VK_LAYER_KHRONOS_validation"
         };
     $endif
+    float[*] queue_priorities = {1};
     vk::DeviceQueueCreateInfo queueCreateInfo = {
         .s_type = vk::STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
         .queue_family_index = indices.graphics_family,
-        .queue_count = 1,
-        .p_queue_priorities = &&1.0f,
+        .queue_count = queue_priorities.len,
+        .p_queue_priorities = &queue_priorities,
     };
     vk::DeviceCreateInfo createInfo = {
         .s_type = vk::STRUCTURE_TYPE_DEVICE_CREATE_INFO,
@@ -314,16 +307,20 @@ fn void! createLogicalDevice() {
         createInfo.enabled_layer_count = layers.len;
         createInfo.pp_enabled_layer_names = layers.ptr;
     $endif
-    vk::createDevice(g_physical_device, &createInfo, null, &g_device)!;
-    vk::getDeviceQueue(g_device, indices.graphics_family, 0, &g_graphics_queue);
-    vk::getDeviceQueue(g_device, indices.present_family, 0, &g_present_queue);
+    vk::createDevice(engine.physical_device, &createInfo, null, &engine.device)!;
+    vk::getDeviceQueue(engine.device, indices.graphics_family, 0, &engine.graphics_queue);
+    vk::getDeviceQueue(engine.device, indices.present_family, 0, &engine.present_queue);
 }
 
 fn vk::SurfaceFormatKHR pickSwapSurfaceFormat(vk::SurfaceFormatKHR[] formats) {
     foreach (f: formats) {
-        if (f.format == vk::FORMAT_B8G8R8A8_SRGB && f.color_space == vk::COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-            return f;
+        if (f.format != vk::FORMAT_B8G8R8A8_SRGB) {
+            continue;
         }
+        if(f.color_space != vk::COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+            continue;
+        }
+        return f;
     }
     return formats[0];
 }
@@ -350,67 +347,66 @@ fn vk::Extent2D pickSwapExtent(vk::SurfaceCapabilitiesKHR capabilities) {
     return actualExtent;
 }
 
-fn void! createSwapchain() {
-    QueueFamilyIndices indices = findQueueFamilies(g_physical_device)!;
-    SwapchainSupportDetails swapChainSupport = querySwapchainSupport(g_physical_device)!;
-    vk::PresentModeKHR presentMode = pickSwapPresentMode(swapChainSupport.present_modes);
-    g_swap_chain_format = pickSwapSurfaceFormat(swapChainSupport.formats);
-    g_swap_chain_extent = pickSwapExtent(swapChainSupport.capabilities);
-    uint count = swapChainSupport.capabilities.min_image_count + 1;
-    bool unlimited = swapChainSupport.capabilities.max_image_count == 0;
-    if (!unlimited && count > swapChainSupport.capabilities.max_image_count) {
-        count = swapChainSupport.capabilities.max_image_count;
+fn void! createSwapchain(Engine* engine) {
+    QueueFamilyIndices indices = findQueueFamilies(engine.physical_device)!;
+    SwapchainSupportDetails supported = querySwapchainSupport(engine.physical_device)!;
+    vk::PresentModeKHR presentMode = pickSwapPresentMode(supported.present_modes);
+    engine.swap_chain_format = pickSwapSurfaceFormat(supported.formats);
+    engine.swap_chain_extent = pickSwapExtent(supported.capabilities);
+    uint count = supported.capabilities.min_image_count + 1;
+    bool unlimited = supported.capabilities.max_image_count == 0;
+    if (!unlimited && count > supported.capabilities.max_image_count) {
+        count = supported.capabilities.max_image_count;
     }
-    uint[2] indiceArray = {indices.graphics_family, indices.present_family};
+    uint[*] indiceArray = { indices.graphics_family, indices.present_family };
     vk::SwapchainCreateInfoKHR createInfo = {
         .s_type = vk::STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
-        .surface = g_surface,
+        .surface = engine.surface,
         .min_image_count = count,
-        .image_format = g_swap_chain_format.format,
-        .image_color_space = g_swap_chain_format.color_space,
-        .image_extent = g_swap_chain_extent,
+        .image_format = engine.swap_chain_format.format,
+        .image_color_space = engine.swap_chain_format.color_space,
+        .image_extent = engine.swap_chain_extent,
         .image_array_layers = 1,
         .image_usage = vk::ImageUsageFlags { .color_attachment },
         .image_sharing_mode = vk::SHARING_MODE_EXCLUSIVE,
-        .queue_family_index_count = 2,
+        .queue_family_index_count = indiceArray.len,
         .p_queue_family_indices = &indiceArray,
-        .pre_transform = swapChainSupport.capabilities.current_transform,
+        .pre_transform = supported.capabilities.current_transform,
         .composite_alpha = vk::CompositeAlphaFlagsKHR { .opaque },
         .present_mode = presentMode,
-        .clipped = (uint)true,
+        .clipped = vk::TRUE,
     };
     if (indices.graphics_family != indices.present_family) {
         createInfo.image_sharing_mode = vk::SHARING_MODE_CONCURRENT;
         createInfo.queue_family_index_count = indiceArray.len;
         createInfo.p_queue_family_indices = &indiceArray;
     }
-    vk::createSwapchainKHR(g_device, &createInfo, null, &g_swap_chain)!;
-    g_swap_chain_images = vk::getSwapchainImagesKHR(g_device, g_swap_chain)!;
-    vk::ImageView* buffer = (vk::ImageView*)malloc(g_swap_chain_images.len * vk::ImageView.sizeof);
-    g_swap_chain_image_views = buffer[:g_swap_chain_images.len];
-    for (uint i = 0; i < g_swap_chain_images.len; i++) {
-        g_swap_chain_image_views[i] = createImageView(g_swap_chain_images[i], g_swap_chain_format.format)!;
+    engine.swap_chain = vk::createSwapchainKHR(engine.device, &createInfo)!;
+    engine.swap_chain_images = vk::getSwapchainImagesKHR(engine.device, engine.swap_chain)!;
+    vk::ImageView* buffer = (vk::ImageView*)malloc(engine.swap_chain_images.len * vk::ImageView.sizeof);
+    engine.swap_chain_image_views = buffer[:engine.swap_chain_images.len];
+    for (uint i = 0; i < engine.swap_chain_images.len; i++) {
+        engine.swap_chain_image_views[i] = createImageView(engine.swap_chain_images[i], engine.swap_chain_format.format)!;
     }
 }
 
 fn void destroySwapchain() {
-    foreach (view:g_swap_chain_image_views) {
-        vk::destroyImageView(g_device, view, null);
+    foreach (view:engine.swap_chain_image_views) {
+        vk::destroyImageView(engine.device, view);
     }
-    vk::destroySwapchainKHR(g_device, g_swap_chain, null);
-    free(g_swap_chain_image_views);
-    free(g_swap_chain_images);
+    vk::destroySwapchainKHR(engine.device, engine.swap_chain);
+    free(engine.swap_chain_image_views);
+    free(engine.swap_chain_images);
 }
 
 fn void! recreateSwapchain() {
-    vk::deviceWaitIdle(g_device)!;
+    vk::deviceWaitIdle(engine.device)!;
     destroySwapchain();
     createSwapchain()!;
 }
 
-fn uint! findMemoryType(uint filter, vk::MemoryPropertyFlags flags) {
-    vk::PhysicalDeviceMemoryProperties props;
-    vk::getPhysicalDeviceMemoryProperties(g_physical_device, &props);
+fn uint! findMemoryType(vk::PhysicalDevice device, uint filter, vk::MemoryPropertyFlags flags) {
+    vk::PhysicalDeviceMemoryProperties props = vk::getPhysicalDeviceMemoryProperties(device);
     for (uint i = 0; i < props.memory_type_count; i++) {
         if (filter & (1 << i) == 0) {
             continue;
@@ -423,20 +419,16 @@ fn uint! findMemoryType(uint filter, vk::MemoryPropertyFlags flags) {
     return vk::VulkanError.ERROR_UNKNOWN?;
 }
 
-fn void allocateMemory(vk::Device device, vk::MemoryRequirements req, vk::MemoryPropertyFlags properties, vk::DeviceMemory* memory) {
-    vk::MemoryAllocateInfo info{
+fn vk::DeviceMemory! allocateMemory(vk::Device device, vk::MemoryRequirements req, vk::MemoryPropertyFlags properties) {
+    vk::MemoryAllocateInfo info = {
         .s_type = vk::STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
         .allocation_size = req.size,
         .memory_type_index = findMemoryType(req.memory_type_bits, properties)!,
     };
-    vk::allocateMemory(device, &info, null, memory)!;
+    return vk::allocateMemory(device, &info)!;
 }
 
-vk::Semaphore[MAX_FRAMES_IN_FLIGHT] g_image_available_semaphore;
-vk::Semaphore[MAX_FRAMES_IN_FLIGHT] g_render_finished_semaphore;
-vk::Fence[MAX_FRAMES_IN_FLIGHT] g_in_flight_fences;
-
-fn void! createSemaphores() {
+fn void! createSemaphores(Engine* engine) {
     vk::SemaphoreCreateInfo semaphoreInfo = {
         .s_type = vk::STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
     };
@@ -445,20 +437,41 @@ fn void! createSemaphores() {
         .flags = vk::FenceCreateFlags { .signaled },
     };
     for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        vk::createSemaphore(g_device, &semaphoreInfo, null, &g_image_available_semaphore[i])!;
-        vk::createSemaphore(g_device, &semaphoreInfo, null, &g_render_finished_semaphore[i])!;
-        vk::createFence(g_device, &fenceInfo, null, &g_in_flight_fences[i])!;
+        engine.image_available_semaphore[i] = vk::createSemaphore(engine.device, &semaphoreInfo)!;
+        engine.render_finished_semaphore[i] = vk::createSemaphore(engine.device, &semaphoreInfo)!;
+        engine.in_flight_fences[i] = vk::createFence(engine.device, &fenceInfo)!;
     }
 }
 
-fn void destroySemaphores() {
+fn void destroySemaphores(Engine* engine) {
     for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        vk::destroySemaphore(g_device, g_image_available_semaphore[i], null);
-        vk::destroySemaphore(g_device, g_render_finished_semaphore[i], null);
-        vk::destroyFence(g_device, g_in_flight_fences[i], null);
+        vk::destroySemaphore(engine.device, engine.image_available_semaphore[i]);
+        vk::destroySemaphore(engine.device, engine.render_finished_semaphore[i]);
+        vk::destroyFence(engine.device, engine.in_flight_fences[i]);
     }
 }
 
+fn void! createCommandPool(Engine* engine) {
+    QueueFamilyIndices queueFamilyIndices = findQueueFamilies(engine.physical_device)!;
+    vk::CommandPoolCreateInfo poolInfo = {
+        .s_type = vk::STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+        .flags = vk::CommandPoolCreateFlags { .reset_command_buffer },
+        .queue_family_index = queueFamilyIndices.graphics_family,
+    };
+    engine.command_pool = vk::createCommandPool(engine.device, &poolInfo)!;
+    vk::CommandBufferAllocateInfo allocInfo = {
+        .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        .command_pool = engine.command_pool,
+        .level = vk::COMMAND_BUFFER_LEVEL_PRIMARY,
+        .command_buffer_count = MAX_FRAMES_IN_FLIGHT,
+    };
+    engine.command_buffers = vk::allocateCommandBuffers(engine.device, &allocInfo)!;
+}
+
+fn void destroyCommandPool(Engine* engine) {
+    vk::freeCommandBuffers(engine.device, engine.command_pool, engine.command_buffers.len, &engine.command_buffers);
+    vk::destroyCommandPool(engine.device, engine.command_pool);
+}
 vk::Buffer[MAX_FRAMES_IN_FLIGHT] g_uniform_buffers;
 vk::DeviceMemory[MAX_FRAMES_IN_FLIGHT] g_uniform_memory;
 void*[MAX_FRAMES_IN_FLIGHT] g_uniform_buffer_mapped;

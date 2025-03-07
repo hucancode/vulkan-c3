@@ -2,8 +2,8 @@ module mj;
 import vk;
 
 fn void destroyGraphicsPipeline() {
-    vk::destroyPipeline(g_device, g_graphics_pipeline, null);
-    vk::destroyPipelineLayout(g_device, g_pipeline_layout, null);
+    vk::destroyPipeline(g_device, g_graphics_pipeline);
+    vk::destroyPipelineLayout(g_device, g_pipeline_layout);
 }
 
 fn vk::ShaderModule! createShaderModule(char[] code) {
@@ -12,11 +12,9 @@ fn vk::ShaderModule! createShaderModule(char[] code) {
         .code_size = code.len,
         .p_code = (uint*)code.ptr,
     };
-    vk::ShaderModule ret;
-    vk::createShaderModule(g_device, &createInfo, null, &ret)!;
-    return ret;
+    return vk::createShaderModule(g_device, &createInfo)!;
 }
 
 fn void destroyDescriptorSetLayout() {
-    vk::destroyDescriptorSetLayout(g_device, g_descriptor_set_layout, null);
+    vk::destroyDescriptorSetLayout(g_device, g_descriptor_set_layout);
 }
