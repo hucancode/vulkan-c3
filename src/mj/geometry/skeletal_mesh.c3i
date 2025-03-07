@@ -1,17 +1,18 @@
 module mj;
 import std::collections::map;
 
-def SkeletalMeshHandle = usz;
-def BoneHandle = usz;
-
-struct Bone {
-    Transform transform;
-    BoneHandle[] children;
-}
+def SkeletalMeshHandle = uint;
 
 struct SkeletalMesh {
     SkinnedVertex[] vertices;
     uint[] indices;
     Bone[] bones;
     HashMap(<String, AnimationTrack>) animations;
+}
+
+struct SkeletalMeshGPU {
+    vk::Buffer vertex_buffer;
+    vk::Buffer index_buffer;
+    vk::Buffer bone_buffer;
+    vk::DeviceMemory memory;
 }

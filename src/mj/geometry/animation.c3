@@ -2,11 +2,11 @@ module mj;
 import std::math::quaternion;
 import std::sort;
 
-struct BoneAnimation {
-    BoneHandle bone;
+struct Animation {
+    NodeHandle node;
     AnimationChannel channels;
 }
-def AnimationTrack = BoneAnimation[];
+def AnimationTrack = Animation[];
 
 struct AnimationChannel {
     PositionKeyframe[] positions;
@@ -48,8 +48,7 @@ fn float[<3>] sample_position(PositionKeyframe[] keyframes, float t) {
     return alpha * prev_pos + (1 - alpha) * next_pos;
 }
 
-fn Quaternion sample_rotation(RotationKeyframe[] keyframes, float t)
-{
+fn Quaternion sample_rotation(RotationKeyframe[] keyframes, float t) {
     if (keyframes.len == 0) return quaternion::identity();
     if (t <= keyframes[0].time) return keyframes[0].value;
     if (t >= keyframes[keyframes.len - 1].time) return keyframes[keyframes.len - 1].value;
@@ -68,8 +67,7 @@ fn Quaternion sample_rotation(RotationKeyframe[] keyframes, float t)
     return quaternion::slerp(q1, q2, alpha);
 }
 
-fn float[<3>] sample_scale(ScaleKeyframe[] keyframes, float t)
-{
+fn float[<3>] sample_scale(ScaleKeyframe[] keyframes, float t) {
     if (keyframes.len == 0) return { 1, 1, 1 };
     if (t <= keyframes[0].time) return keyframes[0].value;
     if (t >= keyframes[keyframes.len - 1].time) return keyframes[keyframes.len - 1].value;

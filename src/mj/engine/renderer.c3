@@ -2,7 +2,10 @@ module mj::vkbe;
 import vk;
 import mj;
 
-uint g_current_frame;
+vk::Buffer[MAX_FRAMES_IN_FLIGHT] g_uniform_buffers;
+vk::DeviceMemory[MAX_FRAMES_IN_FLIGHT] g_uniform_memory;
+void*[MAX_FRAMES_IN_FLIGHT] g_uniform_buffer_mapped;
+
 
 fn void! render() {
     vk::waitForFences(g_device, 1, &g_in_flight_fences[g_current_frame], vk::TRUE, ulong.max)!;
