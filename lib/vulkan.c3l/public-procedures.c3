@@ -13,7 +13,7 @@ fn void deviceMemoryReportCallbackEXT(DeviceMemoryReportCallbackDataEXT* pCallba
 	internal::deviceMemoryReportCallbackEXT(pCallbackData, pUserData);
 }
 
-fn ExtensionProperties[]! enumerateInstanceExtensionProperties(ZString pLayerName) {
+fn ExtensionProperties[]! enumerateInstanceExtensionProperties(ZString pLayerName) @inline {
 	uint n;
 	vk::check(internal::enumerateInstanceExtensionProperties(pLayerName, &n, null))!;
 	ExtensionProperties* ret = (ExtensionProperties*) malloc(n * ExtensionProperties.sizeof);
@@ -21,7 +21,7 @@ fn ExtensionProperties[]! enumerateInstanceExtensionProperties(ZString pLayerNam
 	return ret[:n];
 }
 
-fn LayerProperties[]! enumerateInstanceLayerProperties() {
+fn LayerProperties[]! enumerateInstanceLayerProperties() @inline {
 	uint n;
 	vk::check(internal::enumerateInstanceLayerProperties(&n, null))!;
 	LayerProperties* ret = (LayerProperties*) malloc(n * LayerProperties.sizeof);
@@ -129,7 +129,7 @@ fn void destroySurfaceKHR(Instance instance, SurfaceKHR surface, AllocationCallb
 	internal::destroySurfaceKHR(instance, surface, pAllocator);
 }
 
-fn ExtensionProperties[]! enumerateDeviceExtensionProperties(PhysicalDevice physicalDevice, ZString pLayerName) {
+fn ExtensionProperties[]! enumerateDeviceExtensionProperties(PhysicalDevice physicalDevice, ZString pLayerName) @inline {
 	uint n;
 	vk::check(internal::enumerateDeviceExtensionProperties(physicalDevice, pLayerName, &n, null))!;
 	ExtensionProperties* ret = (ExtensionProperties*) malloc(n * ExtensionProperties.sizeof);
@@ -137,7 +137,7 @@ fn ExtensionProperties[]! enumerateDeviceExtensionProperties(PhysicalDevice phys
 	return ret[:n];
 }
 
-fn LayerProperties[]! enumerateDeviceLayerProperties(PhysicalDevice physicalDevice) {
+fn LayerProperties[]! enumerateDeviceLayerProperties(PhysicalDevice physicalDevice) @inline {
 	uint n;
 	vk::check(internal::enumerateDeviceLayerProperties(physicalDevice, &n, null))!;
 	LayerProperties* ret = (LayerProperties*) malloc(n * LayerProperties.sizeof);
@@ -145,7 +145,7 @@ fn LayerProperties[]! enumerateDeviceLayerProperties(PhysicalDevice physicalDevi
 	return ret[:n];
 }
 
-fn PhysicalDeviceGroupProperties[]! enumeratePhysicalDeviceGroups(Instance instance) {
+fn PhysicalDeviceGroupProperties[]! enumeratePhysicalDeviceGroups(Instance instance) @inline {
 	uint n;
 	vk::check(internal::enumeratePhysicalDeviceGroups(instance, &n, null))!;
 	PhysicalDeviceGroupProperties* ret = (PhysicalDeviceGroupProperties*) malloc(n * PhysicalDeviceGroupProperties.sizeof);
@@ -153,7 +153,7 @@ fn PhysicalDeviceGroupProperties[]! enumeratePhysicalDeviceGroups(Instance insta
 	return ret[:n];
 }
 
-fn PhysicalDeviceGroupProperties[]! enumeratePhysicalDeviceGroupsKHR(Instance instance) {
+fn PhysicalDeviceGroupProperties[]! enumeratePhysicalDeviceGroupsKHR(Instance instance) @inline {
 	uint n;
 	vk::check(internal::enumeratePhysicalDeviceGroupsKHR(instance, &n, null))!;
 	PhysicalDeviceGroupProperties* ret = (PhysicalDeviceGroupProperties*) malloc(n * PhysicalDeviceGroupProperties.sizeof);
@@ -165,7 +165,7 @@ fn void! enumeratePhysicalDeviceQueueFamilyPerformanceQueryCountersKHR(PhysicalD
 	vk::check(internal::enumeratePhysicalDeviceQueueFamilyPerformanceQueryCountersKHR(physicalDevice, queueFamilyIndex, pCounterCount, pCounters, pCounterDescriptions))!;
 }
 
-fn PhysicalDevice[]! enumeratePhysicalDevices(Instance instance) {
+fn PhysicalDevice[]! enumeratePhysicalDevices(Instance instance) @inline {
 	uint n;
 	vk::check(internal::enumeratePhysicalDevices(instance, &n, null))!;
 	PhysicalDevice* ret = (PhysicalDevice*) malloc(n * PhysicalDevice.sizeof);
@@ -173,7 +173,7 @@ fn PhysicalDevice[]! enumeratePhysicalDevices(Instance instance) {
 	return ret[:n];
 }
 
-fn DisplayModeProperties2KHR[]! getDisplayModeProperties2KHR(PhysicalDevice physicalDevice, DisplayKHR display) {
+fn DisplayModeProperties2KHR[]! getDisplayModeProperties2KHR(PhysicalDevice physicalDevice, DisplayKHR display) @inline {
 	uint n;
 	vk::check(internal::getDisplayModeProperties2KHR(physicalDevice, display, &n, null))!;
 	DisplayModeProperties2KHR* ret = (DisplayModeProperties2KHR*) malloc(n * DisplayModeProperties2KHR.sizeof);
@@ -181,7 +181,7 @@ fn DisplayModeProperties2KHR[]! getDisplayModeProperties2KHR(PhysicalDevice phys
 	return ret[:n];
 }
 
-fn DisplayModePropertiesKHR[]! getDisplayModePropertiesKHR(PhysicalDevice physicalDevice, DisplayKHR display) {
+fn DisplayModePropertiesKHR[]! getDisplayModePropertiesKHR(PhysicalDevice physicalDevice, DisplayKHR display) @inline {
 	uint n;
 	vk::check(internal::getDisplayModePropertiesKHR(physicalDevice, display, &n, null))!;
 	DisplayModePropertiesKHR* ret = (DisplayModePropertiesKHR*) malloc(n * DisplayModePropertiesKHR.sizeof);
@@ -201,7 +201,7 @@ fn DisplayPlaneCapabilitiesKHR! getDisplayPlaneCapabilitiesKHR(PhysicalDevice ph
 	return ret;
 }
 
-fn DisplayKHR[]! getDisplayPlaneSupportedDisplaysKHR(PhysicalDevice physicalDevice, uint planeIndex) {
+fn DisplayKHR[]! getDisplayPlaneSupportedDisplaysKHR(PhysicalDevice physicalDevice, uint planeIndex) @inline {
 	uint n;
 	vk::check(internal::getDisplayPlaneSupportedDisplaysKHR(physicalDevice, planeIndex, &n, null))!;
 	DisplayKHR* ret = (DisplayKHR*) malloc(n * DisplayKHR.sizeof);
@@ -219,7 +219,7 @@ fn ProcVoidFunction getInstanceProcAddrLUNARG(Instance instance, ZString pName) 
 	return internal::getInstanceProcAddrLUNARG(instance, pName);
 }
 
-fn TimeDomainKHR[]! getPhysicalDeviceCalibrateableTimeDomainsEXT(PhysicalDevice physicalDevice) {
+fn TimeDomainKHR[]! getPhysicalDeviceCalibrateableTimeDomainsEXT(PhysicalDevice physicalDevice) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceCalibrateableTimeDomainsEXT(physicalDevice, &n, null))!;
 	TimeDomainKHR* ret = (TimeDomainKHR*) malloc(n * TimeDomainKHR.sizeof);
@@ -227,7 +227,7 @@ fn TimeDomainKHR[]! getPhysicalDeviceCalibrateableTimeDomainsEXT(PhysicalDevice 
 	return ret[:n];
 }
 
-fn TimeDomainKHR[]! getPhysicalDeviceCalibrateableTimeDomainsKHR(PhysicalDevice physicalDevice) {
+fn TimeDomainKHR[]! getPhysicalDeviceCalibrateableTimeDomainsKHR(PhysicalDevice physicalDevice) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceCalibrateableTimeDomainsKHR(physicalDevice, &n, null))!;
 	TimeDomainKHR* ret = (TimeDomainKHR*) malloc(n * TimeDomainKHR.sizeof);
@@ -235,7 +235,7 @@ fn TimeDomainKHR[]! getPhysicalDeviceCalibrateableTimeDomainsKHR(PhysicalDevice 
 	return ret[:n];
 }
 
-fn CooperativeMatrixFlexibleDimensionsPropertiesNV[]! getPhysicalDeviceCooperativeMatrixFlexibleDimensionsPropertiesNV(PhysicalDevice physicalDevice) {
+fn CooperativeMatrixFlexibleDimensionsPropertiesNV[]! getPhysicalDeviceCooperativeMatrixFlexibleDimensionsPropertiesNV(PhysicalDevice physicalDevice) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceCooperativeMatrixFlexibleDimensionsPropertiesNV(physicalDevice, &n, null))!;
 	CooperativeMatrixFlexibleDimensionsPropertiesNV* ret = (CooperativeMatrixFlexibleDimensionsPropertiesNV*) malloc(n * CooperativeMatrixFlexibleDimensionsPropertiesNV.sizeof);
@@ -243,7 +243,7 @@ fn CooperativeMatrixFlexibleDimensionsPropertiesNV[]! getPhysicalDeviceCooperati
 	return ret[:n];
 }
 
-fn CooperativeMatrixPropertiesKHR[]! getPhysicalDeviceCooperativeMatrixPropertiesKHR(PhysicalDevice physicalDevice) {
+fn CooperativeMatrixPropertiesKHR[]! getPhysicalDeviceCooperativeMatrixPropertiesKHR(PhysicalDevice physicalDevice) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceCooperativeMatrixPropertiesKHR(physicalDevice, &n, null))!;
 	CooperativeMatrixPropertiesKHR* ret = (CooperativeMatrixPropertiesKHR*) malloc(n * CooperativeMatrixPropertiesKHR.sizeof);
@@ -251,7 +251,7 @@ fn CooperativeMatrixPropertiesKHR[]! getPhysicalDeviceCooperativeMatrixPropertie
 	return ret[:n];
 }
 
-fn CooperativeMatrixPropertiesNV[]! getPhysicalDeviceCooperativeMatrixPropertiesNV(PhysicalDevice physicalDevice) {
+fn CooperativeMatrixPropertiesNV[]! getPhysicalDeviceCooperativeMatrixPropertiesNV(PhysicalDevice physicalDevice) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceCooperativeMatrixPropertiesNV(physicalDevice, &n, null))!;
 	CooperativeMatrixPropertiesNV* ret = (CooperativeMatrixPropertiesNV*) malloc(n * CooperativeMatrixPropertiesNV.sizeof);
@@ -259,7 +259,7 @@ fn CooperativeMatrixPropertiesNV[]! getPhysicalDeviceCooperativeMatrixProperties
 	return ret[:n];
 }
 
-fn CooperativeVectorPropertiesNV[]! getPhysicalDeviceCooperativeVectorPropertiesNV(PhysicalDevice physicalDevice) {
+fn CooperativeVectorPropertiesNV[]! getPhysicalDeviceCooperativeVectorPropertiesNV(PhysicalDevice physicalDevice) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceCooperativeVectorPropertiesNV(physicalDevice, &n, null))!;
 	CooperativeVectorPropertiesNV* ret = (CooperativeVectorPropertiesNV*) malloc(n * CooperativeVectorPropertiesNV.sizeof);
@@ -267,7 +267,7 @@ fn CooperativeVectorPropertiesNV[]! getPhysicalDeviceCooperativeVectorProperties
 	return ret[:n];
 }
 
-fn DisplayPlaneProperties2KHR[]! getPhysicalDeviceDisplayPlaneProperties2KHR(PhysicalDevice physicalDevice) {
+fn DisplayPlaneProperties2KHR[]! getPhysicalDeviceDisplayPlaneProperties2KHR(PhysicalDevice physicalDevice) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceDisplayPlaneProperties2KHR(physicalDevice, &n, null))!;
 	DisplayPlaneProperties2KHR* ret = (DisplayPlaneProperties2KHR*) malloc(n * DisplayPlaneProperties2KHR.sizeof);
@@ -275,7 +275,7 @@ fn DisplayPlaneProperties2KHR[]! getPhysicalDeviceDisplayPlaneProperties2KHR(Phy
 	return ret[:n];
 }
 
-fn DisplayPlanePropertiesKHR[]! getPhysicalDeviceDisplayPlanePropertiesKHR(PhysicalDevice physicalDevice) {
+fn DisplayPlanePropertiesKHR[]! getPhysicalDeviceDisplayPlanePropertiesKHR(PhysicalDevice physicalDevice) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceDisplayPlanePropertiesKHR(physicalDevice, &n, null))!;
 	DisplayPlanePropertiesKHR* ret = (DisplayPlanePropertiesKHR*) malloc(n * DisplayPlanePropertiesKHR.sizeof);
@@ -283,7 +283,7 @@ fn DisplayPlanePropertiesKHR[]! getPhysicalDeviceDisplayPlanePropertiesKHR(Physi
 	return ret[:n];
 }
 
-fn DisplayProperties2KHR[]! getPhysicalDeviceDisplayProperties2KHR(PhysicalDevice physicalDevice) {
+fn DisplayProperties2KHR[]! getPhysicalDeviceDisplayProperties2KHR(PhysicalDevice physicalDevice) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceDisplayProperties2KHR(physicalDevice, &n, null))!;
 	DisplayProperties2KHR* ret = (DisplayProperties2KHR*) malloc(n * DisplayProperties2KHR.sizeof);
@@ -291,7 +291,7 @@ fn DisplayProperties2KHR[]! getPhysicalDeviceDisplayProperties2KHR(PhysicalDevic
 	return ret[:n];
 }
 
-fn DisplayPropertiesKHR[]! getPhysicalDeviceDisplayPropertiesKHR(PhysicalDevice physicalDevice) {
+fn DisplayPropertiesKHR[]! getPhysicalDeviceDisplayPropertiesKHR(PhysicalDevice physicalDevice) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceDisplayPropertiesKHR(physicalDevice, &n, null))!;
 	DisplayPropertiesKHR* ret = (DisplayPropertiesKHR*) malloc(n * DisplayPropertiesKHR.sizeof);
@@ -377,7 +377,7 @@ fn FormatProperties2 getPhysicalDeviceFormatProperties2KHR(PhysicalDevice physic
 	return ret;
 }
 
-fn PhysicalDeviceFragmentShadingRateKHR[]! getPhysicalDeviceFragmentShadingRatesKHR(PhysicalDevice physicalDevice) {
+fn PhysicalDeviceFragmentShadingRateKHR[]! getPhysicalDeviceFragmentShadingRatesKHR(PhysicalDevice physicalDevice) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceFragmentShadingRatesKHR(physicalDevice, &n, null))!;
 	PhysicalDeviceFragmentShadingRateKHR* ret = (PhysicalDeviceFragmentShadingRateKHR*) malloc(n * PhysicalDeviceFragmentShadingRateKHR.sizeof);
@@ -427,7 +427,7 @@ fn MultisamplePropertiesEXT getPhysicalDeviceMultisamplePropertiesEXT(PhysicalDe
 	return ret;
 }
 
-fn OpticalFlowImageFormatPropertiesNV[]! getPhysicalDeviceOpticalFlowImageFormatsNV(PhysicalDevice physicalDevice, OpticalFlowImageFormatInfoNV* pOpticalFlowImageFormatInfo) {
+fn OpticalFlowImageFormatPropertiesNV[]! getPhysicalDeviceOpticalFlowImageFormatsNV(PhysicalDevice physicalDevice, OpticalFlowImageFormatInfoNV* pOpticalFlowImageFormatInfo) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceOpticalFlowImageFormatsNV(physicalDevice, pOpticalFlowImageFormatInfo, &n, null))!;
 	OpticalFlowImageFormatPropertiesNV* ret = (OpticalFlowImageFormatPropertiesNV*) malloc(n * OpticalFlowImageFormatPropertiesNV.sizeof);
@@ -435,7 +435,7 @@ fn OpticalFlowImageFormatPropertiesNV[]! getPhysicalDeviceOpticalFlowImageFormat
 	return ret[:n];
 }
 
-fn Rect2D[]! getPhysicalDevicePresentRectanglesKHR(PhysicalDevice physicalDevice, SurfaceKHR surface) {
+fn Rect2D[]! getPhysicalDevicePresentRectanglesKHR(PhysicalDevice physicalDevice, SurfaceKHR surface) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDevicePresentRectanglesKHR(physicalDevice, surface, &n, null))!;
 	Rect2D* ret = (Rect2D*) malloc(n * Rect2D.sizeof);
@@ -467,7 +467,7 @@ fn uint getPhysicalDeviceQueueFamilyPerformanceQueryPassesKHR(PhysicalDevice phy
 	return ret;
 }
 
-fn QueueFamilyProperties[] getPhysicalDeviceQueueFamilyProperties(PhysicalDevice physicalDevice) {
+fn QueueFamilyProperties[] getPhysicalDeviceQueueFamilyProperties(PhysicalDevice physicalDevice) @inline {
 	uint n;
 	internal::getPhysicalDeviceQueueFamilyProperties(physicalDevice, &n, null);
 	QueueFamilyProperties* ret = (QueueFamilyProperties*) malloc(n * QueueFamilyProperties.sizeof);
@@ -475,7 +475,7 @@ fn QueueFamilyProperties[] getPhysicalDeviceQueueFamilyProperties(PhysicalDevice
 	return ret[:n];
 }
 
-fn QueueFamilyProperties2[] getPhysicalDeviceQueueFamilyProperties2(PhysicalDevice physicalDevice) {
+fn QueueFamilyProperties2[] getPhysicalDeviceQueueFamilyProperties2(PhysicalDevice physicalDevice) @inline {
 	uint n;
 	internal::getPhysicalDeviceQueueFamilyProperties2(physicalDevice, &n, null);
 	QueueFamilyProperties2* ret = (QueueFamilyProperties2*) malloc(n * QueueFamilyProperties2.sizeof);
@@ -483,7 +483,7 @@ fn QueueFamilyProperties2[] getPhysicalDeviceQueueFamilyProperties2(PhysicalDevi
 	return ret[:n];
 }
 
-fn QueueFamilyProperties2[] getPhysicalDeviceQueueFamilyProperties2KHR(PhysicalDevice physicalDevice) {
+fn QueueFamilyProperties2[] getPhysicalDeviceQueueFamilyProperties2KHR(PhysicalDevice physicalDevice) @inline {
 	uint n;
 	internal::getPhysicalDeviceQueueFamilyProperties2KHR(physicalDevice, &n, null);
 	QueueFamilyProperties2* ret = (QueueFamilyProperties2*) malloc(n * QueueFamilyProperties2.sizeof);
@@ -491,7 +491,7 @@ fn QueueFamilyProperties2[] getPhysicalDeviceQueueFamilyProperties2KHR(PhysicalD
 	return ret[:n];
 }
 
-fn SparseImageFormatProperties[] getPhysicalDeviceSparseImageFormatProperties(PhysicalDevice physicalDevice, Format format, ImageType type, SampleCountFlags samples, ImageUsageFlags usage, ImageTiling tiling) {
+fn SparseImageFormatProperties[] getPhysicalDeviceSparseImageFormatProperties(PhysicalDevice physicalDevice, Format format, ImageType type, SampleCountFlags samples, ImageUsageFlags usage, ImageTiling tiling) @inline {
 	uint n;
 	internal::getPhysicalDeviceSparseImageFormatProperties(physicalDevice, format, type, samples, usage, tiling, &n, null);
 	SparseImageFormatProperties* ret = (SparseImageFormatProperties*) malloc(n * SparseImageFormatProperties.sizeof);
@@ -499,7 +499,7 @@ fn SparseImageFormatProperties[] getPhysicalDeviceSparseImageFormatProperties(Ph
 	return ret[:n];
 }
 
-fn SparseImageFormatProperties2[] getPhysicalDeviceSparseImageFormatProperties2(PhysicalDevice physicalDevice, PhysicalDeviceSparseImageFormatInfo2* pFormatInfo) {
+fn SparseImageFormatProperties2[] getPhysicalDeviceSparseImageFormatProperties2(PhysicalDevice physicalDevice, PhysicalDeviceSparseImageFormatInfo2* pFormatInfo) @inline {
 	uint n;
 	internal::getPhysicalDeviceSparseImageFormatProperties2(physicalDevice, pFormatInfo, &n, null);
 	SparseImageFormatProperties2* ret = (SparseImageFormatProperties2*) malloc(n * SparseImageFormatProperties2.sizeof);
@@ -507,7 +507,7 @@ fn SparseImageFormatProperties2[] getPhysicalDeviceSparseImageFormatProperties2(
 	return ret[:n];
 }
 
-fn SparseImageFormatProperties2[] getPhysicalDeviceSparseImageFormatProperties2KHR(PhysicalDevice physicalDevice, PhysicalDeviceSparseImageFormatInfo2* pFormatInfo) {
+fn SparseImageFormatProperties2[] getPhysicalDeviceSparseImageFormatProperties2KHR(PhysicalDevice physicalDevice, PhysicalDeviceSparseImageFormatInfo2* pFormatInfo) @inline {
 	uint n;
 	internal::getPhysicalDeviceSparseImageFormatProperties2KHR(physicalDevice, pFormatInfo, &n, null);
 	SparseImageFormatProperties2* ret = (SparseImageFormatProperties2*) malloc(n * SparseImageFormatProperties2.sizeof);
@@ -515,7 +515,7 @@ fn SparseImageFormatProperties2[] getPhysicalDeviceSparseImageFormatProperties2K
 	return ret[:n];
 }
 
-fn FramebufferMixedSamplesCombinationNV[]! getPhysicalDeviceSupportedFramebufferMixedSamplesCombinationsNV(PhysicalDevice physicalDevice) {
+fn FramebufferMixedSamplesCombinationNV[]! getPhysicalDeviceSupportedFramebufferMixedSamplesCombinationsNV(PhysicalDevice physicalDevice) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceSupportedFramebufferMixedSamplesCombinationsNV(physicalDevice, &n, null))!;
 	FramebufferMixedSamplesCombinationNV* ret = (FramebufferMixedSamplesCombinationNV*) malloc(n * FramebufferMixedSamplesCombinationNV.sizeof);
@@ -541,7 +541,7 @@ fn SurfaceCapabilitiesKHR! getPhysicalDeviceSurfaceCapabilitiesKHR(PhysicalDevic
 	return ret;
 }
 
-fn SurfaceFormat2KHR[]! getPhysicalDeviceSurfaceFormats2KHR(PhysicalDevice physicalDevice, PhysicalDeviceSurfaceInfo2KHR* pSurfaceInfo) {
+fn SurfaceFormat2KHR[]! getPhysicalDeviceSurfaceFormats2KHR(PhysicalDevice physicalDevice, PhysicalDeviceSurfaceInfo2KHR* pSurfaceInfo) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceSurfaceFormats2KHR(physicalDevice, pSurfaceInfo, &n, null))!;
 	SurfaceFormat2KHR* ret = (SurfaceFormat2KHR*) malloc(n * SurfaceFormat2KHR.sizeof);
@@ -549,7 +549,7 @@ fn SurfaceFormat2KHR[]! getPhysicalDeviceSurfaceFormats2KHR(PhysicalDevice physi
 	return ret[:n];
 }
 
-fn SurfaceFormatKHR[]! getPhysicalDeviceSurfaceFormatsKHR(PhysicalDevice physicalDevice, SurfaceKHR surface) {
+fn SurfaceFormatKHR[]! getPhysicalDeviceSurfaceFormatsKHR(PhysicalDevice physicalDevice, SurfaceKHR surface) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &n, null))!;
 	SurfaceFormatKHR* ret = (SurfaceFormatKHR*) malloc(n * SurfaceFormatKHR.sizeof);
@@ -557,7 +557,7 @@ fn SurfaceFormatKHR[]! getPhysicalDeviceSurfaceFormatsKHR(PhysicalDevice physica
 	return ret[:n];
 }
 
-fn PresentModeKHR[]! getPhysicalDeviceSurfacePresentModes2EXT(PhysicalDevice physicalDevice, PhysicalDeviceSurfaceInfo2KHR* pSurfaceInfo) {
+fn PresentModeKHR[]! getPhysicalDeviceSurfacePresentModes2EXT(PhysicalDevice physicalDevice, PhysicalDeviceSurfaceInfo2KHR* pSurfaceInfo) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceSurfacePresentModes2EXT(physicalDevice, pSurfaceInfo, &n, null))!;
 	PresentModeKHR* ret = (PresentModeKHR*) malloc(n * PresentModeKHR.sizeof);
@@ -565,7 +565,7 @@ fn PresentModeKHR[]! getPhysicalDeviceSurfacePresentModes2EXT(PhysicalDevice phy
 	return ret[:n];
 }
 
-fn PresentModeKHR[]! getPhysicalDeviceSurfacePresentModesKHR(PhysicalDevice physicalDevice, SurfaceKHR surface) {
+fn PresentModeKHR[]! getPhysicalDeviceSurfacePresentModesKHR(PhysicalDevice physicalDevice, SurfaceKHR surface) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &n, null))!;
 	PresentModeKHR* ret = (PresentModeKHR*) malloc(n * PresentModeKHR.sizeof);
@@ -579,7 +579,7 @@ fn uint! getPhysicalDeviceSurfaceSupportKHR(PhysicalDevice physicalDevice, uint 
 	return ret;
 }
 
-fn PhysicalDeviceToolProperties[]! getPhysicalDeviceToolProperties(PhysicalDevice physicalDevice) {
+fn PhysicalDeviceToolProperties[]! getPhysicalDeviceToolProperties(PhysicalDevice physicalDevice) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceToolProperties(physicalDevice, &n, null))!;
 	PhysicalDeviceToolProperties* ret = (PhysicalDeviceToolProperties*) malloc(n * PhysicalDeviceToolProperties.sizeof);
@@ -587,7 +587,7 @@ fn PhysicalDeviceToolProperties[]! getPhysicalDeviceToolProperties(PhysicalDevic
 	return ret[:n];
 }
 
-fn PhysicalDeviceToolProperties[]! getPhysicalDeviceToolPropertiesEXT(PhysicalDevice physicalDevice) {
+fn PhysicalDeviceToolProperties[]! getPhysicalDeviceToolPropertiesEXT(PhysicalDevice physicalDevice) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceToolPropertiesEXT(physicalDevice, &n, null))!;
 	PhysicalDeviceToolProperties* ret = (PhysicalDeviceToolProperties*) malloc(n * PhysicalDeviceToolProperties.sizeof);
@@ -607,7 +607,7 @@ fn VideoEncodeQualityLevelPropertiesKHR! getPhysicalDeviceVideoEncodeQualityLeve
 	return ret;
 }
 
-fn VideoFormatPropertiesKHR[]! getPhysicalDeviceVideoFormatPropertiesKHR(PhysicalDevice physicalDevice, PhysicalDeviceVideoFormatInfoKHR* pVideoFormatInfo) {
+fn VideoFormatPropertiesKHR[]! getPhysicalDeviceVideoFormatPropertiesKHR(PhysicalDevice physicalDevice, PhysicalDeviceVideoFormatInfoKHR* pVideoFormatInfo) @inline {
 	uint n;
 	vk::check(internal::getPhysicalDeviceVideoFormatPropertiesKHR(physicalDevice, pVideoFormatInfo, &n, null))!;
 	VideoFormatPropertiesKHR* ret = (VideoFormatPropertiesKHR*) malloc(n * VideoFormatPropertiesKHR.sizeof);
@@ -2441,7 +2441,7 @@ fn void getDeviceImageMemoryRequirementsKHR(Device device, DeviceImageMemoryRequ
 	internal::getDeviceImageMemoryRequirementsKHR(device, pInfo, pMemoryRequirements);
 }
 
-fn SparseImageMemoryRequirements2[] getDeviceImageSparseMemoryRequirements(Device device, DeviceImageMemoryRequirements* pInfo) {
+fn SparseImageMemoryRequirements2[] getDeviceImageSparseMemoryRequirements(Device device, DeviceImageMemoryRequirements* pInfo) @inline {
 	uint n;
 	internal::getDeviceImageSparseMemoryRequirements(device, pInfo, &n, null);
 	SparseImageMemoryRequirements2* ret = (SparseImageMemoryRequirements2*) malloc(n * SparseImageMemoryRequirements2.sizeof);
@@ -2449,7 +2449,7 @@ fn SparseImageMemoryRequirements2[] getDeviceImageSparseMemoryRequirements(Devic
 	return ret[:n];
 }
 
-fn SparseImageMemoryRequirements2[] getDeviceImageSparseMemoryRequirementsKHR(Device device, DeviceImageMemoryRequirements* pInfo) {
+fn SparseImageMemoryRequirements2[] getDeviceImageSparseMemoryRequirementsKHR(Device device, DeviceImageMemoryRequirements* pInfo) @inline {
 	uint n;
 	internal::getDeviceImageSparseMemoryRequirementsKHR(device, pInfo, &n, null);
 	SparseImageMemoryRequirements2* ret = (SparseImageMemoryRequirements2*) malloc(n * SparseImageMemoryRequirements2.sizeof);
@@ -2541,7 +2541,7 @@ fn Win32_HANDLE! getFenceWin32HandleKHR(Device device, FenceGetWin32HandleInfoKH
 	return ret;
 }
 
-fn TilePropertiesQCOM[]! getFramebufferTilePropertiesQCOM(Device device, Framebuffer framebuffer) {
+fn TilePropertiesQCOM[]! getFramebufferTilePropertiesQCOM(Device device, Framebuffer framebuffer) @inline {
 	uint n;
 	vk::check(internal::getFramebufferTilePropertiesQCOM(device, framebuffer, &n, null))!;
 	TilePropertiesQCOM* ret = (TilePropertiesQCOM*) malloc(n * TilePropertiesQCOM.sizeof);
@@ -2589,7 +2589,7 @@ fn void! getImageOpaqueCaptureDescriptorDataEXT(Device device, ImageCaptureDescr
 	vk::check(internal::getImageOpaqueCaptureDescriptorDataEXT(device, pInfo, pData))!;
 }
 
-fn SparseImageMemoryRequirements[] getImageSparseMemoryRequirements(Device device, Image image) {
+fn SparseImageMemoryRequirements[] getImageSparseMemoryRequirements(Device device, Image image) @inline {
 	uint n;
 	internal::getImageSparseMemoryRequirements(device, image, &n, null);
 	SparseImageMemoryRequirements* ret = (SparseImageMemoryRequirements*) malloc(n * SparseImageMemoryRequirements.sizeof);
@@ -2597,7 +2597,7 @@ fn SparseImageMemoryRequirements[] getImageSparseMemoryRequirements(Device devic
 	return ret[:n];
 }
 
-fn SparseImageMemoryRequirements2[] getImageSparseMemoryRequirements2(Device device, ImageSparseMemoryRequirementsInfo2* pInfo) {
+fn SparseImageMemoryRequirements2[] getImageSparseMemoryRequirements2(Device device, ImageSparseMemoryRequirementsInfo2* pInfo) @inline {
 	uint n;
 	internal::getImageSparseMemoryRequirements2(device, pInfo, &n, null);
 	SparseImageMemoryRequirements2* ret = (SparseImageMemoryRequirements2*) malloc(n * SparseImageMemoryRequirements2.sizeof);
@@ -2605,7 +2605,7 @@ fn SparseImageMemoryRequirements2[] getImageSparseMemoryRequirements2(Device dev
 	return ret[:n];
 }
 
-fn SparseImageMemoryRequirements2[] getImageSparseMemoryRequirements2KHR(Device device, ImageSparseMemoryRequirementsInfo2* pInfo) {
+fn SparseImageMemoryRequirements2[] getImageSparseMemoryRequirements2KHR(Device device, ImageSparseMemoryRequirementsInfo2* pInfo) @inline {
 	uint n;
 	internal::getImageSparseMemoryRequirements2KHR(device, pInfo, &n, null);
 	SparseImageMemoryRequirements2* ret = (SparseImageMemoryRequirements2*) malloc(n * SparseImageMemoryRequirements2.sizeof);
@@ -2725,7 +2725,7 @@ fn AccelerationStructureBuildSizesInfoKHR getPartitionedAccelerationStructuresBu
     return ret;
 }
 
-fn PastPresentationTimingGOOGLE[]! getPastPresentationTimingGOOGLE(Device device, SwapchainKHR swapchain) {
+fn PastPresentationTimingGOOGLE[]! getPastPresentationTimingGOOGLE(Device device, SwapchainKHR swapchain) @inline {
 	uint n;
 	vk::check(internal::getPastPresentationTimingGOOGLE(device, swapchain, &n, null))!;
 	PastPresentationTimingGOOGLE* ret = (PastPresentationTimingGOOGLE*) malloc(n * PastPresentationTimingGOOGLE.sizeof);
@@ -2747,7 +2747,7 @@ fn void! getPipelineCacheData(Device device, PipelineCache pipelineCache, usz* p
 	vk::check(internal::getPipelineCacheData(device, pipelineCache, pDataSize, pData))!;
 }
 
-fn PipelineExecutableInternalRepresentationKHR[]! getPipelineExecutableInternalRepresentationsKHR(Device device, PipelineExecutableInfoKHR* pExecutableInfo) {
+fn PipelineExecutableInternalRepresentationKHR[]! getPipelineExecutableInternalRepresentationsKHR(Device device, PipelineExecutableInfoKHR* pExecutableInfo) @inline {
 	uint n;
 	vk::check(internal::getPipelineExecutableInternalRepresentationsKHR(device, pExecutableInfo, &n, null))!;
 	PipelineExecutableInternalRepresentationKHR* ret = (PipelineExecutableInternalRepresentationKHR*) malloc(n * PipelineExecutableInternalRepresentationKHR.sizeof);
@@ -2755,7 +2755,7 @@ fn PipelineExecutableInternalRepresentationKHR[]! getPipelineExecutableInternalR
 	return ret[:n];
 }
 
-fn PipelineExecutablePropertiesKHR[]! getPipelineExecutablePropertiesKHR(Device device, PipelineInfoKHR* pPipelineInfo) {
+fn PipelineExecutablePropertiesKHR[]! getPipelineExecutablePropertiesKHR(Device device, PipelineInfoKHR* pPipelineInfo) @inline {
 	uint n;
 	vk::check(internal::getPipelineExecutablePropertiesKHR(device, pPipelineInfo, &n, null))!;
 	PipelineExecutablePropertiesKHR* ret = (PipelineExecutablePropertiesKHR*) malloc(n * PipelineExecutablePropertiesKHR.sizeof);
@@ -2763,7 +2763,7 @@ fn PipelineExecutablePropertiesKHR[]! getPipelineExecutablePropertiesKHR(Device 
 	return ret[:n];
 }
 
-fn PipelineExecutableStatisticKHR[]! getPipelineExecutableStatisticsKHR(Device device, PipelineExecutableInfoKHR* pExecutableInfo) {
+fn PipelineExecutableStatisticKHR[]! getPipelineExecutableStatisticsKHR(Device device, PipelineExecutableInfoKHR* pExecutableInfo) @inline {
 	uint n;
 	vk::check(internal::getPipelineExecutableStatisticsKHR(device, pExecutableInfo, &n, null))!;
 	PipelineExecutableStatisticKHR* ret = (PipelineExecutableStatisticKHR*) malloc(n * PipelineExecutableStatisticKHR.sizeof);
@@ -2836,9 +2836,9 @@ fn DeviceSize getRayTracingShaderGroupStackSizeKHR(Device device, Pipeline pipel
 }
 
 fn RefreshCycleDurationGOOGLE! getRefreshCycleDurationGOOGLE(Device device, SwapchainKHR swapchain) @inline {
-RefreshCycleDurationGOOGLE ret;
-vk::check(internal::getRefreshCycleDurationGOOGLE(device, swapchain, &ret))!;
-return ret;
+    RefreshCycleDurationGOOGLE ret;
+    vk::check(internal::getRefreshCycleDurationGOOGLE(device, swapchain, &ret))!;
+    return ret;
 }
 
 fn Extent2D getRenderAreaGranularity(Device device, RenderPass renderPass) @inline {
@@ -2911,7 +2911,7 @@ fn ulong! getSwapchainCounterEXT(Device device, SwapchainKHR swapchain, SurfaceC
 	return ret;
 }
 
-fn Image[]! getSwapchainImagesKHR(Device device, SwapchainKHR swapchain) {
+fn Image[]! getSwapchainImagesKHR(Device device, SwapchainKHR swapchain) @inline {
 	uint n;
 	vk::check(internal::getSwapchainImagesKHR(device, swapchain, &n, null))!;
 	Image* ret = (Image*) malloc(n * Image.sizeof);
@@ -2929,7 +2929,7 @@ fn void! getValidationCacheDataEXT(Device device, ValidationCacheEXT validationC
 	return ret;
 }
 
-fn VideoSessionMemoryRequirementsKHR[]! getVideoSessionMemoryRequirementsKHR(Device device, VideoSessionKHR videoSession) {
+fn VideoSessionMemoryRequirementsKHR[]! getVideoSessionMemoryRequirementsKHR(Device device, VideoSessionKHR videoSession) @inline {
 	uint n;
 	vk::check(internal::getVideoSessionMemoryRequirementsKHR(device, videoSession, &n, null))!;
 	VideoSessionMemoryRequirementsKHR* ret = (VideoSessionMemoryRequirementsKHR*) malloc(n * VideoSessionMemoryRequirementsKHR.sizeof);
