@@ -16,7 +16,6 @@ struct SkinnedVertex {
 	uint[<4>] joints;
 	float[<4>] weights;
 }
-
 const VEC_UP = float[<4>] {0.0, 1.0, 0.0, 1.0};
 const VEC_DOWN = float[<4>] {0.0, -1.0, 0.0, 1.0};
 const VEC_RIGHT = float[<4>] {1.0, 0.0, 0.0, 1.0};

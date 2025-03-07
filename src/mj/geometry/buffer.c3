@@ -1,4 +1,4 @@
-module mj::vkbe;
+module mj;
 import vk;
 import glfw;
 

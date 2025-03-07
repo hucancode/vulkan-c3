@@ -1,6 +1,6 @@
 module std::core::env;
 const bool GLFW_INCLUDE_VULKAN = true;
-module mj::vkbe;
+module mj;
 import std::io;
 import vk;
 import glfw;

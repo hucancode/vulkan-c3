@@ -1,4 +1,4 @@
-module mj::vkbe;
+module mj;
 import std::core::mem;
 import std::io;
 import vk;

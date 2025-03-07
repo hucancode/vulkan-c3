@@ -3,7 +3,6 @@ import std::time;
 import std::math::matrix;
 import std::math;
 import vk;
-import mj::vkbe;
 
 const ENGINE_NAME = "Mjolnir";
 const TITLE = "Vulkan C3";
