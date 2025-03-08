@@ -6,6 +6,7 @@ def StaticMeshHandle = uint;
 struct StaticMesh {
     Vertex[] vertices;
     uint[] indices;
+    MaterialHandle material;
 }
 
 struct StaticMeshGPU {

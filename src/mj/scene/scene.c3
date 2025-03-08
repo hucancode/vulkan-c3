@@ -17,6 +17,8 @@ struct SceneUniformData @align(16) {
 struct SceneGPU {
     vk::Buffer buffer;
     vk::DeviceMemory buffer_memory;
+    vk::DescriptorSetLayout descriptor_set_layout;
+    vk::DescriptorSet[MAX_FRAMES_IN_FLIGHT] descriptor_sets;
 }
 
 struct GenerationalIndex {
@@ -56,4 +58,70 @@ fn Scene make_scene() {
         .start_timestamp = now,
         .last_frame_timestamp = now,
     };
+}
+
+fn vk::DescriptorSetLayout! createSceneDescriptorSetLayout(Engine* engine) {
+    vk::DescriptorSetLayoutBinding view = {
+        .binding = 0,
+        .descriptor_type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        .descriptor_count = 1,
+        .stage_flags = vk::ShaderStageFlags{.vertex},
+    };
+    vk::DescriptorSetLayoutBinding proj = {
+        .binding = 1,
+        .descriptor_type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        .descriptor_count = 1,
+        .stage_flags = vk::ShaderStageFlags{.vertex},
+    };
+    vk::DescriptorSetLayoutBinding time = {
+        .binding = 2,
+        .descriptor_type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        .descriptor_count = 1,
+        .stage_flags = vk::ShaderStageFlags{.vertex},
+    };
+    vk::DescriptorSetLayoutBinding[*] bindings = { view, proj, time };
+    vk::DescriptorSetLayoutCreateInfo info = {
+        .s_type        = vk::STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+		.binding_count = bindings.len,
+		.p_bindings    = &bindings,
+	};
+	return vk::createDescriptorSetLayout(engine.device, &info)!;
+}
+
+fn void! createSceneDescriptorSets(Engine* engine, SceneGPU* gpu) {
+    vk::DescriptorPoolSize view = {
+        .type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        .descriptor_count = MAX_FRAMES_IN_FLIGHT,
+    };
+    vk::DescriptorPoolSize proj = {
+            .type = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            .descriptor_count = MAX_FRAMES_IN_FLIGHT,
+        };
+    vk::DescriptorPoolSize time = {
+        .type = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+        .descriptor_count = MAX_FRAMES_IN_FLIGHT,
+    };
+    vk::DescriptorPoolSize[*] pool_sizes = {
+        view,
+        proj,
+        time,
+    };
+    vk::DescriptorPoolCreateInfo create_info = {
+        .s_type         = vk::STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+        .pool_size_count = pool_sizes.len,
+        .p_pool_sizes    = &pool_sizes,
+        .max_sets       = MAX_FRAMES_IN_FLIGHT,
+    };
+    gpu.descriptor_pool = vk::createDescriptorPool(engine.device, &create_info)!;
+	vk::DescriptorSetLayout* set_layouts = (vk::DescriptorSetLayout*) malloc(vk::DescriptorSetLayout.sizeof* MAX_FRAMES_IN_FLIGHT);
+	for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        set_layouts[i] = gpu.descriptor_set_layout;
+    }
+	vk::DescriptorSetAllocateInfo alloc_info = {
+		.s_type              = vk::STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+		.descriptor_pool     = engine.descriptor_pool,
+		.descriptor_set_count = MAX_FRAMES_IN_FLIGHT,
+		.p_set_layouts        = set_layouts,
+	};
+	gpu.descriptor_sets = vk::allocateDescriptorSets(engine.device, &alloc_info)!;
 }

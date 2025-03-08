@@ -29,6 +29,7 @@ struct Engine {
     vk::SwapchainKHR swap_chain;
     vk::Image[] swap_chain_images;
     vk::ImageView[] swap_chain_image_views;
+    vk::DescriptorPool descriptor_pool;
     vk::Semaphore[MAX_FRAMES_IN_FLIGHT] image_available_semaphore;
     vk::Semaphore[MAX_FRAMES_IN_FLIGHT] render_finished_semaphore;
     vk::Fence[MAX_FRAMES_IN_FLIGHT] in_flight_fences;
@@ -572,7 +573,7 @@ fn void! recordCommandBuffer(Engine* engine, vk::CommandBuffer commandBuffer, ui
         .max_depth = 1.0,
     });
     vk::cmdSetScissor(commandBuffer, 0, 1, &&vk::Rect2D {
-        .extent = g_swap_chain_extent,
+        .extent = engine.swap_chain_extent,
     });
     draw(commandBuffer);
     vk::cmdEndRenderingKHR(commandBuffer);
@@ -583,7 +584,7 @@ fn void! recordCommandBuffer(Engine* engine, vk::CommandBuffer commandBuffer, ui
         .new_layout = vk::IMAGE_LAYOUT_PRESENT_SRC_KHR,
         .src_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
         .dst_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
-        .image = g_swap_chain_images[imageIndex],
+        .image = engine.swap_chain_images[imageIndex],
         .subresource_range = {
             .aspect_mask = vk::ImageAspectFlags{.color},
             .base_mip_level = 0,
@@ -612,4 +613,8 @@ fn void draw(vk::CommandBuffer commandBuffer) {
     vk::cmdBindIndexBuffer(commandBuffer, g_index_buffer, 0, vk::INDEX_TYPE_UINT16);
     vk::cmdBindDescriptorSets(commandBuffer, vk::PIPELINE_BIND_POINT_GRAPHICS, g_pipeline_layout, 0, 1, &g_descriptor_sets[g_current_frame], 0, null);
     vk::cmdDrawIndexed(commandBuffer, INDICES.len, 1, 0, 0, 0);
+}
+
+fn void destroyDescriptorSets(Engine* engine) {
+	vk::destroyDescriptorPool(engine.device, engine.descriptor_pool, null);
 }
