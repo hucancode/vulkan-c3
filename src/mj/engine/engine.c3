@@ -34,35 +34,35 @@ struct Engine {
     vk::Fence[MAX_FRAMES_IN_FLIGHT] in_flight_fences;
     vk::CommandPool command_pool;
     vk::CommandBuffer[] command_buffers;
-    Time last_frame_timestamp;
-    Time start_timestamp;
+    vk::Buffer[MAX_FRAMES_IN_FLIGHT] uniform_buffers;
+    vk::DeviceMemory[MAX_FRAMES_IN_FLIGHT] uniform_memory;
+    void*[MAX_FRAMES_IN_FLIGHT] uniform_buffer_mapped;
     uint current_frame;
 }
 
 fn void! init(Engine* engine, glfw::Window* window) {
-    engine.start_timestamp = time::now();
-    engine.last_frame_timestamp = engine.start_timestamp;
-    vkbe::createVulkanInstance(engine)!;
-    vkbe::createWindowSurface()!;
-    vkbe::pickPhysicalDevice()!;
-    vkbe::createLogicalDevice()!;
-    vkbe::createSwapchain()!;
-    vkbe::createSemaphores()!;
-    vkbe::createCommandPool()!;
-    vkbe::createUBO();
+    engine.window = window;
+    createVulkanInstance(engine)!;
+    createWindowSurface(engine)!;
+    pickPhysicalDevice(engine)!;
+    createLogicalDevice(engine)!;
+    createSwapchain(engine)!;
+    createSemaphores(engine)!;
+    createCommandPool(engine)!;
+    createUBO(engine);
 }
 
 fn void destroy(Engine* engine) {
     vk::deviceWaitIdle(engine.device)!!;
-    vkbe::destroySemaphores();
-    vkbe::destroyCommandPool();
-    vkbe::destroyGraphicsPipeline();
-    vkbe::destroyDescriptorSetLayout();
-    vkbe::destroyDescriptorSets();
-    vkbe::destroySwapchain();
-    vkbe::destroyDevice();
-    vkbe::destroySurface();
-    vkbe::destroyVulkanInstance();
+    destroySemaphores(engine);
+    destroyCommandPool(engine);
+    destroyGraphicsPipeline(engine);
+    destroyDescriptorSetLayout(engine);
+    destroyDescriptorSets(engine);
+    destroySwapchain(engine);
+    destroyDevice(engine);
+    destroySurface(engine);
+    destroyVulkanInstance(engine);
 }
 
 fn void update(Engine* engine) {
@@ -73,7 +73,7 @@ fn void update(Engine* engine) {
         .rotate_z((float)math::sin(g_ubo.time*1.17))
         .transpose();
     engine.last_frame_timestamp = time::now();
-    vkbe::updateUniforms();
+    updateUniforms();
 }
 
 fn void! createVulkanInstance(Engine* engine) {
@@ -141,6 +141,7 @@ fn void destroyVulkanInstance(Engine* engine) {
     $endif
     vk::destroyInstance(engine.instance);
 }
+
 fn void! createWindowSurface(Engine* engine) {
     vk::check(glfw::createWindowSurface(engine.instance, engine.window, null, &engine.surface))!;
 }
@@ -151,13 +152,11 @@ fn void destroySurface(Engine* engine) {
 
 fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
     uint score = 0;
-    vk::PhysicalDeviceProperties properties;
-    vk::PhysicalDeviceFeatures features;
-    vk::getPhysicalDeviceProperties(device, &properties);
+    vk::PhysicalDeviceProperties properties = vk::getPhysicalDeviceProperties(device);
+    vk::PhysicalDeviceFeatures features = vk::getPhysicalDeviceFeatures(device);
     ZString deviceName = (ZString)properties.device_name[0..];
     io::printfn("Scoring device %s", deviceName);
     defer io::printfn("Device %s scored %d", score);
-    vk::getPhysicalDeviceFeatures(device, &features);
     $if !env::DARWIN:
         if (!features.geometry_shader) {
             return 0;
@@ -245,7 +244,7 @@ fn void SwapchainSupportDetails.free(SwapchainSupportDetails* self) {
 
 fn SwapchainSupportDetails! querySwapchainSupport(vk::PhysicalDevice device, vk::SurfaceKHR surface) {
     SwapchainSupportDetails ret;
-    vk::getPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &ret.capabilities)!;
+    ret.capabilities = vk::getPhysicalDeviceSurfaceCapabilitiesKHR(device, surface)!;
     ret.formats = vk::getPhysicalDeviceSurfaceFormatsKHR(device, surface)!;
     ret.present_modes = vk::getPhysicalDeviceSurfacePresentModesKHR(device, surface)!;
     return ret;
@@ -256,8 +255,8 @@ struct QueueFamilyIndices {
     uint present_family;
 }
 
-fn QueueFamilyIndices! findQueueFamilies(vk::PhysicalDevice device, vk::SurfaceKHR surface) {
-    vk::QueueFamilyProperties[] families = vk::getPhysicalDeviceQueueFamilyProperties(device);
+fn QueueFamilyIndices! findQueueFamilies(Engine* engine, vk::SurfaceKHR surface) {
+    vk::QueueFamilyProperties[] families = vk::getPhysicalDeviceQueueFamilyProperties(engine.physical_device);
     QueueFamilyIndices indices;
     bool foundGraphics = false;
     bool foundPresent = false;
@@ -267,9 +266,9 @@ fn QueueFamilyIndices! findQueueFamilies(vk::PhysicalDevice device, vk::SurfaceK
             foundGraphics = true;
             io::printfn("Queue family %d support graphics", i);
         }
-        // uint supported = glfw::getPhysicalDevicePresentationSupport(g_instance, device, i);
-        uint! supported = vk::getPhysicalDeviceSurfaceSupportKHR(device, i, surface);
-        if (try supported) {
+        uint supported = glfw::getPhysicalDevicePresentationSupport(engine.instance, engine.physical_device, i);
+        // uint! supported = vk::getPhysicalDeviceSurfaceSupportKHR(engine.physical_device, i, surface);
+        if (supported) {
             indices.present_family = i;
             foundPresent = true;
             io::printfn("Queue family %d support present", i);
@@ -307,9 +306,9 @@ fn void! createLogicalDevice(Engine* engine) {
         createInfo.enabled_layer_count = layers.len;
         createInfo.pp_enabled_layer_names = layers.ptr;
     $endif
-    vk::createDevice(engine.physical_device, &createInfo, null, &engine.device)!;
-    vk::getDeviceQueue(engine.device, indices.graphics_family, 0, &engine.graphics_queue);
-    vk::getDeviceQueue(engine.device, indices.present_family, 0, &engine.present_queue);
+    engine.device = vk::createDevice(engine.physical_device, &createInfo)!;
+    engine.graphic_queue = vk::getDeviceQueue(engine.device, indices.graphics_family, 0);
+    engine.present_queue = vk::getDeviceQueue(engine.device, indices.present_family, 0);
 }
 
 fn vk::SurfaceFormatKHR pickSwapSurfaceFormat(vk::SurfaceFormatKHR[] formats) {
@@ -383,15 +382,16 @@ fn void! createSwapchain(Engine* engine) {
     }
     engine.swap_chain = vk::createSwapchainKHR(engine.device, &createInfo)!;
     engine.swap_chain_images = vk::getSwapchainImagesKHR(engine.device, engine.swap_chain)!;
-    vk::ImageView* buffer = (vk::ImageView*)malloc(engine.swap_chain_images.len * vk::ImageView.sizeof);
-    engine.swap_chain_image_views = buffer[:engine.swap_chain_images.len];
-    for (uint i = 0; i < engine.swap_chain_images.len; i++) {
+    uint n = engine.swap_chain_images.len;
+    vk::ImageView* buffer = (vk::ImageView*) malloc(n * vk::ImageView.sizeof);
+    engine.swap_chain_image_views = buffer[:n];
+    for (uint i = 0; i < n; i++) {
         engine.swap_chain_image_views[i] = createImageView(engine.swap_chain_images[i], engine.swap_chain_format.format)!;
     }
 }
 
-fn void destroySwapchain() {
-    foreach (view:engine.swap_chain_image_views) {
+fn void destroySwapchain(Engine* engine) {
+    foreach (view : engine.swap_chain_image_views) {
         vk::destroyImageView(engine.device, view);
     }
     vk::destroySwapchainKHR(engine.device, engine.swap_chain);
@@ -399,10 +399,10 @@ fn void destroySwapchain() {
     free(engine.swap_chain_images);
 }
 
-fn void! recreateSwapchain() {
+fn void! recreateSwapchain(Engine* engine) {
     vk::deviceWaitIdle(engine.device)!;
-    destroySwapchain();
-    createSwapchain()!;
+    destroySwapchain(engine);
+    createSwapchain(engine)!;
 }
 
 fn uint! findMemoryType(vk::PhysicalDevice device, uint filter, vk::MemoryPropertyFlags flags) {
@@ -472,55 +472,50 @@ fn void destroyCommandPool(Engine* engine) {
     vk::freeCommandBuffers(engine.device, engine.command_pool, engine.command_buffers.len, &engine.command_buffers);
     vk::destroyCommandPool(engine.device, engine.command_pool);
 }
-vk::Buffer[MAX_FRAMES_IN_FLIGHT] g_uniform_buffers;
-vk::DeviceMemory[MAX_FRAMES_IN_FLIGHT] g_uniform_memory;
-void*[MAX_FRAMES_IN_FLIGHT] g_uniform_buffer_mapped;
 
-
-fn void! render() {
-    vk::waitForFences(g_device, 1, &g_in_flight_fences[g_current_frame], vk::TRUE, ulong.max)!;
-    uint imageIndex;
-    anyfault excuse = @catch(vk::acquireNextImageKHR(g_device, g_swap_chain, ulong.max, g_image_available_semaphore[g_current_frame], (vk::Fence)0, &imageIndex));
-    if (excuse == vk::VulkanError.ERROR_OUT_OF_DATE_KHR || excuse == vk::VulkanError.SUBOPTIMAL_KHR) {
-        recreateSwapchain()!;
-        return;
-    }
-    if (excuse) {
+fn void! render(Engine* engine) {
+    vk::waitForFences(engine.device, 1, &engine.in_flight_fences[engine.current_frame])!;
+    uint! imageIndex = vk::acquireNextImageKHR(engine.device, engine.swap_chain, ulong.max, engine.image_available_semaphore[engine.current_frame], (vk::Fence)0);
+    if (catch excuse = imageIndex) {
+        if (excuse == vk::VulkanError.ERROR_OUT_OF_DATE_KHR || excuse == vk::VulkanError.SUBOPTIMAL_KHR) {
+            recreateSwapchain()!;
+            return;
+        }
         return excuse?;
     }
-    vk::resetFences(g_device, 1, &g_in_flight_fences[g_current_frame])!;
-    vk::resetCommandBuffer(g_command_buffers[g_current_frame], CommandBufferResetFlags{})!;
-    recordCommandBuffer(g_command_buffers[g_current_frame], imageIndex)!;
+    vk::resetFences(engine.device, 1, &engine.in_flight_fences[engine.current_frame])!;
+    vk::resetCommandBuffer(engine.command_buffers[engine.current_frame])!;
+    recordCommandBuffer(engine.command_buffers[engine.current_frame], imageIndex)!;
 
     vk::SubmitInfo submitInfo = {
         .s_type = vk::STRUCTURE_TYPE_SUBMIT_INFO,
         .wait_semaphore_count = 1,
-        .p_wait_semaphores = &g_image_available_semaphore[g_current_frame],
+        .p_wait_semaphores = &engine.image_available_semaphore[engine.current_frame],
         .p_wait_dst_stage_mask = &&vk::PipelineStageFlags { .color_attachment_output },
         .command_buffer_count = 1,
-        .p_command_buffers = &g_command_buffers[g_current_frame],
+        .p_command_buffers = &engine.command_buffers[engine.current_frame],
         .signal_semaphore_count = 1,
-        .p_signal_semaphores = &g_render_finished_semaphore[g_current_frame],
+        .p_signal_semaphores = &engine.render_finished_semaphore[engine.current_frame],
     };
-    vk::queueSubmit(g_graphics_queue, 1, &submitInfo, g_in_flight_fences[g_current_frame])!;
+    vk::queueSubmit(engine.graphics_queue, 1, &submitInfo, engine.in_flight_fences[engine.current_frame])!;
     vk::PresentInfoKHR presentInfo = {
         .s_type = vk::STRUCTURE_TYPE_PRESENT_INFO_KHR,
         .wait_semaphore_count = 1,
-        .p_wait_semaphores = &g_render_finished_semaphore[g_current_frame],
+        .p_wait_semaphores = &engine.render_finished_semaphore[engine.current_frame],
         .swapchain_count = 1,
-        .p_swapchains = &g_swap_chain,
+        .p_swapchains = &engine.swap_chain,
         .p_image_indices = &imageIndex,
     };
-    excuse = @catch(vk::queuePresentKHR(g_present_queue, &presentInfo));
+    anyfault excuse = @catch(vk::queuePresentKHR(engine.present_queue, &presentInfo));
     if (excuse == vk::VulkanError.ERROR_OUT_OF_DATE_KHR || excuse == vk::VulkanError.SUBOPTIMAL_KHR) {
         recreateSwapchain()!;
     } else if (excuse) {
         return excuse?;
     }
-    g_current_frame = (g_current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
+    engine.current_frame = (engine.current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
-fn void! recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
+fn void! recordCommandBuffer(Engine* engine, vk::CommandBuffer commandBuffer, uint imageIndex) {
     vk::beginCommandBuffer(commandBuffer, &&vk::CommandBufferBeginInfo {
         .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
     })!;
@@ -530,7 +525,7 @@ fn void! recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
         .new_layout = vk::IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
         .src_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
         .dst_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
-        .image = g_swap_chain_images[imageIndex],
+        .image = engine.swap_chain_images[imageIndex],
         .subresource_range = {
             .aspect_mask = vk::ImageAspectFlags {.color},
             .base_mip_level = 0,
@@ -555,7 +550,7 @@ fn void! recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
     // Begin dynamic rendering
     vk::RenderingAttachmentInfoKHR color_attachment = {
         .s_type = vk::STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
-        .image_view = g_swap_chain_image_views[imageIndex],
+        .image_view = engine.swap_chain_image_views[imageIndex],
         .image_layout = vk::IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
         .load_op = vk::ATTACHMENT_LOAD_OP_CLEAR,
         .store_op = vk::ATTACHMENT_STORE_OP_STORE,
@@ -564,17 +559,16 @@ fn void! recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
 
     vk::RenderingInfoKHR render_info = {
         .s_type = vk::STRUCTURE_TYPE_RENDERING_INFO_KHR,
-        .render_area = {.extent = g_swap_chain_extent},
+        .render_area = {.extent = engine.swap_chain_extent},
         .layer_count = 1,
         .color_attachment_count = 1,
         .p_color_attachments = &color_attachment
     };
-
     vk::cmdBeginRenderingKHR(commandBuffer, &render_info);
-    vk::cmdBindPipeline(commandBuffer, vk::PIPELINE_BIND_POINT_GRAPHICS, g_graphics_pipeline);
+    vk::cmdBindPipeline(commandBuffer, vk::PIPELINE_BIND_POINT_GRAPHICS, engine.graphics_pipeline);
     vk::cmdSetViewport(commandBuffer, 0, 1, &&vk::Viewport {
-        .width = g_swap_chain_extent.width,
-        .height = g_swap_chain_extent.height,
+        .width = engine.swap_chain_extent.width,
+        .height = engine.swap_chain_extent.height,
         .max_depth = 1.0,
     });
     vk::cmdSetScissor(commandBuffer, 0, 1, &&vk::Rect2D {

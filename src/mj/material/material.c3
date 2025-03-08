@@ -1,11 +1,8 @@
 module mj;
 import vk;
-struct MaterialBRDF {
+struct Material {
     float[<3>] color;
     TextureHandle albedo;
-    TextureHandle normal;
-    TextureHandle roughness;
-    TextureHandle metallic;
 }
 
 struct MaterialGPU {
@@ -19,22 +16,14 @@ struct MaterialGPU {
     vk::DescriptorSet[MAX_FRAMES_IN_FLIGHT] descriptor_sets;
 }
 
-struct UniformBuffer @align(16) {
-	Matrix4x4(<float>) projection;
-	Matrix4x4(<float>) view;
-	Matrix4x4(<float>) model;
-	float time;
-}
-
 const char[*] VERTEX_CODE = $embed("shaders/vert.spv");
 const char[*] FRAGMENT_CODE = $embed("shaders/frag.spv");
 
-
-fn void! createGraphicsPipeline() {
-    vk::ShaderModule v = createShaderModule(&VERTEX_CODE)!;
-    defer vk::destroyShaderModule(g_device, v, null);
-    vk::ShaderModule f = createShaderModule(&FRAGMENT_CODE)!;
-    defer vk::destroyShaderModule(g_device, f, null);
+fn void! createGraphicsPipeline(Engine* engine, Material* material, MaterialGPU* gpu) {
+    vk::ShaderModule v = createShaderModule(engine.device, &VERTEX_CODE)!;
+    defer vk::destroyShaderModule(engine.device, v, null);
+    vk::ShaderModule f = createShaderModule(engine.device, &FRAGMENT_CODE)!;
+    defer vk::destroyShaderModule(engine.device, f, null);
     vk::PipelineShaderStageCreateInfo[*] shader_stages = {{
         .s_type = vk::STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
         .stage = vk::ShaderStageFlags { .vertex },
@@ -106,14 +95,14 @@ fn void! createGraphicsPipeline() {
         .p_attachments = &colorBlendAttachment,
     };
     vk::createPipelineLayout(
-        g_device,
+        engine.device,
         &&vk::PipelineLayoutCreateInfo {
             .s_type = vk::STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
             .set_layout_count = 1,
-            .p_set_layouts = &g_descriptor_set_layout,
+            .p_set_layouts = &gpu.descriptor_set_layout,
         },
         null,
-        &g_pipeline_layout)!;
+        &gpu.pipeline_layout)!;
     vk::PipelineRenderingCreateInfoKHR dynamic_rendering_info = {
         .s_type = vk::STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,
         .color_attachment_count = 1,
@@ -137,7 +126,7 @@ fn void! createGraphicsPipeline() {
     vk::createGraphicsPipelines(g_device, (vk::PipelineCache)0, 1, &pipelineInfo, null, &g_graphics_pipeline)!;
 }
 
-fn void! createDescriptorSetLayout() {
+fn void! createDescriptorSetLayout(Engine* engine, Material* material, MaterialGPU* gpu) {
     vk::DescriptorSetLayoutBinding ubo_binding = {
         .binding = 0,
         .descriptor_type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -158,12 +147,7 @@ fn void! createDescriptorSetLayout() {
 		.binding_count = bindings.len,
 		.p_bindings    = &bindings,
 	};
-	vk::createDescriptorSetLayout(
-		g_device,
-		&info,
-		null,
-		&g_descriptor_set_layout,
-	)!;
+	return vk::createDescriptorSetLayout(engine.device, &info)!;
 }
 
 fn void createUBO() {
@@ -179,7 +163,7 @@ fn void createUBO() {
     updateUniforms();
 }
 
-fn void! createDescriptorSets() {
+fn void! createDescriptorSets(Engine* engine, Material* material, MaterialGPU* gpu) {
     vk::DescriptorPoolSize ubo_size = {
         .type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
         .descriptor_count = MAX_FRAMES_IN_FLIGHT,
@@ -198,18 +182,18 @@ fn void! createDescriptorSets() {
         .p_pool_sizes    = &pool_sizes,
         .max_sets       = MAX_FRAMES_IN_FLIGHT,
     };
-    vk::createDescriptorPool(g_device, &create_info, null, &g_descriptor_pool)!;
+    gpu.descriptor_pool = vk::createDescriptorPool(engine.device, &create_info)!;
 	vk::DescriptorSetLayout* set_layouts = (vk::DescriptorSetLayout*) malloc(vk::DescriptorSetLayout.sizeof* MAX_FRAMES_IN_FLIGHT);
 	for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        set_layouts[i] = g_descriptor_set_layout;
+        set_layouts[i] = gpu.descriptor_set_layout;
     }
 	vk::DescriptorSetAllocateInfo alloc_info = {
 		.s_type              = vk::STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-		.descriptor_pool     = g_descriptor_pool,
+		.descriptor_pool     = gpu.descriptor_pool,
 		.descriptor_set_count = MAX_FRAMES_IN_FLIGHT,
 		.p_set_layouts        = set_layouts,
 	};
-	vk::allocateDescriptorSets(g_device, &alloc_info, &g_descriptor_sets)!;
+	gpu.descriptor_sets = vk::allocateDescriptorSets(g_device, &alloc_info)!;
 	for (uint i =0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vk::WriteDescriptorSet uniform_desc = {
     		.s_type           = vk::STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
@@ -239,7 +223,7 @@ fn void! createDescriptorSets() {
 			uniform_desc,
 			sampler_desc,
 		};
-		vk::updateDescriptorSets(g_device, descriptors.len, &descriptors, 0, null);
+		vk::updateDescriptorSets(engine.device, descriptors.len, &descriptors, 0, null);
 	}
 }
 

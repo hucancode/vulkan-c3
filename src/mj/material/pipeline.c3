@@ -6,13 +6,13 @@ fn void destroyGraphicsPipeline() {
     vk::destroyPipelineLayout(g_device, g_pipeline_layout);
 }
 
-fn vk::ShaderModule! createShaderModule(char[] code) {
+fn vk::ShaderModule! createShaderModule(vk::Device device, char[] code) {
     vk::ShaderModuleCreateInfo createInfo = {
         .s_type = vk::STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
         .code_size = code.len,
         .p_code = (uint*)code.ptr,
     };
-    return vk::createShaderModule(g_device, &createInfo)!;
+    return vk::createShaderModule(device, &createInfo)!;
 }
 
 fn void destroyDescriptorSetLayout() {
