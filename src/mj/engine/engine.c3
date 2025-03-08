@@ -29,7 +29,6 @@ struct Engine {
     vk::SwapchainKHR swap_chain;
     vk::Image[] swap_chain_images;
     vk::ImageView[] swap_chain_image_views;
-    vk::DescriptorPool descriptor_pool;
     vk::Semaphore[MAX_FRAMES_IN_FLIGHT] image_available_semaphore;
     vk::Semaphore[MAX_FRAMES_IN_FLIGHT] render_finished_semaphore;
     vk::Fence[MAX_FRAMES_IN_FLIGHT] in_flight_fences;

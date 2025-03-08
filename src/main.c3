@@ -15,18 +15,18 @@ fn int main(String[] args) {
     }
     defer glfw::terminate();
     glfw::windowHint(glfw::CLIENT_API, glfw::NO_API);
-    vkbe::g_window = glfw::createWindow(WIDTH, HEIGHT, TITLE, null, null);
-    if (vkbe::g_window == null) {
+    mj::g_window = glfw::createWindow(WIDTH, HEIGHT, TITLE, null, null);
+    if (mj::g_window == null) {
         return -1;
     }
-    io::printfn("Window created %x", vkbe::g_window);
-    defer glfw::destroyWindow(vkbe::g_window);
+    io::printfn("Window created %x", mj::g_window);
+    defer glfw::destroyWindow(mj::g_window);
     mj::init()!!;
     defer mj::destroy();
-    while (!glfw::windowShouldClose(vkbe::g_window)) {
+    while (!glfw::windowShouldClose(mj::g_window)) {
         glfw::pollEvents();
         mj::update();
-        anyfault excuse = @catch(vkbe::render());
+        anyfault excuse = @catch(mj::render());
         if (excuse) {
             io::printfn("Error: while rendering");
         };

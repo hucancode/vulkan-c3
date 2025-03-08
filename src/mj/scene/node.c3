@@ -28,6 +28,7 @@ struct Node {
 }
 
 struct NodeGPU {
+    vk::DescriptorPool descriptor_pool;
     vk::DescriptorSetLayout descriptor_set_layout;
     vk::DescriptorSet[MAX_FRAMES_IN_FLIGHT] descriptor_sets;
 }
@@ -102,15 +103,13 @@ fn void! createNodeDescriptorSets(Engine* engine, NodeGPU* gpu) {
         .max_sets       = MAX_FRAMES_IN_FLIGHT,
     };
     gpu.descriptor_pool = vk::createDescriptorPool(engine.device, &create_info)!;
-	vk::DescriptorSetLayout* set_layouts = (vk::DescriptorSetLayout*) malloc(vk::DescriptorSetLayout.sizeof* MAX_FRAMES_IN_FLIGHT);
-	for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        set_layouts[i] = gpu.descriptor_set_layout;
-    }
+	vk::DescriptorSetLayout[] set_layouts = @repeat(&gpu.set_layout, MAX_FRAMES_IN_FLIGHT);
+	defer free(set_layouts);
 	vk::DescriptorSetAllocateInfo alloc_info = {
 		.s_type              = vk::STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
 		.descriptor_pool     = gpu.descriptor_pool,
-		.descriptor_set_count = MAX_FRAMES_IN_FLIGHT,
-		.p_set_layouts        = set_layouts,
+		.descriptor_set_count = set_layouts.len,
+		.p_set_layouts        = &set_layouts,
 	};
 	gpu.descriptor_sets = vk::allocateDescriptorSets(engine.device, &alloc_info)!;
 }

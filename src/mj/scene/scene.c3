@@ -17,6 +17,7 @@ struct SceneUniformData @align(16) {
 struct SceneGPU {
     vk::Buffer buffer;
     vk::DeviceMemory buffer_memory;
+    vk::DescriptorPool descriptor_pool;
     vk::DescriptorSetLayout descriptor_set_layout;
     vk::DescriptorSet[MAX_FRAMES_IN_FLIGHT] descriptor_sets;
 }
@@ -41,6 +42,7 @@ struct TexturePool {
 struct MaterialPool {
     List(<Material>) materials;
 }
+
 fn Scene make_scene() {
     Node root;
     Camera camera = {
@@ -94,9 +96,9 @@ fn void! createSceneDescriptorSets(Engine* engine, SceneGPU* gpu) {
         .descriptor_count = MAX_FRAMES_IN_FLIGHT,
     };
     vk::DescriptorPoolSize proj = {
-            .type = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-            .descriptor_count = MAX_FRAMES_IN_FLIGHT,
-        };
+        .type = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+        .descriptor_count = MAX_FRAMES_IN_FLIGHT,
+    };
     vk::DescriptorPoolSize time = {
         .type = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
         .descriptor_count = MAX_FRAMES_IN_FLIGHT,
@@ -113,15 +115,17 @@ fn void! createSceneDescriptorSets(Engine* engine, SceneGPU* gpu) {
         .max_sets       = MAX_FRAMES_IN_FLIGHT,
     };
     gpu.descriptor_pool = vk::createDescriptorPool(engine.device, &create_info)!;
-	vk::DescriptorSetLayout* set_layouts = (vk::DescriptorSetLayout*) malloc(vk::DescriptorSetLayout.sizeof* MAX_FRAMES_IN_FLIGHT);
-	for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        set_layouts[i] = gpu.descriptor_set_layout;
-    }
+	vk::DescriptorSetLayout[] set_layouts = @repeat(&gpu.set_layout, MAX_FRAMES_IN_FLIGHT);
+	defer free(set_layouts);
 	vk::DescriptorSetAllocateInfo alloc_info = {
 		.s_type              = vk::STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-		.descriptor_pool     = engine.descriptor_pool,
-		.descriptor_set_count = MAX_FRAMES_IN_FLIGHT,
-		.p_set_layouts        = set_layouts,
+		.descriptor_pool     = gpu.descriptor_pool,
+		.descriptor_set_count = set_layouts.len,
+		.p_set_layouts        = &set_layouts,
 	};
 	gpu.descriptor_sets = vk::allocateDescriptorSets(engine.device, &alloc_info)!;
+}
+
+fn void updateUniforms() {
+    mem::copy(g_uniform_buffer_mapped[g_current_frame], &g_ubo, UniformBuffer.sizeof);
 }
