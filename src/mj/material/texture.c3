@@ -17,7 +17,7 @@ struct TextureGPU {
     vk::DeviceMemory memory;
 }
 
-fn void! createTextures() {
+fn TextureGPU! createTextures(Engine* engine) {
     int w, h, channel;
     const char[*] DATA = $embed("assets/statue-1275469_1280.jpg");
     char* pixels = stbimage::load_from_memory(&DATA, DATA.len, &w, &h, &channel, stbimage::RGB_ALPHA);
@@ -25,13 +25,13 @@ fn void! createTextures() {
     vk::DeviceSize size = (vk::DeviceSize)(w * h * 4);
     vk::Buffer stg_buffer;
     vk::DeviceMemory stg_memory;
-    createBuffer(size, vk::BufferUsageFlags { .transfer_src }, vk::MemoryPropertyFlags { .host_visible, .host_coherent }, &stg_buffer, &stg_memory)!;
-    defer vk::freeMemory(g_device, stg_memory, null);
-    defer vk::destroyBuffer(g_device, stg_buffer, null);
+    createBuffer(size, { .transfer_src }, { .host_visible, .host_coherent }, &stg_buffer, &stg_memory)!;
+    defer vk::freeMemory(engine.device, stg_memory, null);
+    defer vk::destroyBuffer(engine.device, stg_buffer, null);
     void* image_data_mapped;
-    vk::mapMemory(g_device, stg_memory, 0, size, vk::MemoryMapFlags{}, &image_data_mapped)!;
+    vk::mapMemory(engine.device, stg_memory, 0, size, {}, &image_data_mapped)!;
     mem::copy(image_data_mapped, pixels, (usz)size);
-    vk::unmapMemory(g_device, stg_memory);
+    vk::unmapMemory(engine.device, stg_memory);
     vk::ImageCreateInfo create_info = {
         .s_type = vk::STRUCTURE_TYPE_IMAGE_CREATE_INFO,
         .image_type = vk::IMAGE_TYPE_2D,
@@ -49,13 +49,13 @@ fn void! createTextures() {
         .initial_layout = vk::IMAGE_LAYOUT_UNDEFINED,
         .samples = vk::SampleCountFlags { .n_1 },
     };
-    vk::createImage(g_device, &create_info, null, &g_texture_image)!;
-    allocateMemory(g_device, vk::getImageMemoryRequirements(g_device, g_texture_image), vk::MemoryPropertyFlags { .device_local }, &g_texture_image_memory)!;
-    vk::bindImageMemory(g_device, g_texture_image, g_texture_image_memory, 0)!;
-    transitionImageLayout(g_texture_image, vk::FORMAT_R8G8B8A8_SRGB, vk::IMAGE_LAYOUT_UNDEFINED, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)!;
-    copyBufferImage(stg_buffer, g_texture_image, (uint)w, (uint)h)!;
-    transitionImageLayout(g_texture_image, vk::FORMAT_R8G8B8A8_SRGB, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, vk::IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)!;
-    g_texture_image_view = createImageView(g_texture_image, vk::FORMAT_R8G8B8A8_SRGB)!;
+    texture.image = vk::createImage(engine.device, &create_info)!;
+    texture.image_memory = allocateMemory(engine.device, vk::getImageMemoryRequirements(engine.device, texture.image), { .device_local })!;
+    vk::bindImageMemory(engine.device, texture.image, texture.image_memory, 0)!;
+    transitionImageLayout(texture.image, vk::FORMAT_R8G8B8A8_SRGB, vk::IMAGE_LAYOUT_UNDEFINED, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)!;
+    copyBufferImage(stg_buffer, texture.image, (uint)w, (uint)h)!;
+    transitionImageLayout(texture.image, vk::FORMAT_R8G8B8A8_SRGB, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, vk::IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)!;
+    texture.image_view = createImageView(texture.image, vk::FORMAT_R8G8B8A8_SRGB)!;
     vk::SamplerCreateInfo sampler_info = {
         .s_type = vk::STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
         .mag_filter = vk::FILTER_LINEAR,
@@ -71,14 +71,15 @@ fn void! createTextures() {
         .compare_op = vk::COMPARE_OP_ALWAYS,
         .mipmap_mode = vk::SAMPLER_MIPMAP_MODE_LINEAR,
     };
-    vk::createSampler(g_device, &sampler_info, null, &g_sampler)!;
+    texture.sampler = vk::createSampler(engine.device, &sampler_info)!;
+    return texture;
 }
 
 
-fn void destroyTextures() {
-    vk::destroyImage(g_device, g_texture_image, null);
-    vk::destroyImageView(g_device, g_texture_image_view, null);
-    vk::destroySampler(g_device, g_sampler, null);
+fn void destroyTexture(TextureGPU* texture) {
+    vk::destroyImage(engine.device, texture.image);
+    vk::destroyImageView(engine.device, texture.image_view, null);
+    vk::destroySampler(engine.device, texture.sampler, null);
 }
 
 fn void! transitionImageLayout(vk::Image image, vk::Format format, vk::ImageLayout oldLayout, vk::ImageLayout newLayout) {
@@ -152,6 +153,6 @@ fn vk::ImageView! createImageView(vk::Image image, vk::Format format) {
             .layer_count = 1,
         },
     };
-    vk::createImageView(g_device, &info, null, &ret)!;
+    vk::createImageView(engine.device, &info, null, &ret)!;
     return ret;
 }

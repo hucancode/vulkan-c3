@@ -31,12 +31,12 @@ fn MaterialGPU! createMaterial(Engine* engine, vk::DescriptorSetLayout shared_de
     defer vk::destroyShaderModule(engine.device, f);
     vk::PipelineShaderStageCreateInfo[*] shader_stages = {{
         .s_type = vk::STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-        .stage = vk::ShaderStageFlags { .vertex },
+        .stage = { .vertex },
         .module_ = v,
         .p_name = "main",
     }, {
         .s_type = vk::STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-        .stage = vk::ShaderStageFlags { .fragment },
+        .stage = { .fragment },
         .module_ = f,
         .p_name = "main",
     }};
