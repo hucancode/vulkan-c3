@@ -4,7 +4,7 @@ import stbimage;
 def TextureHandle = uint;
 
 struct Texture {
-    void* pixels;
+    char* pixels;
     uint width;
     uint height;
     char channel;
@@ -17,10 +17,11 @@ struct TextureGPU {
     vk::DeviceMemory memory;
 }
 
-fn TextureGPU! createTextures(Engine* engine) {
+fn TextureGPU! createTextures(Engine* engine, Texture* data) {
+    TextureGPU texture;
     int w, h, channel;
-    const char[*] DATA = $embed("assets/statue-1275469_1280.jpg");
-    char* pixels = stbimage::load_from_memory(&DATA, DATA.len, &w, &h, &channel, stbimage::RGB_ALPHA);
+    // const char[*] DATA = $embed("assets/statue-1275469_1280.jpg");
+    // char* pixels = stbimage::load_from_memory(&DATA, DATA.len, &w, &h, &channel, stbimage::RGB_ALPHA);
     // defer stbimage::image_free(pixels);
     vk::DeviceSize size = (vk::DeviceSize)(w * h * 4);
     vk::Buffer stg_buffer;
@@ -30,7 +31,7 @@ fn TextureGPU! createTextures(Engine* engine) {
     defer vk::destroyBuffer(engine.device, stg_buffer, null);
     void* image_data_mapped;
     vk::mapMemory(engine.device, stg_memory, 0, size, {}, &image_data_mapped)!;
-    mem::copy(image_data_mapped, pixels, (usz)size);
+    mem::copy(image_data_mapped, data.pixels, (usz)size);
     vk::unmapMemory(engine.device, stg_memory);
     vk::ImageCreateInfo create_info = {
         .s_type = vk::STRUCTURE_TYPE_IMAGE_CREATE_INFO,
