@@ -697,18 +697,12 @@ fn void! acquireProfilingLockKHR(Device device, AcquireProfilingLockInfoKHR* pIn
 	vk::check(internal::acquireProfilingLockKHR(device, pInfo))!;
 }
 
-fn CommandBuffer[]! allocateCommandBuffers(Device device, CommandBufferAllocateInfo* pAllocateInfo) @inline {
-    uint n = pAllocateInfo.commandBufferCount;
-    CommandBuffer* ret = (CommandBuffer*) malloc(n * CommandBuffer.sizeof);
-	vk::check(internal::allocateCommandBuffers(device, pAllocateInfo, ret))!;
-	return ret[:n];
+fn void! allocateCommandBuffers(Device device, CommandBufferAllocateInfo* pAllocateInfo, CommandBuffer* pCommandBuffers) @inline {
+	vk::check(internal::allocateCommandBuffers(device, pAllocateInfo, pCommandBuffers))!;
 }
 
-fn DescriptorSet[]! allocateDescriptorSets(Device device, DescriptorSetAllocateInfo* pAllocateInfo) @inline {
-    uint n = pAllocateInfo.descriptorSetCount;
-	DescriptorSet* ret = (DescriptorSet*) malloc(n * DescriptorSet.sizeof);
-    vk::check(internal::allocateDescriptorSets(device, pAllocateInfo, ret))!;
-    return ret[:n];
+fn void! allocateDescriptorSets(Device device, DescriptorSetAllocateInfo* pAllocateInfo, DescriptorSet* pDescriptorSets) @inline {
+	vk::check(internal::allocateDescriptorSets(device, pAllocateInfo, pDescriptorSets))!;
 }
 
 fn DeviceMemory! allocateMemory(Device device, MemoryAllocateInfo* pAllocateInfo, AllocationCallbacks* pAllocator = null) @inline {
