@@ -103,7 +103,7 @@ fn void! copyBuffer(vk::Buffer dst, vk::Buffer src, vk::DeviceSize size) {
 fn void! createBufferInit(void* data, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags flags, vk::Buffer* buffer, vk::DeviceMemory* memory) {
     vk::Buffer stg_buffer;
     vk::DeviceMemory stg_memory;
-    createBuffer(size, vk::BufferUsageFlags { .transfer_src }, vk::MemoryPropertyFlags { .host_visible, .host_coherent }, &stg_buffer, &stg_memory)!;
+    createBuffer(size, { .transfer_src }, { .host_visible, .host_coherent }, &stg_buffer, &stg_memory)!;
     defer {
         vk::destroyBuffer(g_device, stg_buffer, null);
         vk::freeMemory(g_device, stg_memory, null);
@@ -112,18 +112,18 @@ fn void! createBufferInit(void* data, vk::DeviceSize size, vk::BufferUsageFlags 
     vk::mapMemory(g_device, stg_memory, 0, size, vk::MemoryMapFlags{}, &mapped)!;
     defer vk::unmapMemory(g_device, stg_memory);
     mem::copy(mapped, data, (usz)size);
-    createBuffer(size, vk::BufferUsageFlags { .transfer_dst } | usage, flags, buffer, memory)!;
+    createBuffer(size, { .transfer_dst } | usage, flags, buffer, memory)!;
     copyBuffer(*buffer, stg_buffer, size)!;
 }
 
-fn void! createBuffers() {
-    createBufferInit(&VERTICES, (vk::DeviceSize)($sizeof(VERTICES)), vk::BufferUsageFlags { .vertex_buffer }, vk::MemoryPropertyFlags { .device_local }, &g_vertex_buffer, &g_vertex_memory)!;
-    createBufferInit(&INDICES, (vk::DeviceSize)($sizeof(INDICES)), vk::BufferUsageFlags { .index_buffer }, vk::MemoryPropertyFlags { .device_local }, &g_index_buffer, &g_index_memory)!;
+fn StaticMeshGPU! createStaticMesh(Engine* engine, StaticMesh* data) {
+    StaticMeshGPU mesh;
+    createBufferInit(&data.vertices, (vk::DeviceSize)($sizeof(data.vertices)), { .vertex_buffer }, { .device_local }, &g_vertex_buffer, &g_vertex_memory)!;
+    createBufferInit(&INDICES, (vk::DeviceSize)($sizeof(INDICES)), { .index_buffer }, { .device_local }, &g_index_buffer, &g_index_memory)!;
     for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        createBufferInit(&g_ubo, UniformBuffer.sizeof, vk::BufferUsageFlags { .uniform_buffer }, vk::MemoryPropertyFlags { .host_visible, .host_coherent }, &g_uniform_buffers[i], &g_uniform_memory[i])!;
-        vk::mapMemory(g_device, g_uniform_memory[i], 0, UniformBuffer.sizeof, vk::MemoryMapFlags{}, &g_uniform_buffer_mapped[i])!;
+        createBufferInit(&g_ubo, UniformBuffer.sizeof, { .uniform_buffer }, { .host_visible, .host_coherent }, &g_uniform_buffers[i], &g_uniform_memory[i])!;
+        vk::mapMemory(g_device, g_uniform_memory[i], 0, UniformBuffer.sizeof, {}, &g_uniform_buffer_mapped[i])!;
     }
-    createTextures()!;
 }
 
 fn void destroyBuffers() {

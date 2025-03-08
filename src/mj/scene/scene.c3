@@ -15,8 +15,10 @@ struct SceneUniformData @align(16) {
 }
 
 struct SceneGPU {
-    vk::Buffer buffer;
-    vk::DeviceMemory buffer_memory;
+    vk::Buffer[MAX_FRAMES_IN_FLIGHT] view_buffer;
+    vk::Buffer[MAX_FRAMES_IN_FLIGHT] proj_buffer;
+    vk::Buffer[MAX_FRAMES_IN_FLIGHT] time_buffer;
+    vk::DeviceMemory[MAX_FRAMES_IN_FLIGHT] buffer_memory;
     vk::DescriptorPool descriptor_pool;
     vk::DescriptorSetLayout descriptor_set_layout;
     vk::DescriptorSet[MAX_FRAMES_IN_FLIGHT] descriptor_sets;
@@ -60,6 +62,15 @@ fn Scene make_scene() {
         .start_timestamp = now,
         .last_frame_timestamp = now,
     };
+}
+
+fn SceneGPU! createScene(Engine* engine) {
+    SceneGPU scene;
+    for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        createBufferInit(&g_ubo, UniformBuffer.sizeof, { .uniform_buffer }, { .host_visible, .host_coherent }, &g_uniform_buffers[i], &g_uniform_memory[i])!;
+        vk::mapMemory(g_device, g_uniform_memory[i], 0, UniformBuffer.sizeof, {}, &g_uniform_buffer_mapped[i])!;
+    }
+    return scene;
 }
 
 fn vk::DescriptorSetLayout! createSceneDescriptorSetLayout(Engine* engine) {
@@ -127,5 +138,7 @@ fn void! createSceneDescriptorSets(Engine* engine, SceneGPU* gpu) {
 }
 
 fn void updateUniforms() {
+    // calculate camera matrices
+    // push to uniform buffer
     mem::copy(g_uniform_buffer_mapped[g_current_frame], &g_ubo, UniformBuffer.sizeof);
 }
