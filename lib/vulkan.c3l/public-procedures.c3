@@ -677,12 +677,16 @@ fn void! acquireFullScreenExclusiveModeEXT(Device device, SwapchainKHR swapchain
 	vk::check(internal::acquireFullScreenExclusiveModeEXT(device, swapchain))!;
 }
 
-fn void! acquireNextImage2KHR(Device device, AcquireNextImageInfoKHR* pAcquireInfo, uint* pImageIndex) @inline {
-	vk::check(internal::acquireNextImage2KHR(device, pAcquireInfo, pImageIndex))!;
+fn uint! acquireNextImage2KHR(Device device, AcquireNextImageInfoKHR* pAcquireInfo) @inline {
+    uint ret;
+	vk::check(internal::acquireNextImage2KHR(device, pAcquireInfo, &ret))!;
+	return ret;
 }
 
-fn void! acquireNextImageKHR(Device device, SwapchainKHR swapchain, ulong timeout, Semaphore semaphore, Fence fence, uint* pImageIndex) @inline {
-	vk::check(internal::acquireNextImageKHR(device, swapchain, timeout, semaphore, fence, pImageIndex))!;
+fn uint! acquireNextImageKHR(Device device, SwapchainKHR swapchain, ulong timeout, Semaphore semaphore, Fence fence) @inline {
+    uint ret;
+	vk::check(internal::acquireNextImageKHR(device, swapchain, timeout, semaphore, fence, &ret))!;
+	return ret;
 }
 
 fn void! acquirePerformanceConfigurationINTEL(Device device, PerformanceConfigurationAcquireInfoINTEL* pAcquireInfo, PerformanceConfigurationINTEL* pConfiguration) @inline {
@@ -3189,15 +3193,15 @@ fn void! releaseSwapchainImagesEXT(Device device, ReleaseSwapchainImagesInfoEXT*
 	vk::check(internal::releaseSwapchainImagesEXT(device, pReleaseInfo))!;
 }
 
-fn void! resetCommandBuffer(CommandBuffer commandBuffer, CommandBufferResetFlags flags) @inline {
+fn void! resetCommandBuffer(CommandBuffer commandBuffer, CommandBufferResetFlags flags = {}) @inline {
 	vk::check(internal::resetCommandBuffer(commandBuffer, flags))!;
 }
 
-fn void! resetCommandPool(Device device, CommandPool commandPool, CommandPoolResetFlags flags) @inline {
+fn void! resetCommandPool(Device device, CommandPool commandPool, CommandPoolResetFlags flags = {}) @inline {
 	vk::check(internal::resetCommandPool(device, commandPool, flags))!;
 }
 
-fn void! resetDescriptorPool(Device device, DescriptorPool descriptorPool, DescriptorPoolResetFlags flags) @inline {
+fn void! resetDescriptorPool(Device device, DescriptorPool descriptorPool, DescriptorPoolResetFlags flags = {}) @inline {
 	vk::check(internal::resetDescriptorPool(device, descriptorPool, flags))!;
 }
 
@@ -3321,7 +3325,7 @@ fn void! updateVideoSessionParametersKHR(Device device, VideoSessionParametersKH
 	vk::check(internal::updateVideoSessionParametersKHR(device, videoSessionParameters, pUpdateInfo))!;
 }
 
-fn void! waitForFences(Device device, uint fenceCount, Fence* pFences, uint waitAll, ulong timeout) @inline {
+fn void! waitForFences(Device device, uint fenceCount, Fence* pFences, uint waitAll = TRUE, ulong timeout = ulong.max) @inline {
 	vk::check(internal::waitForFences(device, fenceCount, pFences, waitAll, timeout))!;
 }
 
