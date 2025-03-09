@@ -31,6 +31,18 @@ fn Handle ResourceManager.malloc(ResourceManager* this) {
     return {index, gen};
 }
 
+fn void ResourceManager.free(ResourceManager* this, Handle handle) {
+    if (handle.index >= this.entries.size()) {
+        return;
+    }
+    char gen = this.entries[handle.index].generation;
+    if (gen != handle.generation) {
+        return;
+    }
+    this.entries[handle.index].active = false;
+    this.free_indices.push(handle.index);
+}
+
 fn Type* ResourceManager.get(ResourceManager* this, Handle handle) {
     if (handle.index >= this.entries.size()) {
         return null;
