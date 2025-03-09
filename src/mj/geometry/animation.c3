@@ -85,3 +85,5 @@ fn float[<3>] sample_scale(ScaleKeyframe[] keyframes, float t) {
     float[<3>] next_scale = keyframes[next_idx].value;
     return alpha * prev_scale + (1 - alpha) * next_scale;
 }
+
+// TODO: WIP

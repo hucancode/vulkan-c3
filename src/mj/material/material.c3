@@ -11,7 +11,6 @@ struct Material {
 }
 
 struct MaterialGPU {
-    vk::DescriptorSet descriptor_set;
     vk::PipelineLayout pipeline_layout;
     vk::Pipeline pipeline;
     vk::DescriptorPool descriptor_pool;

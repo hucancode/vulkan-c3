@@ -78,19 +78,19 @@ fn vk::DescriptorSetLayout! createSceneDescriptorSetLayout(Engine* engine) {
         .binding = 0,
         .descriptor_type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
         .descriptor_count = 1,
-        .stage_flags = vk::ShaderStageFlags{.vertex},
+        .stage_flags = { .vertex },
     };
     vk::DescriptorSetLayoutBinding proj = {
         .binding = 1,
         .descriptor_type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
         .descriptor_count = 1,
-        .stage_flags = vk::ShaderStageFlags{.vertex},
+        .stage_flags = { .vertex },
     };
     vk::DescriptorSetLayoutBinding time = {
         .binding = 2,
         .descriptor_type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
         .descriptor_count = 1,
-        .stage_flags = vk::ShaderStageFlags{.vertex},
+        .stage_flags = { .vertex },
     };
     vk::DescriptorSetLayoutBinding[*] bindings = { view, proj, time };
     vk::DescriptorSetLayoutCreateInfo info = {
@@ -101,7 +101,7 @@ fn vk::DescriptorSetLayout! createSceneDescriptorSetLayout(Engine* engine) {
 	return vk::createDescriptorSetLayout(engine.device, &info)!;
 }
 
-fn void! createSceneDescriptorSets(Engine* engine, SceneGPU* gpu) {
+fn void! createSceneDescriptorSets(Engine* engine, SceneGPU* scene) {
     vk::DescriptorPoolSize view = {
         .type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
         .descriptor_count = MAX_FRAMES_IN_FLIGHT,
@@ -125,8 +125,8 @@ fn void! createSceneDescriptorSets(Engine* engine, SceneGPU* gpu) {
         .p_pool_sizes    = &pool_sizes,
         .max_sets       = MAX_FRAMES_IN_FLIGHT,
     };
-    gpu.descriptor_pool = vk::createDescriptorPool(engine.device, &create_info)!;
-	vk::DescriptorSetLayout[] set_layouts = @repeat(&gpu.set_layout, MAX_FRAMES_IN_FLIGHT);
+    scene.descriptor_pool = vk::createDescriptorPool(engine.device, &create_info)!;
+	vk::DescriptorSetLayout[] set_layouts = @repeat(&scene.set_layout, MAX_FRAMES_IN_FLIGHT);
 	defer free(set_layouts);
 	vk::DescriptorSetAllocateInfo alloc_info = {
 		.s_type              = vk::STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,

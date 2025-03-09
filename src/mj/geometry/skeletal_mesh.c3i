@@ -16,3 +16,5 @@ struct SkeletalMeshGPU {
     vk::Buffer bone_buffer;
     vk::DeviceMemory memory;
 }
+
+// TODO: WIP

@@ -1,0 +1,205 @@
+module mj;
+// rewrite this to support scene rendering
+
+const MAX_FRAMES_IN_FLIGHT = 2;
+struct Renderer {
+    uint current_frame;
+    vk::Semaphore[MAX_FRAMES_IN_FLIGHT] image_available_semaphore;
+    vk::Semaphore[MAX_FRAMES_IN_FLIGHT] render_finished_semaphore;
+    vk::Fence[MAX_FRAMES_IN_FLIGHT] in_flight_fences;
+    vk::CommandBuffer[MAX_FRAMES_IN_FLIGHT] command_buffers;
+}
+
+fn Renderer! createRenderer(Engine* engine) {
+    Renderer renderer;
+    createCommandBuffers(engine, renderer);
+    createSynchronizers(engine, renderer);
+    return renderer;
+}
+
+fn void! createSynchronizers(Engine* engine, Renderer* renderer) {
+    vk::SemaphoreCreateInfo semaphoreInfo = {
+        .s_type = vk::STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+    };
+    vk::FenceCreateInfo fenceInfo = {
+        .s_type = vk::STRUCTURE_TYPE_FENCE_CREATE_INFO,
+        .flags = { .signaled },
+    };
+    for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        renderer.image_available_semaphore[i] = vk::createSemaphore(engine.device, &semaphoreInfo)!;
+        renderer.render_finished_semaphore[i] = vk::createSemaphore(engine.device, &semaphoreInfo)!;
+        renderer.in_flight_fences[i] = vk::createFence(engine.device, &fenceInfo)!;
+    }
+}
+
+fn void destroySynchronizers(Engine* engine, Renderer* renderer) {
+    for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        vk::destroySemaphore(engine.device, renderer.image_available_semaphore[i]);
+        vk::destroySemaphore(engine.device, renderer.render_finished_semaphore[i]);
+        vk::destroyFence(engine.device, renderer.in_flight_fences[i]);
+    }
+}
+
+fn void! createCommandBuffers(Engine* engine, Renderer* renderer) {
+    vk::CommandBufferAllocateInfo allocInfo = {
+        .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        .command_pool = engine.command_pool,
+        .level = vk::COMMAND_BUFFER_LEVEL_PRIMARY,
+        .command_buffer_count = renderer.command_buffers.len,
+    };
+    vk::allocateCommandBuffers(engine.device, &allocInfo, &renderer.command_buffers)!;
+}
+
+fn void destroyCommandBuffers(Engine* engine, Renderer* renderer) {
+    vk::freeCommandBuffers(engine.device, engine.command_pool, renderer.command_buffers.len, &renderer.command_buffers);
+}
+
+fn void! frameBegin(Engine* engine, Renderer* renderer) {
+    vk::waitForFences(engine.device, 1, &renderer.in_flight_fences[renderer.current_frame])!;
+    uint! imageIndex = vk::acquireNextImageKHR(engine.device, engine.swap_chain, ulong.max, renderer.image_available_semaphore[renderer.current_frame], (vk::Fence)0);
+    if (catch excuse = imageIndex) {
+        if (excuse == vk::VulkanError.ERROR_OUT_OF_DATE_KHR || excuse == vk::VulkanError.SUBOPTIMAL_KHR) {
+            recreateSwapchain()!;
+            return;
+        }
+        return excuse?;
+    }
+    vk::resetFences(engine.device, 1, &renderer.in_flight_fences[renderer.current_frame])!;
+    vk::CommandBuffer commandBuffer = renderer.command_buffers[renderer.current_frame];
+    vk::resetCommandBuffer(commandBuffer)!;
+    vk::beginCommandBuffer(commandBuffer, &&vk::CommandBufferBeginInfo {
+        .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+    })!;
+    vk::ImageMemoryBarrier barrier_before = {
+        .s_type = vk::STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+        .old_layout = vk::IMAGE_LAYOUT_UNDEFINED,
+        .new_layout = vk::IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        .src_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
+        .dst_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
+        .image = engine.swap_chain_images[imageIndex],
+        .subresource_range = {
+            .aspect_mask = {.color},
+            .base_mip_level = 0,
+            .level_count = 1,
+            .base_array_layer = 0,
+            .layer_count = 1
+        },
+        .src_access_mask = {},
+        .dst_access_mask = {.color_attachment_write},
+    };
+
+    vk::cmdPipelineBarrier(
+        commandBuffer,
+        {.top_of_pipe},
+        {.color_attachment_output},
+        {},
+        0, null,
+        0, null,
+        1, &barrier_before
+    );
+
+    // Begin dynamic rendering
+    vk::RenderingAttachmentInfoKHR color_attachment = {
+        .s_type = vk::STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
+        .image_view = engine.swap_chain_image_views[imageIndex],
+        .image_layout = vk::IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        .load_op = vk::ATTACHMENT_LOAD_OP_CLEAR,
+        .store_op = vk::ATTACHMENT_STORE_OP_STORE,
+        .clear_value = { .color = { .float32 = {0.0117, 0.0117, 0.0179, 1.0} } }
+    };
+
+    vk::RenderingInfoKHR render_info = {
+        .s_type = vk::STRUCTURE_TYPE_RENDERING_INFO_KHR,
+        .render_area = {.extent = engine.swap_chain_extent},
+        .layer_count = 1,
+        .color_attachment_count = 1,
+        .p_color_attachments = &color_attachment
+    };
+    vk::cmdBeginRenderingKHR(commandBuffer, &render_info);
+    vk::cmdSetViewport(commandBuffer, 0, 1, &&vk::Viewport {
+        .width = engine.swap_chain_extent.width,
+        .height = engine.swap_chain_extent.height,
+        .max_depth = 1.0,
+    });
+    vk::cmdSetScissor(commandBuffer, 0, 1, &&vk::Rect2D {
+        .extent = engine.swap_chain_extent,
+    });
+}
+
+fn void! frameEnd(Engine* engine, Renderer* renderer) {
+    vk::cmdEndRenderingKHR(commandBuffer);
+    // Transition to PRESENT_SRC_KHR
+    vk::ImageMemoryBarrier barrier_after = {
+        .s_type = vk::STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+        .old_layout = vk::IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        .new_layout = vk::IMAGE_LAYOUT_PRESENT_SRC_KHR,
+        .src_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
+        .dst_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
+        .image = engine.swap_chain_images[imageIndex],
+        .subresource_range = {
+            .aspect_mask = {.color},
+            .base_mip_level = 0,
+            .level_count = 1,
+            .base_array_layer = 0,
+            .layer_count = 1
+        },
+        .src_access_mask = {.color_attachment_write},
+        .dst_access_mask = {}
+    };
+
+    vk::cmdPipelineBarrier(
+        commandBuffer,
+        {.color_attachment_output},
+        {.bottom_of_pipe},
+        {},
+        0, null,
+        0, null,
+        1, &barrier_after
+    );
+    vk::endCommandBuffer(commandBuffer)!;
+    vk::SubmitInfo submitInfo = {
+        .s_type = vk::STRUCTURE_TYPE_SUBMIT_INFO,
+        .wait_semaphore_count = 1,
+        .p_wait_semaphores = &renderer.image_available_semaphore[renderer.current_frame],
+        .p_wait_dst_stage_mask = &&vk::PipelineStageFlags { .color_attachment_output },
+        .command_buffer_count = 1,
+        .p_command_buffers = &renderer.command_buffers[renderer.current_frame],
+        .signal_semaphore_count = 1,
+        .p_signal_semaphores = &renderer.render_finished_semaphore[renderer.current_frame],
+    };
+    vk::queueSubmit(renderer.graphics_queue, 1, &submitInfo, renderer.in_flight_fences[renderer.current_frame])!;
+    vk::PresentInfoKHR presentInfo = {
+        .s_type = vk::STRUCTURE_TYPE_PRESENT_INFO_KHR,
+        .wait_semaphore_count = 1,
+        .p_wait_semaphores = &renderer.render_finished_semaphore[renderer.current_frame],
+        .swapchain_count = 1,
+        .p_swapchains = &engine.swap_chain,
+        .p_image_indices = &imageIndex,
+    };
+    anyfault excuse = @catch(vk::queuePresentKHR(engine.present_queue, &presentInfo));
+    if (excuse == vk::VulkanError.ERROR_OUT_OF_DATE_KHR || excuse == vk::VulkanError.SUBOPTIMAL_KHR) {
+        recreateSwapchain()!;
+    } else if (excuse) {
+        return excuse?;
+    }
+    renderer.current_frame = (renderer.current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
+}
+
+
+fn void! frameRender(Engine* engine, Renderer* renderer, Scene* scene) {
+    vk::CommandBuffer commandBuffer = renderer.command_buffers[renderer.current_frame];
+    // TODO: implement render function, take data from scene instead of hard coded values
+    // for each material
+    // vk::cmdBindPipeline(commandBuffer, vk::PIPELINE_BIND_POINT_GRAPHICS, g_pipeline);
+    // vk::cmdBindDescriptorSets(commandBuffer, vk::PIPELINE_BIND_POINT_GRAPHICS, g_pipeline_layout, 0, 1, &g_descriptor_sets[g_current_frame], 0, null);
+    // for each mesh
+    // vk::cmdBindVertexBuffers(commandBuffer, 0, 1, &g_vertex_buffer, &&(vk::DeviceSize)0);
+    // vk::cmdBindIndexBuffer(commandBuffer, g_index_buffer, 0, vk::INDEX_TYPE_UINT16);
+    // vk::cmdDrawIndexed(commandBuffer, INDICES.len, 1, 0, 0, 0);
+}
+
+fn void! render(Engine* engine, Renderer* renderer, Scene* scene) {
+    frameBegin(engine, renderer);
+    frameRender(engine, renderer, scene);
+    frameEnd(engine, renderer);
+}

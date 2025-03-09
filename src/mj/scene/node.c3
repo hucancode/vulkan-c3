@@ -71,13 +71,28 @@ fn Node new_skeletal_mesh_node(uint mesh_handle = 0) {
         .transform = new_transform(),
     };
 }
+fn NodeGPU! createNode(Engine* engine, Node* data) {
+    NodeGPU node;
+    for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        createBufferInit(&g_ubo, UniformBuffer.sizeof, { .uniform_buffer }, { .host_visible, .host_coherent }, &g_uniform_buffers[i], &g_uniform_memory[i])!;
+        vk::mapMemory(g_device, engine.uniform_memory[i], 0, UniformBuffer.sizeof, {}, &g_uniform_buffer_mapped[i])!;
+    }
+    return node;
+}
+
+fn void destroyNode(NodeGPU* node) {
+    for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        vk::destroyBuffer(engine.device, node.uniform_buffers[i]);
+        vk::freeMemory(engine.device, node.uniform_memory[i]);
+    }
+}
 
 fn vk::DescriptorSetLayout! createNodeDescriptorSetLayout(Engine* engine) {
     vk::DescriptorSetLayoutBinding world = {
         .binding = 0,
         .descriptor_type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
         .descriptor_count = 1,
-        .stage_flags = vk::ShaderStageFlags{.vertex},
+        .stage_flags = { .vertex },
     };
     vk::DescriptorSetLayoutBinding[*] bindings = { world };
     vk::DescriptorSetLayoutCreateInfo info = {

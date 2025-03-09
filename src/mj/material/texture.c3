@@ -11,28 +11,23 @@ struct Texture {
 }
 
 struct TextureGPU {
+    vk::ImageBuffer buffer;
     vk::Sampler sampler;
-    vk::Image image;
     vk::ImageView view;
-    vk::DeviceMemory memory;
 }
 
-fn TextureGPU! createTextures(Engine* engine, Texture* data) {
+// const char[*] DATA = $embed("assets/statue-1275469_1280.jpg");
+// defer stbimage::image_free(pixels);
+fn Texture createTextureData(char[] data) {
+    Texture ret;
+    ret.pixels = stbimage::load_from_memory(&data, data.len, &ret.width, &ret.height, &ret.channel, stbimage::RGB_ALPHA);
+    ret.channel = 4;
+    return ret;
+}
+
+fn TextureGPU! createTexture(Engine* engine, Texture* data) {
     TextureGPU texture;
-    int w, h, channel;
-    // const char[*] DATA = $embed("assets/statue-1275469_1280.jpg");
-    // char* pixels = stbimage::load_from_memory(&DATA, DATA.len, &w, &h, &channel, stbimage::RGB_ALPHA);
-    // defer stbimage::image_free(pixels);
-    vk::DeviceSize size = (vk::DeviceSize)(w * h * 4);
-    vk::Buffer stg_buffer;
-    vk::DeviceMemory stg_memory;
-    createBuffer(size, { .transfer_src }, { .host_visible, .host_coherent }, &stg_buffer, &stg_memory)!;
-    defer vk::freeMemory(engine.device, stg_memory, null);
-    defer vk::destroyBuffer(engine.device, stg_buffer, null);
-    void* image_data_mapped;
-    vk::mapMemory(engine.device, stg_memory, 0, size, {}, &image_data_mapped)!;
-    mem::copy(image_data_mapped, data.pixels, (usz)size);
-    vk::unmapMemory(engine.device, stg_memory);
+    usz size = data.width * data.height * data.channel;
     vk::ImageCreateInfo create_info = {
         .s_type = vk::STRUCTURE_TYPE_IMAGE_CREATE_INFO,
         .image_type = vk::IMAGE_TYPE_2D,
@@ -45,18 +40,13 @@ fn TextureGPU! createTextures(Engine* engine, Texture* data) {
         .array_layers = 1,
         .format = vk::FORMAT_R8G8B8A8_SRGB,
         .tiling = vk::IMAGE_TILING_OPTIMAL,
-        .usage = vk::ImageUsageFlags { .transfer_dst, .sampled },
+        .usage = { .transfer_dst, .sampled },
         .sharing_mode = vk::SHARING_MODE_EXCLUSIVE,
         .initial_layout = vk::IMAGE_LAYOUT_UNDEFINED,
-        .samples = vk::SampleCountFlags { .n_1 },
+        .samples = { .n_1 },
     };
-    texture.image = vk::createImage(engine.device, &create_info)!;
-    texture.image_memory = allocateMemory(engine.device, vk::getImageMemoryRequirements(engine.device, texture.image), { .device_local })!;
-    vk::bindImageMemory(engine.device, texture.image, texture.image_memory, 0)!;
-    transitionImageLayout(texture.image, vk::FORMAT_R8G8B8A8_SRGB, vk::IMAGE_LAYOUT_UNDEFINED, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)!;
-    copyBufferImage(stg_buffer, texture.image, (uint)w, (uint)h)!;
-    transitionImageLayout(texture.image, vk::FORMAT_R8G8B8A8_SRGB, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, vk::IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)!;
-    texture.image_view = createImageView(texture.image, vk::FORMAT_R8G8B8A8_SRGB)!;
+    texture.buffer = transferToImage(engine.device, &createMappedBuffer(engine, data.pixels, size), &create_info);
+    texture.view = createImageView(texture.buffer.image, create_info.format)!;
     vk::SamplerCreateInfo sampler_info = {
         .s_type = vk::STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
         .mag_filter = vk::FILTER_LINEAR,
@@ -76,69 +66,10 @@ fn TextureGPU! createTextures(Engine* engine, Texture* data) {
     return texture;
 }
 
-
 fn void destroyTexture(TextureGPU* texture) {
     vk::destroyImage(engine.device, texture.image);
     vk::destroyImageView(engine.device, texture.image_view, null);
     vk::destroySampler(engine.device, texture.sampler, null);
-}
-
-fn void! transitionImageLayout(vk::Image image, vk::Format format, vk::ImageLayout oldLayout, vk::ImageLayout newLayout) {
-    vk::CommandBuffer command_buffer = beginSingleTimeCommand()!;
-    vk::PipelineStageFlags src_stage;
-    vk::PipelineStageFlags dst_stage;
-    vk::ImageMemoryBarrier barrier = {
-        .s_type = vk::STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-        .old_layout = oldLayout,
-        .new_layout = newLayout,
-        .src_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
-        .dst_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
-        .image = image,
-        .subresource_range = {
-            .aspect_mask = vk::ImageAspectFlags { .color },
-            .base_mip_level = 0,
-            .level_count = 1,
-            .base_array_layer = 0,
-            .layer_count = 1,
-        },
-    };
-    if(oldLayout == vk::IMAGE_LAYOUT_UNDEFINED && newLayout == vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-        barrier.dst_access_mask = vk::AccessFlags { .transfer_write };
-        src_stage = vk::PipelineStageFlags { .top_of_pipe };
-        dst_stage = vk::PipelineStageFlags { .transfer };
-    } else if(oldLayout == vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == vk::IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-        barrier.src_access_mask = vk::AccessFlags { .transfer_write };
-        barrier.dst_access_mask = vk::AccessFlags { .shader_read };
-        src_stage = vk::PipelineStageFlags { .transfer };
-        dst_stage = vk::PipelineStageFlags { .fragment_shader };
-    }
-    vk::cmdPipelineBarrier(
-        command_buffer,
-        src_stage, dst_stage,
-        vk::DependencyFlags {},
-        0, null,
-        0, null,
-        1, &barrier);
-    endSingleTimeCommand(command_buffer)!;
-}
-
-fn void! copyBufferImage(vk::Buffer buffer, vk::Image image, uint width, uint height) {
-    vk::CommandBuffer command_buffer = beginSingleTimeCommand()!;
-    vk::BufferImageCopy copy_region = {
-        .buffer_offset = 0,
-        .buffer_row_length = 0,
-        .buffer_image_height = 0,
-        .image_subresource = {
-            .aspect_mask = vk::ImageAspectFlags { .color },
-            .mip_level = 0,
-            .base_array_layer = 0,
-            .layer_count = 1,
-        },
-        .image_offset = {0, 0, 0},
-        .image_extent = {width, height, 1},
-    };
-    vk::cmdCopyBufferToImage(command_buffer, buffer, image, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copy_region);
-    endSingleTimeCommand(command_buffer)!;
 }
 
 fn vk::ImageView! createImageView(vk::Image image, vk::Format format) {
@@ -149,7 +80,7 @@ fn vk::ImageView! createImageView(vk::Image image, vk::Format format) {
         .view_type = vk::IMAGE_VIEW_TYPE_2D,
         .format = format,
         .subresource_range = {
-            .aspect_mask = vk::ImageAspectFlags { .color },
+            .aspect_mask = { .color },
             .level_count = 1,
             .layer_count = 1,
         },
