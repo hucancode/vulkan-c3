@@ -8,26 +8,6 @@ struct Scene {
     Time start_timestamp;
 }
 
-// struct GenerationalIndex {
-//     uint generation;
-//     uint index;
-// }
-
-// struct StaticMeshPool {
-//     List(<StaticMesh>) meshes;
-// }
-
-// struct SkeletalMeshPool {
-//     List(<SkeletalMesh>) meshes;
-// }
-
-// struct TexturePool {
-//     List(<Texture>) textures;
-// }
-
-// struct MaterialPool {
-//     List(<Material>) materials;
-// }
 
 // fn Scene make_scene() {
 //     Node root;
@@ -57,12 +37,11 @@ struct SceneGPU {
     vk::DescriptorSet[MAX_FRAMES_IN_FLIGHT] descriptor_sets;
 }
 
-
 fn SceneGPU! createScene(Engine* engine, Scene* data) {
     SceneGPU scene;
     {
         // scene-level descriptor set layout
-        vk::DescriptorSetLayoutBinding view = {
+        vk::DescriptorSetLayoutBinding view_proj = {
             .binding = 0,
             .descriptor_type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
             .descriptor_count = 1,
@@ -124,8 +103,8 @@ fn SceneGPU! createScene(Engine* engine, Scene* data) {
         scene.descriptor_sets = vk::allocateDescriptorSets(engine.device, &alloc_info)!;
 	}
     for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        scene.view_buffer[i] = createMappedBuffer(engine, &Matrix4x4(<float>).IDENTITY, Matrix4x4(<float>).sizeof, { .uniform_buffer })!;
-        scene.proj_buffer[i] = createMappedBuffer(engine, &Matrix4x4(<float>).IDENTITY, Matrix4x4(<float>).sizeof, { .uniform_buffer })!;
+        scene.view_buffer[i] = createMappedBuffer(engine, &Matrix4f.IDENTITY, Matrix4f.sizeof, { .uniform_buffer })!;
+        scene.proj_buffer[i] = createMappedBuffer(engine, &Matrix4f.IDENTITY, Matrix4f.sizeof, { .uniform_buffer })!;
         scene.time_buffer[i] = createMappedBuffer(engine, &&0, float.sizeof, { .uniform_buffer })!;
     }
     return scene;
@@ -133,8 +112,8 @@ fn SceneGPU! createScene(Engine* engine, Scene* data) {
 
 fn void pushSceneDataToGPU(Scene* data, SceneGPU* scene, uint current_frame) {
     Time now = time::now();
-    Matrix4x4(<float>) view = calculate_camera_lookat_matrix(data.camera);
-    Matrix4x4(<float>) proj = calculate_camera_projection_matrix(data.camera);
+    Matrix4f view = calculate_camera_lookat_matrix(data.camera);
+    Matrix4f proj = calculate_camera_projection_matrix(data.camera);
     float t = (float)now.diff_sec(scene.start_timestamp);
     writeToMappedBuffer(&view, scene.view_buffer[current_frame]);
     writeToMappedBuffer(&proj, scene.proj_buffer[current_frame]);

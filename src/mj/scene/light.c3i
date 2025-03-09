@@ -1,6 +1,6 @@
 module mj;
 
-def LightHandle = usz;
+def LightHandle = uint;
 
 enum LightType {
     POINT,

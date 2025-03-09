@@ -1,5 +1,6 @@
 module hellovk;
 import std::io;
+import std::math::quaternion;
 import glfw;
 import mj;
 
@@ -15,18 +16,24 @@ fn int main(String[] args) {
     }
     defer glfw::terminate();
     glfw::windowHint(glfw::CLIENT_API, glfw::NO_API);
-    mj::g_window = glfw::createWindow(WIDTH, HEIGHT, TITLE, null, null);
-    if (mj::g_window == null) {
+    glfw::Window* window = glfw::createWindow(WIDTH, HEIGHT, TITLE, null, null);
+    if (window == null) {
         return -1;
     }
-    io::printfn("Window created %x", mj::g_window);
-    defer glfw::destroyWindow(mj::g_window);
-    mj::init()!!;
-    defer mj::destroy();
-    while (!glfw::windowShouldClose(mj::g_window)) {
+    io::printfn("Window created %x", window);
+    defer glfw::destroyWindow(window);
+    Engine* engine = createEngine(window)!!;
+    defer destroyEngine(engine);
+    Renderer* renderer = createRenderer(engine)!!;
+    defer destroyRenderer(renderer);
+    Scene scene = make_scene();
+    Node cube = new_static_mesh_node(make_cube());
+    add_child(scene.root, cube);
+    while (!glfw::windowShouldClose(window)) {
         glfw::pollEvents();
-        mj::update();
-        anyfault excuse = @catch(mj::render());
+        double t = scene.last_frame_timestamp.elapsed_seconds();
+        cube.transform.rotation = quaternion::rotate_y(t);
+        anyfault excuse = @catch(render(engine, renderer));
         if (excuse) {
             io::printfn("Error: while rendering");
         };

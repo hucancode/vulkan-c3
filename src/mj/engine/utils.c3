@@ -16,3 +16,8 @@ macro @repeatn(seed, n) {
     }
     return ret[:n];
 }
+
+def Matrix4f = Matrix4x4(<float>);
+def Vec4f = float[<4>];
+def Vec3f = float[<3>];
+def Vec2f = float[<2>];

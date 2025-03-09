@@ -1,0 +1,39 @@
+# Engine data structure
+  - Scene (contains root node, camera)
+  - Node (contains transformation, mesh/light/none, children)
+  - Light (contains type, color, intensity)
+  - Mesh (contains vertices, indices, material)
+  - Material (contains shader, textures)
+  - Texture (contains image data, width, height, channel count)
+  - Vertex (contains position, normal, color, uv)
+# Vulkan specific data structure
+  - Engine (contains window, vulkan instance, surface, device, queue, swapchain, command pool)
+  - Renderer (contains command buffers, semaphores, fences)
+  - SceneGPU (contains descriptor set layout, descriptor pool, descriptor set for camera matrix and camera matrix)
+  - NodeGPU (contains model matrix)
+  - MeshGPU (contains vertex buffer, index buffer)
+  - MaterialGPU (contains descriptor set layout, descriptor set for textures, render pipeline)
+  - TextureGPU (contains image, image view, sampler)
+# Functions
+  - engine
+    - create, setup basic vulkan, ready to accept model and materials
+    - destroy
+    - render, draw the scene
+    - expose vulkan functionality for mesh, material, texture, scene, ... to use
+  - scene
+    - manage node transformation
+    - manage camera, camera movement
+    - manage shared pools, expose resources lookup functionality, allow mesh to lookup material, allow material to lookup texture, ...
+    - allow resource lookup using index, avoid using pointer to resource
+    - destroy
+  - node
+    - add/remove children
+  - mesh
+    - create from vertices, indices, material
+    - destroy
+  - material
+    - create from shader, textures
+    - destroy
+  - texture
+    - create from image data using stb_image
+    - destroy

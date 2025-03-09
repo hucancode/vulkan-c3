@@ -186,16 +186,61 @@ fn void! frameEnd(Engine* engine, Renderer* renderer) {
 }
 
 
-fn void! frameRender(Engine* engine, Renderer* renderer, Scene* scene) {
-    vk::CommandBuffer commandBuffer = renderer.command_buffers[renderer.current_frame];
-    // TODO: implement render function, take data from scene instead of hard coded values
-    // for each material
-    // vk::cmdBindPipeline(commandBuffer, vk::PIPELINE_BIND_POINT_GRAPHICS, g_pipeline);
-    // vk::cmdBindDescriptorSets(commandBuffer, vk::PIPELINE_BIND_POINT_GRAPHICS, g_pipeline_layout, 0, 1, &g_descriptor_sets[g_current_frame], 0, null);
-    // for each mesh
-    // vk::cmdBindVertexBuffers(commandBuffer, 0, 1, &g_vertex_buffer, &&(vk::DeviceSize)0);
-    // vk::cmdBindIndexBuffer(commandBuffer, g_index_buffer, 0, vk::INDEX_TYPE_UINT16);
-    // vk::cmdDrawIndexed(commandBuffer, INDICES.len, 1, 0, 0, 0);
+fn void! frameRender(Engine* engine, Renderer* renderer, Scene* scene, ResourceManager* resource_manager) {
+    vk::CommandBuffer command_buffer = renderer.command_buffers[renderer.current_frame];
+    List(<NodeHandle>) node_stack;
+    List(<Matrix4f>) transform_stack;
+    defer {
+        node_stack.free();
+        transform_stack.free();
+    }
+    node_stack.push(scene.root);
+    transform_stack.push(Matrix4f.IDENTITY);
+    while (!node_stack.empty()) {
+        Node* node = getNode(resource_manager, node_stack.pop());
+        Matrix4f local_matrix = calculateTransform(node.transform);
+        Matrix4f world_matrix = transform_stack.pop().mul(local_matrix);
+        switch (node.type) {
+            case NodeType.STATIC_MESH: {
+                StaticMeshGPU* mesh = getStaticMeshGPU(resource_manager, node.static_mesh);
+                MaterialGPU* material = getMaterialGPU(resource_manager, node.material);
+                vk::cmdBindPipeline(command_buffer, vk::PIPELINE_BIND_POINT_GRAPHICS, material.pipeline);
+                vk::DescriptorSet[*] descriptor_sets = {
+                    scene.gpu.descriptor_sets[renderer.current_frame],
+                    material.descriptor_sets[renderer.current_frame]
+                };
+                vk::cmdBindDescriptorSets(
+                    command_buffer,
+                    vk::PIPELINE_BIND_POINT_GRAPHICS,
+                    material.pipeline_layout,
+                    0,
+                    descriptor_sets.len,
+                    &descriptor_sets,
+                    0,
+                    null
+                );
+                vk::cmdPushConstants(
+                    command_buffer,
+                    material.pipeline_layout,
+                    {.vertex},
+                    0,
+                    sizeof(Matrix4f),
+                    &world_matrix
+                );
+                vk::DeviceSize[*] offsets = {0};
+                vk::cmdBindVertexBuffers(command_buffer, 0, 1, &mesh.vertex.buffer, offsets);
+                vk::cmdBindIndexBuffer(command_buffer, mesh.index.buffer, 0, vk::INDEX_TYPE_UINT32);
+                vk::cmdDrawIndexed(command_buffer, mesh.index_count, 1, 0, 0, 0);
+                break;
+            }
+            default:
+                break;
+        }
+        foreach (child : current_node.children) {
+            node_stack.push(child);
+            transform_stack.push(world_matrix);
+        }
+    }
 }
 
 fn void! render(Engine* engine, Renderer* renderer, Scene* scene) {
