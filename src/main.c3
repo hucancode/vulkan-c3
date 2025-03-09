@@ -22,10 +22,12 @@ fn int main(String[] args) {
     }
     io::printfn("Window created %x", window);
     defer glfw::destroyWindow(window);
-    Engine* engine = createEngine(window)!!;
-    defer destroyEngine(engine);
-    Renderer* renderer = createRenderer(engine)!!;
-    defer destroyRenderer(renderer);
+    Engine engine;
+    engine.init(window)!!;
+    defer engine.destroy();
+    Renderer renderer;
+    renderer.init(engine)!!;
+    defer renderer.destroy();
     Scene scene = make_scene();
     Node cube = new_static_mesh_node(make_cube());
     add_child(scene.root, cube);

@@ -32,33 +32,29 @@ struct Engine {
     vk::CommandPool command_pool;
 }
 
-// TODO: create engine here
-
-fn Engine! createEngine(glfw::Window* window) {
-    Engine engine = {
-        .window = window,
-    };
-    createVulkanInstance(&engine)!;
-    createWindowSurface(&engine)!;
-    pickPhysicalDevice(&engine)!;
-    createLogicalDevice(&engine)!;
-    createSwapchain(&engine)!;
-    createSemaphores(&engine)!;
-    createCommandPool(&engine)!;
+fn Engine! Engine.init(Engine* engine, glfw::Window* window) {
+    engine.window = window;
+    engine.createVulkanInstance()!;
+    engine.createWindowSurface()!;
+    engine.pickPhysicalDevice()!;
+    engine.createLogicalDevice()!;
+    engine.createSwapchain()!;
+    engine.createSemaphores()!;
+    engine.createCommandPool()!;
     return engine;
 }
 
-fn void destroyEngine(Engine* engine) {
+fn void Engine.destroy(Engine* engine) {
     vk::deviceWaitIdle(engine.device)!!;
-    destroySwapchain(engine);
-    destroySemaphores(engine);
-    destroyCommandPool(engine);
-    destroyDevice(engine);
-    destroySurface(engine);
-    destroyVulkanInstance(engine);
+    engine.destroySwapchain();
+    engine.destroySemaphores();
+    engine.destroyCommandPool();
+    engine.destroyDevice();
+    engine.destroySurface();
+    engine.destroyVulkanInstance();
 }
 
-fn void! createVulkanInstance(Engine* engine) {
+fn void! Engine.createVulkanInstance(Engine* engine) {
     vk::loadProcAddressesGlobal(&glfw::getInstanceProcAddress);
     ulong extensionCount;
     ZString* glfwExtensions = glfw::getRequiredInstanceExtensions(&extensionCount);
@@ -117,18 +113,18 @@ fn void! createVulkanInstance(Engine* engine) {
     $endif
 }
 
-fn void destroyVulkanInstance(Engine* engine) {
+fn void Engine.destroyVulkanInstance(Engine* engine) {
     $if ENABLE_VALIDATION_LAYERS:
         vk::destroyDebugUtilsMessengerEXT(engine.instance, engine.debug_messenger);
     $endif
     vk::destroyInstance(engine.instance);
 }
 
-fn void! createWindowSurface(Engine* engine) {
+fn void! Engine.createWindowSurface(Engine* engine) {
     vk::check(glfw::createWindowSurface(engine.instance, engine.window, null, &engine.surface))!;
 }
 
-fn void destroySurface(Engine* engine) {
+fn void Engine.destroySurface(Engine* engine) {
     vk::destroySurfaceKHR(engine.instance, engine.surface);
 }
 
@@ -194,7 +190,7 @@ fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
     return score;
 }
 
-fn void! pickPhysicalDevice(Engine* engine) {
+fn void! Engine.pickPhysicalDevice(Engine* engine) {
     vk::PhysicalDevice[] devices = vk::enumeratePhysicalDevices(engine.instance)!;
     defer free(devices);
     engine.physical_device = devices[0];
@@ -210,7 +206,7 @@ fn void! pickPhysicalDevice(Engine* engine) {
     io::printfn("Selected physical device: %x with score %d", engine.physical_device, bestScore);
 }
 
-fn void destroyDevice(Engine* engine) {
+fn void Engine.destroyDevice(Engine* engine) {
     vk::destroyDevice(engine.device);
 }
 
@@ -237,7 +233,7 @@ struct QueueFamilyIndices {
     uint present_family;
 }
 
-fn QueueFamilyIndices! findQueueFamilies(Engine* engine) {
+fn QueueFamilyIndices! Engine.findQueueFamilies(Engine* engine) {
     vk::QueueFamilyProperties[] families = vk::getPhysicalDeviceQueueFamilyProperties(engine.physical_device);
     QueueFamilyIndices indices;
     bool foundGraphics = false;
@@ -261,7 +257,7 @@ fn QueueFamilyIndices! findQueueFamilies(Engine* engine) {
     return vk::VulkanError.ERROR_UNKNOWN?;
 }
 
-fn void! createLogicalDevice(Engine* engine) {
+fn void! Engine.createLogicalDevice(Engine* engine) {
     QueueFamilyIndices indices = findQueueFamilies(engine.physical_device)!;
     ZString[] layers;
     $if ENABLE_VALIDATION_LAYERS:
@@ -327,7 +323,7 @@ fn vk::Extent2D pickSwapExtent(vk::SurfaceCapabilitiesKHR capabilities) {
     return actualExtent;
 }
 
-fn void! createSwapchain(Engine* engine) {
+fn void! Engine.createSwapchain(Engine* engine) {
     QueueFamilyIndices indices = findQueueFamilies(engine.physical_device)!;
     SwapchainSupportDetails supported = querySwapchainSupport(engine.physical_device)!;
     vk::PresentModeKHR presentMode = pickSwapPresentMode(supported.present_modes);
@@ -371,7 +367,7 @@ fn void! createSwapchain(Engine* engine) {
     }
 }
 
-fn void destroySwapchain(Engine* engine) {
+fn void Engine.destroySwapchain(Engine* engine) {
     foreach (view : engine.swap_chain_image_views) {
         vk::destroyImageView(engine.device, view);
     }
@@ -380,13 +376,13 @@ fn void destroySwapchain(Engine* engine) {
     free(engine.swap_chain_images);
 }
 
-fn void! recreateSwapchain(Engine* engine) {
+fn void! Engine.recreateSwapchain(Engine* engine) {
     vk::deviceWaitIdle(engine.device)!;
     destroySwapchain(engine);
     createSwapchain(engine)!;
 }
 
-fn void! createCommandPool(Engine* engine) {
+fn void! Engine.createCommandPool(Engine* engine) {
     QueueFamilyIndices queueFamilyIndices = findQueueFamilies(engine.physical_device)!;
     vk::CommandPoolCreateInfo info = {
         .s_type = vk::STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
@@ -396,11 +392,11 @@ fn void! createCommandPool(Engine* engine) {
     engine.command_pool = vk::createCommandPool(engine.device, &info)!;
 }
 
-fn void destroyCommandPool(Engine* engine) {
+fn void Engine.destroyCommandPool(Engine* engine) {
     vk::destroyCommandPool(engine.device, engine.command_pool);
 }
 
-fn vk::CommandBuffer! beginSingleTimeCommand(Engine* engine) {
+fn vk::CommandBuffer! Engine.beginSingleTimeCommand(Engine* engine) {
     vk::CommandBuffer[] command_buffer = vk::allocateCommandBuffers(engine.device, &&vk::CommandBufferAllocateInfo {
         .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
         .level = vk::COMMAND_BUFFER_LEVEL_PRIMARY,
@@ -414,7 +410,7 @@ fn vk::CommandBuffer! beginSingleTimeCommand(Engine* engine) {
     return command_buffer[0];
 }
 
-fn void! endSingleTimeCommand(Engine* engine, vk::CommandBuffer command_buffer) {
+fn void! Engine.endSingleTimeCommand(Engine* engine, vk::CommandBuffer command_buffer) {
     defer vk::freeCommandBuffers(engine.device, engine.command_pool, 1, &command_buffer);
     vk::endCommandBuffer(command_buffer)!;
     vk::queueSubmit(engine.graphics_queue, 1, &&vk::SubmitInfo {

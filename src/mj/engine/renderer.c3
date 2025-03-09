@@ -10,14 +10,14 @@ struct Renderer {
     vk::CommandBuffer[MAX_FRAMES_IN_FLIGHT] command_buffers;
 }
 
-fn Renderer! createRenderer(Engine* engine) {
-    Renderer renderer;
-    createCommandBuffers(engine, renderer);
-    createSynchronizers(engine, renderer);
-    return renderer;
-}
-
-fn void! createSynchronizers(Engine* engine, Renderer* renderer) {
+fn void! Renderer.init(Renderer* this, Engine* engine) {
+    vk::CommandBufferAllocateInfo allocInfo = {
+        .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        .command_pool = engine.command_pool,
+        .level = vk::COMMAND_BUFFER_LEVEL_PRIMARY,
+        .command_buffer_count = this.command_buffers.len,
+    };
+    vk::allocateCommandBuffers(engine.device, &allocInfo, &this.command_buffers)!;
     vk::SemaphoreCreateInfo semaphoreInfo = {
         .s_type = vk::STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
     };
@@ -26,35 +26,22 @@ fn void! createSynchronizers(Engine* engine, Renderer* renderer) {
         .flags = { .signaled },
     };
     for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        renderer.image_available_semaphore[i] = vk::createSemaphore(engine.device, &semaphoreInfo)!;
-        renderer.render_finished_semaphore[i] = vk::createSemaphore(engine.device, &semaphoreInfo)!;
-        renderer.in_flight_fences[i] = vk::createFence(engine.device, &fenceInfo)!;
+        this.image_available_semaphore[i] = vk::createSemaphore(engine.device, &semaphoreInfo)!;
+        this.render_finished_semaphore[i] = vk::createSemaphore(engine.device, &semaphoreInfo)!;
+        this.in_flight_fences[i] = vk::createFence(engine.device, &fenceInfo)!;
     }
 }
 
-fn void destroySynchronizers(Engine* engine, Renderer* renderer) {
+fn void Renderer.destroy(Renderer* this, Engine* engine) {
+    vk::freeCommandBuffers(engine.device, engine.command_pool, this.command_buffers.len, &this.command_buffers);
     for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        vk::destroySemaphore(engine.device, renderer.image_available_semaphore[i]);
-        vk::destroySemaphore(engine.device, renderer.render_finished_semaphore[i]);
-        vk::destroyFence(engine.device, renderer.in_flight_fences[i]);
+        vk::destroySemaphore(engine.device, this.image_available_semaphore[i]);
+        vk::destroySemaphore(engine.device, this.render_finished_semaphore[i]);
+        vk::destroyFence(engine.device, this.in_flight_fences[i]);
     }
 }
 
-fn void! createCommandBuffers(Engine* engine, Renderer* renderer) {
-    vk::CommandBufferAllocateInfo allocInfo = {
-        .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-        .command_pool = engine.command_pool,
-        .level = vk::COMMAND_BUFFER_LEVEL_PRIMARY,
-        .command_buffer_count = renderer.command_buffers.len,
-    };
-    vk::allocateCommandBuffers(engine.device, &allocInfo, &renderer.command_buffers)!;
-}
-
-fn void destroyCommandBuffers(Engine* engine, Renderer* renderer) {
-    vk::freeCommandBuffers(engine.device, engine.command_pool, renderer.command_buffers.len, &renderer.command_buffers);
-}
-
-fn void! frameBegin(Engine* engine, Renderer* renderer) {
+fn uint! Renderer.frameBegin(Renderer* renderer, Engine* engine) {
     vk::waitForFences(engine.device, 1, &renderer.in_flight_fences[renderer.current_frame])!;
     uint! imageIndex = vk::acquireNextImageKHR(engine.device, engine.swap_chain, ulong.max, renderer.image_available_semaphore[renderer.current_frame], (vk::Fence)0);
     if (catch excuse = imageIndex) {
@@ -124,9 +111,11 @@ fn void! frameBegin(Engine* engine, Renderer* renderer) {
     vk::cmdSetScissor(commandBuffer, 0, 1, &&vk::Rect2D {
         .extent = engine.swap_chain_extent,
     });
+    return imageIndex;
 }
 
-fn void! frameEnd(Engine* engine, Renderer* renderer) {
+fn void! Renderer.frameEnd(Renderer* this, Engine* engine, uint imageIndex) {
+    vk::CommandBuffer commandBuffer = this.command_buffers[this.current_frame];
     vk::cmdEndRenderingKHR(commandBuffer);
     // Transition to PRESENT_SRC_KHR
     vk::ImageMemoryBarrier barrier_after = {
@@ -160,18 +149,18 @@ fn void! frameEnd(Engine* engine, Renderer* renderer) {
     vk::SubmitInfo submitInfo = {
         .s_type = vk::STRUCTURE_TYPE_SUBMIT_INFO,
         .wait_semaphore_count = 1,
-        .p_wait_semaphores = &renderer.image_available_semaphore[renderer.current_frame],
+        .p_wait_semaphores = &this.image_available_semaphore[this.current_frame],
         .p_wait_dst_stage_mask = &&vk::PipelineStageFlags { .color_attachment_output },
         .command_buffer_count = 1,
-        .p_command_buffers = &renderer.command_buffers[renderer.current_frame],
+        .p_command_buffers = &this.command_buffers[this.current_frame],
         .signal_semaphore_count = 1,
-        .p_signal_semaphores = &renderer.render_finished_semaphore[renderer.current_frame],
+        .p_signal_semaphores = &this.render_finished_semaphore[this.current_frame],
     };
-    vk::queueSubmit(renderer.graphics_queue, 1, &submitInfo, renderer.in_flight_fences[renderer.current_frame])!;
+    vk::queueSubmit(this.graphics_queue, 1, &submitInfo, this.in_flight_fences[this.current_frame])!;
     vk::PresentInfoKHR presentInfo = {
         .s_type = vk::STRUCTURE_TYPE_PRESENT_INFO_KHR,
         .wait_semaphore_count = 1,
-        .p_wait_semaphores = &renderer.render_finished_semaphore[renderer.current_frame],
+        .p_wait_semaphores = &this.render_finished_semaphore[this.current_frame],
         .swapchain_count = 1,
         .p_swapchains = &engine.swap_chain,
         .p_image_indices = &imageIndex,
@@ -182,12 +171,12 @@ fn void! frameEnd(Engine* engine, Renderer* renderer) {
     } else if (excuse) {
         return excuse?;
     }
-    renderer.current_frame = (renderer.current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
+    this.current_frame = (this.current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
 
-fn void! frameRender(Engine* engine, Renderer* renderer, Scene* scene, ResourceManager* resource_manager) {
-    vk::CommandBuffer command_buffer = renderer.command_buffers[renderer.current_frame];
+fn void! Renderer.frameRender(Renderer* this, Engine* engine, Scene* scene, ResourceManager* resource_manager) {
+    vk::CommandBuffer command_buffer = this.command_buffers[this.current_frame];
     List(<NodeHandle>) node_stack;
     List(<Matrix4f>) transform_stack;
     defer {
@@ -243,8 +232,8 @@ fn void! frameRender(Engine* engine, Renderer* renderer, Scene* scene, ResourceM
     }
 }
 
-fn void! render(Engine* engine, Renderer* renderer, Scene* scene) {
-    frameBegin(engine, renderer);
-    frameRender(engine, renderer, scene);
-    frameEnd(engine, renderer);
+fn void! Renderer.render(Renderer* renderer, Engine* engine, Scene* scene) {
+    uint imageIdx = renderer.frameBegin(engine);
+    renderer.frameRender(engine, scene);
+    renderer.frameEnd(engine, imageIdx);
 }
