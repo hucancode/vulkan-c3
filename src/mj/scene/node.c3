@@ -3,8 +3,6 @@ import std::math::matrix;
 import std::math::quaternion;
 import std::collections::list;
 
-def NodeHandle = uint;
-
 enum NodeType {
     GROUP,
     LIGHT,

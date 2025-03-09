@@ -1,20 +1,44 @@
 module mj;
 import std::collections::map;
 
-def SkeletalMeshHandle = uint;
+struct SkinnedVertex {
+	Vec3f position;
+	Vec3f normal;
+	Vec4f color;
+	Vec2f uv;
+	Vec4u joints;
+	Vec4f weights;
+}
 
+const vk::VertexInputBindingDescription[*] SKINNED_VERTEX_DESCRIPTION = {{
+	.binding   = 0,
+	.stride    = SkinnedVertex.sizeof,
+	.input_rate = vk::VERTEX_INPUT_RATE_VERTEX,
+}};
+
+const vk::VertexInputAttributeDescription[*] SKINNED_VERTEX_ATTR_DESCRIPTION = {{
+   .binding = 0, .location = 0, .format = vk::FORMAT_R32G32B32_SFLOAT, .offset = SkinnedVertex.position.offsetof
+}, {
+   .binding = 0, .location = 1, .format = vk::FORMAT_R32G32B32_SFLOAT, .offset = SkinnedVertex.normal.offsetof
+}, {
+   .binding = 0, .location = 2, .format = vk::FORMAT_R32G32B32A32_SFLOAT, .offset = SkinnedVertex.color.offsetof
+}, {
+   .binding = 0, .location = 3, .format = vk::FORMAT_R32G32_SFLOAT, .offset = SkinnedVertex.uv.offsetof
+}, {
+   .binding = 0, .location = 4, .format = vk::FORMAT_R32G32B32A32_UINT, .offset = SkinnedVertex.joints.offsetof
+}, {
+   .binding = 0, .location = 5, .format = vk::FORMAT_R32G32B32A32_SFLOAT, .offset = SkinnedVertex.weights.offsetof
+}};
 struct SkeletalMesh {
     SkinnedVertex[] vertices;
     uint[] indices;
     Bone[] bones;
     HashMap(<String, AnimationTrack>) animations;
-}
-
-struct SkeletalMeshGPU {
-    vk::Buffer vertex_buffer;
-    vk::Buffer index_buffer;
-    vk::Buffer bone_buffer;
-    vk::DeviceMemory memory;
+    struct gpu {
+        LocalBuffer vertex;
+        LocalBuffer index;
+        MappedBuffer bone;
+    }
 }
 
 // TODO: WIP

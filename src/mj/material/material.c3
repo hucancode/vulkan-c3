@@ -1,33 +1,28 @@
 module mj;
 import vk;
 
-def MaterialHandle = uint;
-
 struct Material {
     TextureHandle albedo;
     TextureHandle metallic;
     TextureHandle roughness;
-}
-
-struct MaterialGPU {
-    vk::PipelineLayout pipeline_layout;
-    vk::Pipeline pipeline;
-    vk::DescriptorPool descriptor_pool;
-    vk::DescriptorSetLayout descriptor_set_layout;
-    vk::DescriptorSet[MAX_FRAMES_IN_FLIGHT] descriptor_sets;
+    struct gpu {
+        vk::PipelineLayout pipeline_layout;
+        vk::Pipeline pipeline;
+        vk::DescriptorPool descriptor_pool;
+        vk::DescriptorSetLayout descriptor_set_layout;
+        vk::DescriptorSet[MAX_FRAMES_IN_FLIGHT] descriptor_sets;
+    }
 }
 
 const char[*] VERTEX_CODE = $embed("shaders/vert.spv");
 const char[*] FRAGMENT_CODE = $embed("shaders/frag.spv");
 
-fn MaterialGPU! createMaterial(Engine* engine, vk::DescriptorSetLayout shared_descriptor_set_layout) {
-    MaterialGPU mat;
-    createPipeline(engine, shared_descriptor_set_layout);
+fn void! createMaterial(Engine* engine, Material* mat, vk::DescriptorSetLayout shared_descriptor_set_layout) {
+    createPipeline(engine, &mat, shared_descriptor_set_layout);
     createMaterialDescriptorSets(engine, &mat);
-    return mat;
 }
 
-fn void! createPipeline(Engine* engine, vk::DescriptorSetLayout shared_descriptor_set_layout) {
+fn void! createPipeline(Engine* engine, Material* mat, vk::DescriptorSetLayout shared_descriptor_set_layout) {
     vk::ShaderModule v = createShaderModule(engine.device, &VERTEX_CODE)!;
     defer vk::destroyShaderModule(engine.device, v);
     vk::ShaderModule f = createShaderModule(engine.device, &FRAGMENT_CODE)!;
@@ -111,14 +106,14 @@ fn void! createPipeline(Engine* engine, vk::DescriptorSetLayout shared_descripto
     		.binding_count = bindings.len,
     		.p_bindings    = &bindings,
     	};
-    	mat.descriptor_set_layout = vk::createDescriptorSetLayout(engine.device, &info)!;
+    	mat.gpu.descriptor_set_layout = vk::createDescriptorSetLayout(engine.device, &info)!;
 	}
 	{
         vk::DescriptorSetLayout[*] set_layouts = {
             shared_descriptor_set_layout,
-            mat.descriptor_set_layout,
+            mat.gpu.descriptor_set_layout,
         };
-        mat.pipeline_layout = vk::createPipelineLayout(
+        mat.gpu.pipeline_layout = vk::createPipelineLayout(
             engine.device,
             &&vk::PipelineLayoutCreateInfo {
                 .s_type = vk::STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
@@ -142,14 +137,14 @@ fn void! createPipeline(Engine* engine, vk::DescriptorSetLayout shared_descripto
         .p_multisample_state = &multisampling,
         .p_color_blend_state = &colorBlending,
         .p_dynamic_state = &dynamicState,
-        .layout = mat.pipeline_layout,
+        .layout = mat.gpu.pipeline_layout,
         .base_pipeline_index = -1,
         .p_next = &dynamic_rendering_info,
     };
-    mat.pipeline = vk::createGraphicsPipelines(engine.device, (vk::PipelineCache)0, 1, &pipelineInfo)!;
+    mat.gpu.pipeline = vk::createGraphicsPipelines(engine.device, (vk::PipelineCache)0, 1, &pipelineInfo)!;
 }
 
-fn void! createMaterialDescriptorSets(Engine* engine, MaterialGPU* mat) {
+fn void! createMaterialDescriptorSets(Engine* engine, Material* mat) {
     vk::DescriptorPoolSize albedo_sampler = {
         .type = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
         .descriptor_count = MAX_FRAMES_IN_FLIGHT,
@@ -174,7 +169,7 @@ fn void! createMaterialDescriptorSets(Engine* engine, MaterialGPU* mat) {
         .max_sets       = MAX_FRAMES_IN_FLIGHT,
     };
     mat.descriptor_pool = vk::createDescriptorPool(engine.device, &create_info)!;
-	vk::DescriptorSetLayout[] set_layouts = @repeat(&mat.set_layout, MAX_FRAMES_IN_FLIGHT);
+	vk::DescriptorSetLayout[] set_layouts = @repeat(&mat.gpu.descriptor_set_layout, MAX_FRAMES_IN_FLIGHT);
 	defer free(set_layouts);
 	vk::DescriptorSetAllocateInfo alloc_info = {
 		.s_type              = vk::STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
@@ -182,44 +177,44 @@ fn void! createMaterialDescriptorSets(Engine* engine, MaterialGPU* mat) {
 		.descriptor_set_count = set_layouts.len,
 		.p_set_layouts        = &set_layouts,
 	};
-	mat.descriptor_sets = vk::allocateDescriptorSets(engine.device, &alloc_info)!;
+	mat.gpu.descriptor_sets = vk::allocateDescriptorSets(engine.device, &alloc_info)!;
 }
 
-fn void updateDescriptorSets(Engine* engine, MaterialGPU* mat, TextureGPU* albedo, TextureGPU* metalic, TextureGPU* roughness) {
+fn void updateDescriptorSets(Engine* engine, Material* mat, Texture* albedo, Texture* metalic, Texture* roughness) {
     for (uint i =0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vk::WriteDescriptorSet albedo = {
             .s_type           = vk::STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-            .dst_set          = mat.descriptor_sets[i],
+            .dst_set          = mat.gpu.descriptor_sets[i],
             .dst_binding      = 0,
             .descriptor_type  = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
             .descriptor_count = 1,
             .p_image_info     = &&vk::DescriptorImageInfo {
-                .sampler = albedo.sampler,
-                .image_view = albedo.view,
+                .sampler = albedo.gpu.sampler,
+                .image_view = albedo.gpu.view,
                 .image_layout = vk::IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
             },
 		};
 		vk::WriteDescriptorSet metalic = {
             .s_type           = vk::STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-            .dst_set          = mat.descriptor_sets[i],
+            .dst_set          = mat.gpu.descriptor_sets[i],
             .dst_binding      = 1,
             .descriptor_type  = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
             .descriptor_count = 1,
             .p_image_info     = &&vk::DescriptorImageInfo {
-                .sampler = metalic.sampler,
-                .image_view = metalic.view,
+                .sampler = metalic.gpu.sampler,
+                .image_view = metalic.gpu.view,
                 .image_layout = vk::IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
             },
 		};
 		vk::WriteDescriptorSet roughness = {
             .s_type           = vk::STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-            .dst_set          = mat.descriptor_sets[i],
+            .dst_set          = mat.gpu.descriptor_sets[i],
             .dst_binding      = 2,
             .descriptor_type  = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
             .descriptor_count = 1,
             .p_image_info     = &&vk::DescriptorImageInfo {
-                .sampler = roughness.sampler,
-                .image_view = roughness.view,
+                .sampler = roughness.gpu.sampler,
+                .image_view = roughness.gpu.view,
                 .image_layout = vk::IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
             },
 		};
@@ -228,7 +223,7 @@ fn void updateDescriptorSets(Engine* engine, MaterialGPU* mat, TextureGPU* albed
 			metalic,
 			roughness,
 		};
-		vk::updateDescriptorSets(engine.device, descriptors.len, &descriptors, 0, null);
+		vk::updateDescriptorSets(engine.device, writes.len, &writes, 0, null);
 	}
 }
 
@@ -241,12 +236,12 @@ fn vk::ShaderModule! createShaderModule(vk::Device device, char[] code) {
     return vk::createShaderModule(device, &createInfo)!;
 }
 
-fn void destroyMaterial(Engine* engine, MaterialGPU* mat) {
-    vk::destroyPipeline(engine.device, mat.pipeline);
-    vk::destroyPipelineLayout(engine.device, mat.pipeline_layout);
-    vk::destroyDescriptorSetLayout(engine.device, mat.descriptor_set_layout);
-    foreach (set: mat.descriptor_sets) {
+fn void destroyMaterial(Engine* engine, Material* mat) {
+    vk::destroyPipeline(engine.device, mat.gpu.pipeline);
+    vk::destroyPipelineLayout(engine.device, mat.gpu.pipeline_layout);
+    vk::destroyDescriptorSetLayout(engine.device, mat.gpu.descriptor_set_layout);
+    foreach (set: mat.gpu.descriptor_sets) {
         vk::destroyDescriptorSet(engine.device, set);
     }
-    vk::destroyBuffer(engine.device, mat.color_buffer);
+    vk::destroyBuffer(engine.device, mat.gpu.color_buffer);
 }

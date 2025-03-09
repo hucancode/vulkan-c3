@@ -1,33 +1,25 @@
 module mj;
 import stbimage;
 
-def TextureHandle = uint;
-
 struct Texture {
     char* pixels;
     uint width;
     uint height;
     char channel;
+    struct gpu {
+        vk::ImageBuffer buffer;
+        vk::Sampler sampler;
+        vk::ImageView view;
+    }
 }
 
 // const char[*] DATA = $embed("assets/statue-1275469_1280.jpg");
 // defer stbimage::image_free(pixels);
-fn Texture createTextureData(char[] data) {
-    Texture ret;
-    ret.pixels = stbimage::load_from_memory(&data, data.len, &ret.width, &ret.height, &ret.channel, stbimage::RGB_ALPHA);
-    ret.channel = 4;
-    return ret;
-}
 
-struct TextureGPU {
-    vk::ImageBuffer buffer;
-    vk::Sampler sampler;
-    vk::ImageView view;
-}
-
-fn TextureGPU! createTexture(Engine* engine, Texture* data) {
-    TextureGPU texture;
-    usz size = data.width * data.height * data.channel;
+fn void! createTexture(Engine* engine, Texture* texture, char[] data) {
+    texture.pixels = stbimage::load_from_memory(&data, data.len, &texture.width, &texture.height, &texture.channel, stbimage::RGB_ALPHA);
+    texture.channel = 4;
+    usz size = texture.width * texture.height * texture.channel;
     vk::ImageCreateInfo create_info = {
         .s_type = vk::STRUCTURE_TYPE_IMAGE_CREATE_INFO,
         .image_type = vk::IMAGE_TYPE_2D,
@@ -45,8 +37,8 @@ fn TextureGPU! createTexture(Engine* engine, Texture* data) {
         .initial_layout = vk::IMAGE_LAYOUT_UNDEFINED,
         .samples = { .n_1 },
     };
-    texture.buffer = transferToImage(engine.device, &createMappedBuffer(engine, data.pixels, size), &create_info);
-    texture.view = createImageView(texture.buffer.image, create_info.format)!;
+    texture.gpu.buffer = transferToImage(engine.device, &createMappedBuffer(engine, data.pixels, size), &create_info);
+    texture.gpu.view = createImageView(texture.gpu.buffer.image, create_info.format)!;
     vk::SamplerCreateInfo sampler_info = {
         .s_type = vk::STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
         .mag_filter = vk::FILTER_LINEAR,
@@ -62,14 +54,13 @@ fn TextureGPU! createTexture(Engine* engine, Texture* data) {
         .compare_op = vk::COMPARE_OP_ALWAYS,
         .mipmap_mode = vk::SAMPLER_MIPMAP_MODE_LINEAR,
     };
-    texture.sampler = vk::createSampler(engine.device, &sampler_info)!;
-    return texture;
+    texture.gpu.sampler = vk::createSampler(engine.device, &sampler_info)!;
 }
 
-fn void destroyTexture(TextureGPU* texture) {
-    vk::destroyImage(engine.device, texture.image);
-    vk::destroyImageView(engine.device, texture.image_view, null);
-    vk::destroySampler(engine.device, texture.sampler, null);
+fn void destroyTexture(Texture* texture) {
+    vk::destroyImage(engine.device, texture.gpu.image);
+    vk::destroyImageView(engine.device, texture.gpu.view, null);
+    vk::destroySampler(engine.device, texture.gpu.sampler, null);
 }
 
 fn vk::ImageView! createImageView(vk::Image image, vk::Format format) {
