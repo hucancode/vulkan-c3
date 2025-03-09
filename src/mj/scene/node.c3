@@ -30,10 +30,10 @@ struct Node {
     Transform transform;
 }
 
-fn Matrix4f calculateTransform(Transform transform) {
-    return transform.rotation.to_matrix()
-        .mul(Matrix4f.translate(transform.position))
-        .mul(Matrix4f.scale(transform.scale));
+fn Matrix4f Transform.calculate(Transform* this) {
+    return this.rotation.to_matrix()
+        .mul(Matrix4f.translate(this.position))
+        .mul(Matrix4f.scale(this.scale));
 }
 
 fn Transform new_transform() {

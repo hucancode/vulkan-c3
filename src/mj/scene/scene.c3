@@ -6,6 +6,14 @@ struct Scene {
     Camera camera;
     Time last_frame_timestamp;
     Time start_timestamp;
+    struct gpu {
+        MappedBuffer[MAX_FRAMES_IN_FLIGHT] view_buffer;
+        MappedBuffer[MAX_FRAMES_IN_FLIGHT] proj_buffer;
+        MappedBuffer[MAX_FRAMES_IN_FLIGHT] time_buffer;
+        vk::DescriptorPool descriptor_pool;
+        vk::DescriptorSetLayout descriptor_set_layout;
+        vk::DescriptorSet[MAX_FRAMES_IN_FLIGHT] descriptor_sets;
+    }
 }
 
 
@@ -28,17 +36,9 @@ struct Scene {
 //     };
 // }
 
-struct SceneGPU {
-    MappedBuffer[MAX_FRAMES_IN_FLIGHT] view_buffer;
-    MappedBuffer[MAX_FRAMES_IN_FLIGHT] proj_buffer;
-    MappedBuffer[MAX_FRAMES_IN_FLIGHT] time_buffer;
-    vk::DescriptorPool descriptor_pool;
-    vk::DescriptorSetLayout descriptor_set_layout;
-    vk::DescriptorSet[MAX_FRAMES_IN_FLIGHT] descriptor_sets;
-}
 
-fn SceneGPU! createScene(Engine* engine, Scene* data) {
-    SceneGPU scene;
+fn Scene! createScene(Engine* engine) {
+    Scene scene;
     {
         // scene-level descriptor set layout
         vk::DescriptorSetLayoutBinding view_proj = {
@@ -65,7 +65,7 @@ fn SceneGPU! createScene(Engine* engine, Scene* data) {
       		.binding_count = bindings.len,
       		.p_bindings    = &bindings,
        	};
-       	scene.descriptor_set_layout = vk::createDescriptorSetLayout(engine.device, &info)!;
+       	scene.gpu.descriptor_set_layout = vk::createDescriptorSetLayout(engine.device, &info)!;
 	}
 	{
     	vk::DescriptorPoolSize view = {
@@ -91,31 +91,31 @@ fn SceneGPU! createScene(Engine* engine, Scene* data) {
             .p_pool_sizes    = &pool_sizes,
             .max_sets       = MAX_FRAMES_IN_FLIGHT,
         };
-        scene.descriptor_pool = vk::createDescriptorPool(engine.device, &create_info)!;
-        vk::DescriptorSetLayout[] set_layouts = @repeat(&scene.descriptor_set_layout, MAX_FRAMES_IN_FLIGHT);
+        scene.gpu.descriptor_pool = vk::createDescriptorPool(engine.device, &create_info)!;
+        vk::DescriptorSetLayout[] set_layouts = @repeat(&scene.gpu.descriptor_set_layout, MAX_FRAMES_IN_FLIGHT);
         defer free(set_layouts);
         vk::DescriptorSetAllocateInfo alloc_info = {
             .s_type              = vk::STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-            .descriptor_pool     = gpu.descriptor_pool,
+            .descriptor_pool     = scene.gpu.descriptor_pool,
             .descriptor_set_count = set_layouts.len,
             .p_set_layouts        = &set_layouts,
         };
-        scene.descriptor_sets = vk::allocateDescriptorSets(engine.device, &alloc_info)!;
+        scene.gpu.descriptor_sets = vk::allocateDescriptorSets(engine.device, &alloc_info)!;
 	}
     for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        scene.view_buffer[i] = createMappedBuffer(engine, &Matrix4f.IDENTITY, Matrix4f.sizeof, { .uniform_buffer })!;
-        scene.proj_buffer[i] = createMappedBuffer(engine, &Matrix4f.IDENTITY, Matrix4f.sizeof, { .uniform_buffer })!;
-        scene.time_buffer[i] = createMappedBuffer(engine, &&0, float.sizeof, { .uniform_buffer })!;
+        scene.gpu.view_buffer[i] = createMappedBuffer(engine, &Matrix4f.IDENTITY, Matrix4f.sizeof, { .uniform_buffer })!;
+        scene.gpu.proj_buffer[i] = createMappedBuffer(engine, &Matrix4f.IDENTITY, Matrix4f.sizeof, { .uniform_buffer })!;
+        scene.gpu.time_buffer[i] = createMappedBuffer(engine, &&0, float.sizeof, { .uniform_buffer })!;
     }
     return scene;
 }
 
-fn void pushSceneDataToGPU(Scene* data, SceneGPU* scene, uint current_frame) {
+fn void Scene.pushDataToGPU(Scene* this, uint current_frame) {
     Time now = time::now();
-    Matrix4f view = calculate_camera_lookat_matrix(data.camera);
-    Matrix4f proj = calculate_camera_projection_matrix(data.camera);
-    float t = (float)now.diff_sec(scene.start_timestamp);
-    writeToMappedBuffer(&view, scene.view_buffer[current_frame]);
-    writeToMappedBuffer(&proj, scene.proj_buffer[current_frame]);
-    writeToMappedBuffer(&t, scene.time_buffer[current_frame]);
+    Matrix4f view = calculate_camera_lookat_matrix(this.camera);
+    Matrix4f proj = calculate_camera_projection_matrix(this.camera);
+    float t = (float)now.diff_sec(this.start_timestamp);
+    writeToMappedBuffer(&view, this.gpu.view_buffer[current_frame]);
+    writeToMappedBuffer(&proj, this.gpu.proj_buffer[current_frame]);
+    writeToMappedBuffer(&t, this.gpu.time_buffer[current_frame]);
 }
