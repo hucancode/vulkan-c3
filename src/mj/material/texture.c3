@@ -10,12 +10,6 @@ struct Texture {
     char channel;
 }
 
-struct TextureGPU {
-    vk::ImageBuffer buffer;
-    vk::Sampler sampler;
-    vk::ImageView view;
-}
-
 // const char[*] DATA = $embed("assets/statue-1275469_1280.jpg");
 // defer stbimage::image_free(pixels);
 fn Texture createTextureData(char[] data) {
@@ -23,6 +17,12 @@ fn Texture createTextureData(char[] data) {
     ret.pixels = stbimage::load_from_memory(&data, data.len, &ret.width, &ret.height, &ret.channel, stbimage::RGB_ALPHA);
     ret.channel = 4;
     return ret;
+}
+
+struct TextureGPU {
+    vk::ImageBuffer buffer;
+    vk::Sampler sampler;
+    vk::ImageView view;
 }
 
 fn TextureGPU! createTexture(Engine* engine, Texture* data) {

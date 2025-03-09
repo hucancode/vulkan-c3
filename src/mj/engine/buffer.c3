@@ -57,7 +57,7 @@ fn MappedBuffer! createMappedBuffer(Engine* engine, void* data, usz size, vk::Bu
     return ret;
 }
 
-fn void! writeToMappedBuffer(Engine* engine, void* src, MappedBuffer* dst) {
+fn void! writeToMappedBuffer(void* src, MappedBuffer* dst) {
     mem::copy(dst.mapped, src, dst.size);
 }
 

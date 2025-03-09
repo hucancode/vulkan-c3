@@ -1,9 +1,9 @@
 #version 450
 
-layout(set = 1, binding = 0) uniform vec4 color;
-layout(set = 1, binding = 1) uniform sampler2D albedoSampler;
-layout(set = 1, binding = 2) uniform sampler2D metalicSampler;
-layout(set = 1, binding = 3) uniform sampler2D roughnessSampler;
+layout(set = 0, binding = 2) uniform float time;
+layout(set = 1, binding = 0) uniform sampler2D albedoSampler;
+layout(set = 1, binding = 1) uniform sampler2D metalicSampler;
+layout(set = 1, binding = 2) uniform sampler2D roughnessSampler;
 
 layout(location = 0) in vec4 normal;
 layout(location = 1) in vec4 color;

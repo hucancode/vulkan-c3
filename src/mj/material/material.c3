@@ -4,7 +4,6 @@ import vk;
 def MaterialHandle = uint;
 
 struct Material {
-    float[<4>] color;
     TextureHandle albedo;
     TextureHandle metallic;
     TextureHandle roughness;
@@ -16,7 +15,6 @@ struct MaterialGPU {
     vk::DescriptorPool descriptor_pool;
     vk::DescriptorSetLayout descriptor_set_layout;
     vk::DescriptorSet[MAX_FRAMES_IN_FLIGHT] descriptor_sets;
-    vk::Buffer color_buffer;
 }
 
 const char[*] VERTEX_CODE = $embed("shaders/vert.spv");
@@ -24,6 +22,12 @@ const char[*] FRAGMENT_CODE = $embed("shaders/frag.spv");
 
 fn MaterialGPU! createMaterial(Engine* engine, vk::DescriptorSetLayout shared_descriptor_set_layout) {
     MaterialGPU mat;
+    createPipeline(engine, shared_descriptor_set_layout);
+    createMaterialDescriptorSets(engine, &mat);
+    return mat;
+}
+
+fn void! createPipeline(Engine* engine, vk::DescriptorSetLayout shared_descriptor_set_layout) {
     vk::ShaderModule v = createShaderModule(engine.device, &VERTEX_CODE)!;
     defer vk::destroyShaderModule(engine.device, v);
     vk::ShaderModule f = createShaderModule(engine.device, &FRAGMENT_CODE)!;
@@ -83,31 +87,25 @@ fn MaterialGPU! createMaterial(Engine* engine, vk::DescriptorSetLayout shared_de
     };
     {
         // material-level descriptor set layout
-        vk::DescriptorSetLayoutBinding color = {
-            .binding = 0,
-            .descriptor_type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-            .descriptor_count = 1,
-            .stage_flags = { .fragment },
-        };
         vk::DescriptorSetLayoutBinding albedo = {
-            .binding = 1,
+            .binding = 0,
             .descriptor_type = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
             .descriptor_count = 1,
             .stage_flags = { .fragment },
         };
         vk::DescriptorSetLayoutBinding metalic = {
-            .binding = 2,
+            .binding = 1,
             .descriptor_type = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
             .descriptor_count = 1,
             .stage_flags = { .fragment },
         };
         vk::DescriptorSetLayoutBinding roughness = {
-            .binding = 3,
+            .binding = 2,
             .descriptor_type = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
             .descriptor_count = 1,
             .stage_flags = { .fragment },
         };
-        vk::DescriptorSetLayoutBinding[*] bindings = { color, albedo, metalic, roughness };
+        vk::DescriptorSetLayoutBinding[*] bindings = { albedo, metalic, roughness };
         vk::DescriptorSetLayoutCreateInfo info = {
             .s_type        = vk::STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
     		.binding_count = bindings.len,
@@ -149,22 +147,25 @@ fn MaterialGPU! createMaterial(Engine* engine, vk::DescriptorSetLayout shared_de
         .p_next = &dynamic_rendering_info,
     };
     mat.pipeline = vk::createGraphicsPipelines(engine.device, (vk::PipelineCache)0, 1, &pipelineInfo)!;
-    createMaterialDescriptorSets(engine, &mat);
-    return mat;
 }
 
 fn void! createMaterialDescriptorSets(Engine* engine, MaterialGPU* mat) {
-    vk::DescriptorPoolSize color = {
-        .type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-        .descriptor_count = MAX_FRAMES_IN_FLIGHT,
-    };
     vk::DescriptorPoolSize albedo_sampler = {
         .type = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
         .descriptor_count = MAX_FRAMES_IN_FLIGHT,
     };
+    vk::DescriptorPoolSize metalic_sampler = {
+        .type = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+        .descriptor_count = MAX_FRAMES_IN_FLIGHT,
+    };
+    vk::DescriptorPoolSize roughness_sampler = {
+        .type = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+        .descriptor_count = MAX_FRAMES_IN_FLIGHT,
+    };
     vk::DescriptorPoolSize[*] pool_sizes = {
-        color,
         albedo_sampler,
+        metalic_sampler,
+        roughness_sampler,
     };
     vk::DescriptorPoolCreateInfo create_info = {
         .s_type         = vk::STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
@@ -186,22 +187,10 @@ fn void! createMaterialDescriptorSets(Engine* engine, MaterialGPU* mat) {
 
 fn void updateDescriptorSets(Engine* engine, MaterialGPU* mat, TextureGPU* albedo, TextureGPU* metalic, TextureGPU* roughness) {
     for (uint i =0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        vk::WriteDescriptorSet color = {
-            .s_type           = vk::STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-            .dst_set          = mat.descriptor_sets[i],
-            .dst_binding      = 0,
-            .descriptor_type  = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-            .descriptor_count = 1,
-            .p_buffer_info     = &&vk::DescriptorBufferInfo {
-                .buffer = mat.color_buffer,
-                .offset = 0,
-                .range = float[<4>].sizeof,
-            },
-		};
 		vk::WriteDescriptorSet albedo = {
             .s_type           = vk::STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
             .dst_set          = mat.descriptor_sets[i],
-            .dst_binding      = 1,
+            .dst_binding      = 0,
             .descriptor_type  = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
             .descriptor_count = 1,
             .p_image_info     = &&vk::DescriptorImageInfo {
@@ -213,7 +202,7 @@ fn void updateDescriptorSets(Engine* engine, MaterialGPU* mat, TextureGPU* albed
 		vk::WriteDescriptorSet metalic = {
             .s_type           = vk::STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
             .dst_set          = mat.descriptor_sets[i],
-            .dst_binding      = 2,
+            .dst_binding      = 1,
             .descriptor_type  = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
             .descriptor_count = 1,
             .p_image_info     = &&vk::DescriptorImageInfo {
@@ -225,7 +214,7 @@ fn void updateDescriptorSets(Engine* engine, MaterialGPU* mat, TextureGPU* albed
 		vk::WriteDescriptorSet roughness = {
             .s_type           = vk::STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
             .dst_set          = mat.descriptor_sets[i],
-            .dst_binding      = 3,
+            .dst_binding      = 2,
             .descriptor_type  = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
             .descriptor_count = 1,
             .p_image_info     = &&vk::DescriptorImageInfo {
@@ -235,7 +224,6 @@ fn void updateDescriptorSets(Engine* engine, MaterialGPU* mat, TextureGPU* albed
             },
 		};
 		vk::WriteDescriptorSet[*] writes = {
-			color,
 			albedo,
 			metalic,
 			roughness,
@@ -253,12 +241,12 @@ fn vk::ShaderModule! createShaderModule(vk::Device device, char[] code) {
     return vk::createShaderModule(device, &createInfo)!;
 }
 
-fn void destroyMaterial(Engine* engine, MaterialGPU* gpu) {
-    vk::destroyPipeline(engine.device, gpu.pipeline);
-    vk::destroyPipelineLayout(engine.device, gpu.pipeline_layout);
-    vk::destroyDescriptorSetLayout(engine.device, gpu.descriptor_set_layout);
-    foreach (vk::DescriptorSet descriptor_set: gpu.descriptor_sets) {
-        vk::destroyDescriptorSet(engine.device, descriptor_set);
+fn void destroyMaterial(Engine* engine, MaterialGPU* mat) {
+    vk::destroyPipeline(engine.device, mat.pipeline);
+    vk::destroyPipelineLayout(engine.device, mat.pipeline_layout);
+    vk::destroyDescriptorSetLayout(engine.device, mat.descriptor_set_layout);
+    foreach (set: mat.descriptor_sets) {
+        vk::destroyDescriptorSet(engine.device, set);
     }
-    vk::destroyBuffer(engine.device, gpu.color_buffer);
+    vk::destroyBuffer(engine.device, mat.color_buffer);
 }
