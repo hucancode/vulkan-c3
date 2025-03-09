@@ -44,3 +44,12 @@ fn Type* ResourceManager.get(ResourceManager* this, Handle handle) {
     }
     return &this.entries[handle.index].item;
 }
+
+module mj;
+import mj::resource;
+
+def StaticMeshManager = ResourceManager(<StaticMesh>);
+def SkeletalMeshManager = ResourceManager(<SkeletalMesh>);
+def MaterialManager = ResourceManager(<Material>);
+def TextureManager = ResourceManager(<Texture>);
+def NodeManager = ResourceManager(<Node>);
