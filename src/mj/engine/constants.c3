@@ -27,6 +27,11 @@ def Vec2i = int[<2>];
 def Vec4u = uint[<4>];
 def Vec3u = uint[<3>];
 def Vec2u = uint[<2>];
+def Position = float[<3>];
+def Position4 = float[<4>];
+def Scale = float[<3>];
+def Scale4 = float[<4>];
+def Color = float[<4>];
 
 const VEC_UP = Vec3f {0.0, 1.0, 0.0};
 const VEC_DOWN = Vec3f {0.0, -1.0, 0.0};
