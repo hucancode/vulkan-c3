@@ -44,8 +44,12 @@ fn Transform Transform.new() {
     };
 }
 
-fn Node Node.new() {
-    return Node {
-        .transform = Transform.new(),
-    };
+fn void NodePool.parent(NodePool* this, NodeHandle parent, NodeHandle child) {
+    Node* p = this.get(parent);
+    Node* c = this.get(child);
+    if (p == null || c == null) {
+        return;
+    }
+    c.parent = parent;
+    p.children.push(child);
 }

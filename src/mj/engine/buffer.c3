@@ -19,7 +19,7 @@ struct MappedBuffer {
     void* mapped;
 }
 
-fn LocalBuffer! createLocalBuffer(Engine* engine, usz size, vk::BufferUsageFlags usage) {
+fn LocalBuffer! createLocalBuffer(Renderer* renderer, usz size, vk::BufferUsageFlags usage) {
     vk::BufferCreateInfo create_info = {
         .s_type = vk::STRUCTURE_TYPE_BUFFER_CREATE_INFO,
         .size = (vk::DeviceSize)size,
@@ -27,20 +27,20 @@ fn LocalBuffer! createLocalBuffer(Engine* engine, usz size, vk::BufferUsageFlags
         .sharing_mode = vk::SHARING_MODE_EXCLUSIVE,
     };
     LocalBuffer ret = {
-        .buffer = vk::createBuffer(engine.device, &create_info)!,
-        .memory = allocateMemory(engine.device, vk::getBufferMemoryRequirements(engine.device, ret.buffer))!,
+        .buffer = vk::createBuffer(renderer.device, &create_info)!,
+        .memory = allocateMemory(renderer.device, vk::getBufferMemoryRequirements(renderer.device, ret.buffer))!,
         .size = size,
     };
-    vk::bindBufferMemory(engine.device, ret.buffer, ret.memory, 0)!;
+    vk::bindBufferMemory(renderer.device, ret.buffer, ret.memory, 0)!;
     return ret;
 }
 
-fn LocalBuffer! createLocalBufferInit(Engine* engine, void* data, usz size, vk::BufferUsageFlags usage) {
+fn LocalBuffer! createLocalBufferInit(Renderer* renderer, void* data, usz size, vk::BufferUsageFlags usage) {
     MappedBuffer staging = createMappedBuffer(engine, data, size);
     return transferToLocal(engine, &staging, usage);
 }
 
-fn MappedBuffer! createMappedBuffer(Engine* engine, void* data, usz size, vk::BufferUsageFlags usage = { .transfer_src }) {
+fn MappedBuffer! createMappedBuffer(Renderer* renderer, void* data, usz size, vk::BufferUsageFlags usage = { .transfer_src }) {
     vk::BufferCreateInfo create_info = {
         .s_type = vk::STRUCTURE_TYPE_BUFFER_CREATE_INFO,
         .size = (vk::DeviceSize)size,
@@ -48,11 +48,11 @@ fn MappedBuffer! createMappedBuffer(Engine* engine, void* data, usz size, vk::Bu
         .sharing_mode = vk::SHARING_MODE_EXCLUSIVE,
     };
     MappedBuffer ret = {
-        .buffer = vk::createBuffer(engine.device, &create_info)!,
-        .memory = allocateMemory(engine.device, vk::getBufferMemoryRequirements(engine.device, ret.buffer), { .host_visible, .host_coherent })!,
-        .mapped = vk::mapMemory(engine.device, ret.memory, 0, (vk::DeviceSize)size)!,
+        .buffer = vk::createBuffer(renderer.device, &create_info)!,
+        .memory = allocateMemory(renderer.device, vk::getBufferMemoryRequirements(renderer.device, ret.buffer), { .host_visible, .host_coherent })!,
+        .mapped = vk::mapMemory(renderer.device, ret.memory, 0, (vk::DeviceSize)size)!,
     };
-    vk::bindBufferMemory(engine.device, ret.buffer, ret.memory, 0)!;
+    vk::bindBufferMemory(renderer.device, ret.buffer, ret.memory, 0)!;
     mem::copy(ret.mapped, data, size);
     return ret;
 }
@@ -61,7 +61,7 @@ fn void! writeToMappedBuffer(void* src, MappedBuffer* dst) {
     mem::copy(dst.mapped, src, dst.size);
 }
 
-fn LocalBuffer! transferToLocal(Engine* engine, MappedBuffer* src, vk::BufferUsageFlags usage) {
+fn LocalBuffer! transferToLocal(Renderer* renderer, MappedBuffer* src, vk::BufferUsageFlags usage) {
     defer destroyBuffer(engine, src.buffer, src.memory);
     LocalBuffer dst = createLocalBuffer(engine, src.size, { .transfer_dst } | usage);
     vk::CommandBuffer command_buffer = beginSingleTimeCommand()!;
@@ -70,14 +70,14 @@ fn LocalBuffer! transferToLocal(Engine* engine, MappedBuffer* src, vk::BufferUsa
     return dst;
 }
 
-fn ImageBuffer! transferToImage(Engine* engine, MappedBuffer* src, vk::ImageCreateInfo* image_info) {
+fn ImageBuffer! transferToImage(Renderer* renderer, MappedBuffer* src, vk::ImageCreateInfo* image_info) {
     defer destroyBuffer(engine, src.buffer, src.memory);
     ImageBuffer ret = {
-        .image = vk::createImage(engine.device, &image_info),
-        .memory = allocateMemory(engine, vk::getImageMemoryRequirements(engine.device, ret.image))!,
+        .image = vk::createImage(renderer.device, &image_info),
+        .memory = allocateMemory(engine, vk::getImageMemoryRequirements(renderer.device, ret.image))!,
         .size = src.size,
     };
-    vk::bindImageMemory(engine.device, ret.image, ret.memory, 0)!;
+    vk::bindImageMemory(renderer.device, ret.image, ret.memory, 0)!;
     transitionImageLayout(ret.image, image_info.format, vk::IMAGE_LAYOUT_UNDEFINED, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)!;
     vk::CommandBuffer command_buffer = beginSingleTimeCommand()!;
     vk::BufferImageCopy copy_region = {
@@ -107,19 +107,19 @@ fn uint! findMemoryType(vk::PhysicalDevice device, uint filter, vk::MemoryProper
     return vk::VulkanError.ERROR_UNKNOWN?;
 }
 
-fn vk::DeviceMemory! allocateMemory(Engine* engine, vk::MemoryRequirements req, vk::MemoryPropertyFlags properties = { .device_local }) {
+fn vk::DeviceMemory! allocateMemory(Renderer* renderer, vk::MemoryRequirements req, vk::MemoryPropertyFlags properties = { .device_local }) {
     vk::MemoryAllocateInfo info = {
         .s_type = vk::STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
         .allocation_size = req.size,
-        .memory_type_index = findMemoryType(engine.physical_device, req.memory_type_bits, properties)!,
+        .memory_type_index = findMemoryType(renderer.physical_device, req.memory_type_bits, properties)!,
     };
-    return vk::allocateMemory(engine.device, &info)!;
+    return vk::allocateMemory(renderer.device, &info)!;
 }
 
-fn void destroyBuffer(Engine* engine, vk::Buffer buffer, vk::DeviceMemory memory) {
-    vk::destroyBuffer(engine.device, buffer);
-    vk::freeMemory(engine.device, memory);
-    vk::unmapMemory(engine.device, memory);
+fn void destroyBuffer(Renderer* renderer, vk::Buffer buffer, vk::DeviceMemory memory) {
+    vk::destroyBuffer(renderer.device, buffer);
+    vk::freeMemory(renderer.device, memory);
+    vk::unmapMemory(renderer.device, memory);
 }
 
 fn void! transitionImageLayout(vk::Image image, vk::Format format, vk::ImageLayout old, vk::ImageLayout new) {

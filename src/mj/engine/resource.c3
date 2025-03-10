@@ -83,23 +83,23 @@ struct ResourceManager {
     NodePool nodes;
 }
 
-fn MeshHandle ResourceManager.new_mesh(ResourceManager* this) {
+fn MeshHandle ResourceManager.malloc_mesh(ResourceManager* this) {
     return this.meshes.malloc();
 }
 
-fn SkeletalMeshHandle ResourceManager.new_skeleton_mesh(ResourceManager* this) {
+fn SkeletalMeshHandle ResourceManager.malloc_skeleton_mesh(ResourceManager* this) {
     return this.skeleton_meshes.malloc();
 }
 
-fn MaterialHandle ResourceManager.new_material(ResourceManager* this) {
+fn MaterialHandle ResourceManager.malloc_material(ResourceManager* this) {
     return this.materials.malloc();
 }
 
-fn TextureHandle ResourceManager.new_texture(ResourceManager* this) {
+fn TextureHandle ResourceManager.malloc_texture(ResourceManager* this) {
     return this.textures.malloc();
 }
 
-fn LightHandle ResourceManager.new_light(ResourceManager* this) {
+fn LightHandle ResourceManager.malloc_light(ResourceManager* this) {
     LightHandle ret = this.lights.malloc();
     Light* light = &this.lights[ret.index].item;
     light.color = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -107,10 +107,28 @@ fn LightHandle ResourceManager.new_light(ResourceManager* this) {
     return ret;
 }
 
-fn NodeHandle ResourceManager.new_node(ResourceManager* this, NodeType type = NodeType.GROUP) {
+fn NodeHandle ResourceManager.malloc_node(ResourceManager* this, NodeType type = NodeType.GROUP) {
     NodeHandle ret = this.nodes.malloc();
     Node* node = &this.nodes[ret.index].item;
     node.transform.scale = {1.0f, 1.0f, 1.0f};
     node.type = type;
+    return ret;
+}
+
+fn NodeHandle ResourceManager.malloc_static_mesh_node(ResourceManager* this, StaticMeshHandle mesh) {
+    NodeHandle ret = this.nodes.malloc();
+    Node* node = &this.nodes[ret.index].item;
+    node.transform.scale = {1.0f, 1.0f, 1.0f};
+    node.type = NodeType.STATIC_MESH;
+    node.mesh = mesh;
+    return ret;
+}
+
+fn NodeHandle ResourceManager.malloc_skeletal_mesh_node(ResourceManager* this, SkeletalMeshHandle mesh) {
+    NodeHandle ret = this.nodes.malloc();
+    Node* node = &this.nodes[ret.index].item;
+    node.transform.scale = {1.0f, 1.0f, 1.0f};
+    node.type = NodeType.SKELETAL_MESH;
+    node.mesh = mesh;
     return ret;
 }

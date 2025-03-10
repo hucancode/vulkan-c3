@@ -22,18 +22,23 @@ fn int main(String[] args) {
     }
     io::printfn("Window created %x", window);
     defer glfw::destroyWindow(window);
-    Renderer renderer;
-    ResourceManager resource_manager;
+    Engine engine;
     Scene scene;
-    renderer.init(window)!!;
+    engine.renderer.init(window)!!;
     defer engine.destroy();
-    scene.init(resource_manager)!!;
+    scene.init(engine)!!;
     defer scene.destroy();
-    Node cube = new_static_mesh_node(make_cube());
-    add_child(scene.root, cube);
+    MeshHandle cube_mesh_handle = engine.resource.malloc_mesh();
+    engine.resource.meshes.get(cube_mesh_handle).init_cube(scene.renderer);
+    Mesh* cube_mesh = engine.resource.meshes.get(cube_mesh_handle);
+    defer cube_mesh.destroy();
+    NodeHandle cube_handle = engine.resource.malloc_static_mesh_node(cube_mesh_handle);
+    defer engine.resource.nodes.free(cube_handle);
+    engine.resource.nodes.parent(scene.root, cube_handle);
+    Node* cube = engine.resource.nodes.get(cube_handle);
     while (!glfw::windowShouldClose(window)) {
         glfw::pollEvents();
-        double t = scene.last_frame_timestamp.elapsed_seconds();
+        float t = (float)scene.last_frame_timestamp.elapsed_seconds();
         cube.transform.rotation = quaternion::rotate_y(t);
         anyfault excuse = @catch(renderer.render());
         if (excuse) {

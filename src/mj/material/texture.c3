@@ -16,7 +16,7 @@ struct Texture {
 // const char[*] DATA = $embed("assets/statue-1275469_1280.jpg");
 // defer stbimage::image_free(pixels);
 
-fn void! createTexture(Engine* engine, Texture* texture, char[] data) {
+fn void! createTexture(Renderer* renderer, Texture* texture, char[] data) {
     texture.pixels = stbimage::load_from_memory(&data, data.len, &texture.width, &texture.height, &texture.channel, stbimage::RGB_ALPHA);
     texture.channel = 4;
     usz size = texture.width * texture.height * texture.channel;
@@ -37,7 +37,7 @@ fn void! createTexture(Engine* engine, Texture* texture, char[] data) {
         .initial_layout = vk::IMAGE_LAYOUT_UNDEFINED,
         .samples = { .n_1 },
     };
-    texture.gpu.buffer = transferToImage(engine.device, &createMappedBuffer(engine, data.pixels, size), &create_info);
+    texture.gpu.buffer = transferToImage(renderer.device, &createMappedBuffer(engine, data.pixels, size), &create_info);
     texture.gpu.view = createImageView(texture.gpu.buffer.image, create_info.format)!;
     vk::SamplerCreateInfo sampler_info = {
         .s_type = vk::STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
@@ -54,13 +54,13 @@ fn void! createTexture(Engine* engine, Texture* texture, char[] data) {
         .compare_op = vk::COMPARE_OP_ALWAYS,
         .mipmap_mode = vk::SAMPLER_MIPMAP_MODE_LINEAR,
     };
-    texture.gpu.sampler = vk::createSampler(engine.device, &sampler_info)!;
+    texture.gpu.sampler = vk::createSampler(renderer.device, &sampler_info)!;
 }
 
 fn void destroyTexture(Texture* texture) {
-    vk::destroyImage(engine.device, texture.gpu.image);
-    vk::destroyImageView(engine.device, texture.gpu.view, null);
-    vk::destroySampler(engine.device, texture.gpu.sampler, null);
+    vk::destroyImage(renderer.device, texture.gpu.image);
+    vk::destroyImageView(renderer.device, texture.gpu.view, null);
+    vk::destroySampler(renderer.device, texture.gpu.sampler, null);
 }
 
 fn vk::ImageView! createImageView(vk::Image image, vk::Format format) {
@@ -76,6 +76,6 @@ fn vk::ImageView! createImageView(vk::Image image, vk::Format format) {
             .layer_count = 1,
         },
     };
-    vk::createImageView(engine.device, &info, null, &ret)!;
+    vk::createImageView(renderer.device, &info, null, &ret)!;
     return ret;
 }
