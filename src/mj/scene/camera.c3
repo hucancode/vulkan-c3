@@ -7,10 +7,20 @@ enum CameraProjection {
 }
 
 struct Camera {
-    float fov;
-    float aspect_ratio;
-    float near;
-    float far;
+    union {
+        struct {
+            float fov;
+            float aspect_ratio;
+            float near;
+            float far;
+        }
+        struct {
+            float right;
+            float bottom;
+            float near;
+            float far;
+        }
+    }
     Vec3f up;
     Position position;
     CameraProjection projection;
@@ -23,7 +33,7 @@ fn Matrix4f calculate_camera_projection_matrix(Camera camera) {
             return matrix::perspective(<float>)(camera.fov, camera.aspect_ratio, camera.near, camera.far)
                 .transpose();
         case CameraProjection.ORTHOGRAPHIC:
-            return matrix::perspective(<float>)(camera.fov, camera.aspect_ratio, camera.near, camera.far)
+            return matrix::ortho(<float>)(0.0, camera.right, 0.0, camera.bottom, camera.near, camera.far)
                 .transpose();
     }
     return matrix::perspective(<float>)(camera.fov, camera.aspect_ratio, camera.near, camera.far)

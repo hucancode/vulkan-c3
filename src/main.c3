@@ -22,14 +22,11 @@ fn int main(String[] args) {
     }
     io::printfn("Window created %x", window);
     defer glfw::destroyWindow(window);
-    Engine engine;
     Renderer renderer;
     ResourceManager resource_manager;
     Scene scene;
-    engine.init(window)!!;
+    renderer.init(window)!!;
     defer engine.destroy();
-    renderer.init(engine)!!;
-    defer renderer.destroy();
     scene.init(resource_manager)!!;
     defer scene.destroy();
     Node cube = new_static_mesh_node(make_cube());
@@ -38,7 +35,7 @@ fn int main(String[] args) {
         glfw::pollEvents();
         double t = scene.last_frame_timestamp.elapsed_seconds();
         cube.transform.rotation = quaternion::rotate_y(t);
-        anyfault excuse = @catch(render(engine, renderer));
+        anyfault excuse = @catch(renderer.render());
         if (excuse) {
             io::printfn("Error: while rendering");
         };

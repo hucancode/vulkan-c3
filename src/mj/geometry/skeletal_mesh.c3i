@@ -32,8 +32,8 @@ const vk::VertexInputAttributeDescription[*] SKINNED_VERTEX_ATTR_DESCRIPTION = {
 struct SkeletalMesh {
     SkinnedVertex[] vertices;
     uint[] indices;
-    Bone[] bones;
-    HashMap(<String, AnimationTrack>) animations;
+    NodeHandle[] bones;
+    HashMap(<String, Animation[]>) animations;
     struct gpu {
         LocalBuffer vertex;
         LocalBuffer index;

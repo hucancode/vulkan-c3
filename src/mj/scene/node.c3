@@ -9,6 +9,7 @@ enum NodeType {
     LIGHT,
     SKELETAL_MESH,
     STATIC_MESH,
+    BONE,
 }
 struct Transform {
     float[<3>] position;
