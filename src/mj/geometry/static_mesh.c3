@@ -35,7 +35,7 @@ struct StaticMesh {
     }
 }
 
-fn void! StaticMesh.init_cube(StaticMesh* mesh, Renderer* renderer, float[<4>] color = {0.125, 0.25, 0.5, 1.0}) {
+fn void! StaticMesh.initCube(StaticMesh* mesh, Renderer* renderer, float[<4>] color = {0.125, 0.25, 0.5, 1.0}) {
     const float[<4>] A =  {-1.0, -1.0, 1.0, 1.0};
     const float[<4>] B =  {1.0, -1.0, 1.0, 1.0};
     const float[<4>] C =  {1.0, 1.0, 1.0, 1.0};

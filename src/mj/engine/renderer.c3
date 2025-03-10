@@ -40,7 +40,7 @@ struct Renderer {
     }
 }
 
-fn void! Renderer.init(Renderer* this, glfw::Window* window) {
+fn void! Renderer.init(this, glfw::Window* window) {
     this.window = window;
     this.createVulkanInstance()!;
     this.createWindowSurface()!;
@@ -52,7 +52,7 @@ fn void! Renderer.init(Renderer* this, glfw::Window* window) {
     this.createSynchronizers()!;
 }
 
-fn void Renderer.destroy(Renderer* this) {
+fn void Renderer.destroy(this) {
     vk::deviceWaitIdle(this.device)!!;
     this.destroySynchronizers();
     this.destroySwapchain();
@@ -63,7 +63,7 @@ fn void Renderer.destroy(Renderer* this) {
     this.destroyVulkanInstance();
 }
 
-fn void! Renderer.createVulkanInstance(Renderer* this) {
+fn void! Renderer.createVulkanInstance(this) {
     vk::loadProcAddressesGlobal(&glfw::getInstanceProcAddress);
     ulong extensionCount;
     ZString* glfwExtensions = glfw::getRequiredInstanceExtensions(&extensionCount);
@@ -122,18 +122,18 @@ fn void! Renderer.createVulkanInstance(Renderer* this) {
     $endif
 }
 
-fn void Renderer.destroyVulkanInstance(Renderer* this) {
+fn void Renderer.destroyVulkanInstance(this) {
     $if ENABLE_VALIDATION_LAYERS:
         vk::destroyDebugUtilsMessengerEXT(this.instance, this.debug_messenger);
     $endif
     vk::destroyInstance(this.instance);
 }
 
-fn void! Renderer.createWindowSurface(Renderer* this) {
+fn void! Renderer.createWindowSurface(this) {
     vk::check(glfw::createWindowSurface(this.instance, this.window, null, &this.surface))!;
 }
 
-fn void Renderer.destroySurface(Renderer* this) {
+fn void Renderer.destroySurface(this) {
     vk::destroySurfaceKHR(this.instance, this.surface);
 }
 
@@ -199,7 +199,7 @@ fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
     return score;
 }
 
-fn void! Renderer.pickPhysicalDevice(Renderer* engine) {
+fn void! Renderer.pickPhysicalDevice(this) {
     vk::PhysicalDevice[] devices = vk::enumeratePhysicalDevices(this.instance)!;
     defer free(devices);
     this.physical_device = devices[0];
@@ -215,7 +215,7 @@ fn void! Renderer.pickPhysicalDevice(Renderer* engine) {
     io::printfn("Selected physical device: %x with score %d", this.physical_device, bestScore);
 }
 
-fn void Renderer.destroyDevice(Renderer* engine) {
+fn void Renderer.destroyDevice(this) {
     vk::destroyDevice(this.device);
 }
 
@@ -242,7 +242,7 @@ struct QueueFamilyIndices {
     uint present_family;
 }
 
-fn QueueFamilyIndices! Renderer.findQueueFamilies(Renderer* engine) {
+fn QueueFamilyIndices! Renderer.findQueueFamilies(this) {
     vk::QueueFamilyProperties[] families = vk::getPhysicalDeviceQueueFamilyProperties(this.physical_device);
     QueueFamilyIndices indices;
     bool foundGraphics = false;
@@ -266,7 +266,7 @@ fn QueueFamilyIndices! Renderer.findQueueFamilies(Renderer* engine) {
     return vk::VulkanError.ERROR_UNKNOWN?;
 }
 
-fn void! Renderer.createLogicalDevice(Renderer* engine) {
+fn void! Renderer.createLogicalDevice(this) {
     QueueFamilyIndices indices = findQueueFamilies(this.physical_device)!;
     ZString[] layers;
     $if ENABLE_VALIDATION_LAYERS:
@@ -332,7 +332,7 @@ fn vk::Extent2D pickSwapExtent(vk::SurfaceCapabilitiesKHR capabilities) {
     return actualExtent;
 }
 
-fn void! Renderer.createSwapchain(Renderer* engine) {
+fn void! Renderer.createSwapchain(this) {
     QueueFamilyIndices indices = findQueueFamilies(this.physical_device)!;
     SwapchainSupportDetails supported = querySwapchainSupport(this.physical_device)!;
     vk::PresentModeKHR presentMode = pickSwapPresentMode(supported.present_modes);
@@ -376,7 +376,7 @@ fn void! Renderer.createSwapchain(Renderer* engine) {
     }
 }
 
-fn void Renderer.destroySwapchain(Renderer* engine) {
+fn void Renderer.destroySwapchain(this) {
     foreach (view : this.swap_chain_image_views) {
         vk::destroyImageView(this.device, view);
     }
@@ -385,13 +385,13 @@ fn void Renderer.destroySwapchain(Renderer* engine) {
     free(this.swap_chain_images);
 }
 
-fn void! Renderer.recreateSwapchain(Renderer* engine) {
+fn void! Renderer.recreateSwapchain(this) {
     vk::deviceWaitIdle(this.device)!;
-    destroySwapchain(engine);
-    createSwapchain(engine)!;
+    destroySwapchain(this);
+    createSwapchain(this)!;
 }
 
-fn void! Renderer.createCommandPool(Renderer* engine) {
+fn void! Renderer.createCommandPool(this) {
     QueueFamilyIndices queueFamilyIndices = findQueueFamilies(this.physical_device)!;
     vk::CommandPoolCreateInfo info = {
         .s_type = vk::STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
@@ -401,11 +401,11 @@ fn void! Renderer.createCommandPool(Renderer* engine) {
     this.command_pool = vk::createCommandPool(this.device, &info)!;
 }
 
-fn void Renderer.destroyCommandPool(Renderer* engine) {
+fn void Renderer.destroyCommandPool(this) {
     vk::destroyCommandPool(this.device, this.command_pool);
 }
 
-fn vk::CommandBuffer! Renderer.beginSingleTimeCommand(Renderer* engine) {
+fn vk::CommandBuffer! Renderer.beginSingleTimeCommand(this) {
     vk::CommandBuffer[] command_buffer = vk::allocateCommandBuffers(this.device, &&vk::CommandBufferAllocateInfo {
         .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
         .level = vk::COMMAND_BUFFER_LEVEL_PRIMARY,
@@ -419,7 +419,7 @@ fn vk::CommandBuffer! Renderer.beginSingleTimeCommand(Renderer* engine) {
     return command_buffer[0];
 }
 
-fn void! Renderer.endSingleTimeCommand(Renderer* engine, vk::CommandBuffer command_buffer) {
+fn void! Renderer.endSingleTimeCommand(this, vk::CommandBuffer command_buffer) {
     defer vk::freeCommandBuffers(this.device, this.command_pool, 1, &command_buffer);
     vk::endCommandBuffer(command_buffer)!;
     vk::queueSubmit(this.graphics_queue, 1, &&vk::SubmitInfo {
@@ -430,7 +430,7 @@ fn void! Renderer.endSingleTimeCommand(Renderer* engine, vk::CommandBuffer comma
     vk::queueWaitIdle(this.graphics_queue)!;
 }
 
-fn void! Renderer.createSynchronizers(Renderer* this) {
+fn void! Renderer.createSynchronizers(this) {
     vk::CommandBufferAllocateInfo allocInfo = {
         .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
         .command_pool = this.command_pool,
@@ -452,7 +452,7 @@ fn void! Renderer.createSynchronizers(Renderer* this) {
     }
 }
 
-fn void Renderer.destroySynchronizers(Renderer* this) {
+fn void Renderer.destroySynchronizers(this) {
     vk::freeCommandBuffers(this.device, this.command_pool, this.command_buffers.len, &this.command_buffers);
     for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         vk::destroySemaphore(this.device, this.image_available_semaphore[i]);
@@ -461,9 +461,9 @@ fn void Renderer.destroySynchronizers(Renderer* this) {
     }
 }
 
-fn uint! Renderer.frameBegin(Renderer* renderer) {
-    vk::waitForFences(this.device, 1, &renderer.in_flight_fences[renderer.current_frame])!;
-    uint! imageIndex = vk::acquireNextImageKHR(this.device, this.swap_chain, ulong.max, renderer.image_available_semaphore[renderer.current_frame], (vk::Fence)0);
+fn uint! Renderer.frameBegin(this) {
+    vk::waitForFences(this.device, 1, &this.in_flight_fences[this.current_frame])!;
+    uint! imageIndex = vk::acquireNextImageKHR(this.device, this.swap_chain, ulong.max, this.image_available_semaphore[this.current_frame], (vk::Fence)0);
     if (catch excuse = imageIndex) {
         if (excuse == vk::VulkanError.ERROR_OUT_OF_DATE_KHR || excuse == vk::VulkanError.SUBOPTIMAL_KHR) {
             recreateSwapchain()!;
@@ -471,8 +471,8 @@ fn uint! Renderer.frameBegin(Renderer* renderer) {
         }
         return excuse?;
     }
-    vk::resetFences(this.device, 1, &renderer.in_flight_fences[renderer.current_frame])!;
-    vk::CommandBuffer commandBuffer = renderer.command_buffers[renderer.current_frame];
+    vk::resetFences(this.device, 1, &this.in_flight_fences[this.current_frame])!;
+    vk::CommandBuffer commandBuffer = this.command_buffers[this.current_frame];
     vk::resetCommandBuffer(commandBuffer)!;
     vk::beginCommandBuffer(commandBuffer, &&vk::CommandBufferBeginInfo {
         .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -534,7 +534,7 @@ fn uint! Renderer.frameBegin(Renderer* renderer) {
     return imageIndex;
 }
 
-fn void! Renderer.frameEnd(Renderer* this, uint imageIndex) {
+fn void! Renderer.frameEnd(this, uint imageIndex) {
     vk::CommandBuffer commandBuffer = this.command_buffers[this.current_frame];
     vk::cmdEndRenderingKHR(commandBuffer);
     // Transition to PRESENT_SRC_KHR
@@ -594,8 +594,12 @@ fn void! Renderer.frameEnd(Renderer* this, uint imageIndex) {
     this.current_frame = (this.current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
-fn void! Renderer.frameRender(Renderer* this, Scene* scene, ResourceManager* resource_manager) {
-    vk::CommandBuffer command_buffer = this.command_buffers[this.current_frame];
+fn void! Engine.render(this) {
+    Scene* scene = &this.scene;
+    ResourceManager* resource = &this.resource;
+    Renderer* renderer = &this.renderer;
+    uint imageIdx = renderer.frameBegin();
+    vk::CommandBuffer command_buffer = renderer.command_buffers[renderer.current_frame];
     List(<NodeHandle>) node_stack;
     List(<Matrix4f>) transform_stack;
     defer {
@@ -605,13 +609,13 @@ fn void! Renderer.frameRender(Renderer* this, Scene* scene, ResourceManager* res
     node_stack.push(scene.root);
     transform_stack.push(Matrix4f.IDENTITY);
     while (!node_stack.empty()) {
-        Node* node = getNode(resource_manager, node_stack.pop());
-        Matrix4f local_matrix = calculateTransform(node.transform);
+        Node* node = resource.nodes.get(node_stack.pop());
+        Matrix4f local_matrix = node.transform.to_matrix();
         Matrix4f world_matrix = transform_stack.pop().mul(local_matrix);
         switch (node.type) {
             case NodeType.STATIC_MESH: {
-                StaticMeshGPU* mesh = getStaticMeshGPU(resource_manager, node.static_mesh);
-                MaterialGPU* material = getMaterialGPU(resource_manager, node.material);
+                StaticMeshGPU* mesh = resource.static_meshes.get(node.static_mesh);
+                MaterialGPU* material = resource.materials.get(node.material);
                 vk::cmdBindPipeline(command_buffer, vk::PIPELINE_BIND_POINT_GRAPHICS, material.pipeline);
                 vk::DescriptorSet[*] descriptor_sets = {
                     scene.gpu.descriptor_sets[renderer.current_frame],
@@ -649,10 +653,5 @@ fn void! Renderer.frameRender(Renderer* this, Scene* scene, ResourceManager* res
             transform_stack.push(world_matrix);
         }
     }
-}
-
-fn void! Renderer.render(Renderer* this, Scene* scene) {
-    uint imageIdx = this.frameBegin();
-    this.frameRender(scene);
-    this.frameEnd(imageIdx);
+    renderer.frameEnd(imageIdx);
 }

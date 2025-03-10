@@ -16,8 +16,8 @@ struct Scene {
     }
 }
 
-fn void! init(Scene* this, Engine* engine) {
-    this.root = engine.resource.new_node(NodeType.ROOT);
+fn void! Scene.init(this, Renderer* renderer, ResourceManager* resource_manager) {
+    this.root = resource_manager.new_node(NodeType.ROOT);
     this.camera = {
         .projection = CameraProjection.PERSPECTIVE,
         .fov = 45.0,
@@ -54,7 +54,7 @@ fn void! init(Scene* this, Engine* engine) {
       		.binding_count = bindings.len,
       		.p_bindings    = &bindings,
        	};
-       	this.gpu.descriptor_set_layout = vk::createDescriptorSetLayout(engine.renderer.device, &info)!;
+       	this.gpu.descriptor_set_layout = vk::createDescriptorSetLayout(renderer.device, &info)!;
 	}
 	{
     	vk::DescriptorPoolSize view = {
@@ -80,7 +80,7 @@ fn void! init(Scene* this, Engine* engine) {
             .p_pool_sizes    = &pool_sizes,
             .max_sets       = MAX_FRAMES_IN_FLIGHT,
         };
-        this.gpu.descriptor_pool = vk::createDescriptorPool(engine.renderer.device, &create_info)!;
+        this.gpu.descriptor_pool = vk::createDescriptorPool(renderer.device, &create_info)!;
         vk::DescriptorSetLayout[] set_layouts = @repeat(&this.gpu.descriptor_set_layout, MAX_FRAMES_IN_FLIGHT);
         defer free(set_layouts);
         vk::DescriptorSetAllocateInfo alloc_info = {
@@ -89,16 +89,16 @@ fn void! init(Scene* this, Engine* engine) {
             .descriptor_set_count = set_layouts.len,
             .p_set_layouts        = &set_layouts,
         };
-        this.gpu.descriptor_sets = vk::allocateDescriptorSets(engine.renderer.device, &alloc_info)!;
+        this.gpu.descriptor_sets = vk::allocateDescriptorSets(renderer.device, &alloc_info)!;
 	}
     for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        this.gpu.view_buffer[i] = createMappedBuffer(engine.renderer, &Matrix4f.IDENTITY, Matrix4f.sizeof, { .uniform_buffer })!;
-        this.gpu.proj_buffer[i] = createMappedBuffer(engine.renderer, &Matrix4f.IDENTITY, Matrix4f.sizeof, { .uniform_buffer })!;
-        this.gpu.time_buffer[i] = createMappedBuffer(engine.renderer, &&0, float.sizeof, { .uniform_buffer })!;
+        this.gpu.view_buffer[i] = createMappedBuffer(renderer, &Matrix4f.IDENTITY, Matrix4f.sizeof, { .uniform_buffer })!;
+        this.gpu.proj_buffer[i] = createMappedBuffer(renderer, &Matrix4f.IDENTITY, Matrix4f.sizeof, { .uniform_buffer })!;
+        this.gpu.time_buffer[i] = createMappedBuffer(renderer, &&0, float.sizeof, { .uniform_buffer })!;
     }
 }
 
-fn void Scene.destroy(Scene* this) {
+fn void Scene.destroy(this) {
     vk::destroyDescriptorPool(this.gpu.descriptor_pool);
     vk::destroyDescriptorSetLayout(this.gpu.descriptor_set_layout);
     vk::destroyBuffer(this.gpu.view_buffer[0]);
@@ -106,7 +106,7 @@ fn void Scene.destroy(Scene* this) {
     vk::destroyBuffer(this.gpu.time_buffer[0]);
 }
 
-fn void Scene.pushDataToGPU(Scene* this, uint current_frame) {
+fn void Scene.pushDataToGPU(this, uint current_frame) {
     Time now = time::now();
     Matrix4f view = calculate_camera_lookat_matrix(this.camera);
     Matrix4f proj = calculate_camera_projection_matrix(this.camera);

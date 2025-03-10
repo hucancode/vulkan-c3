@@ -83,23 +83,23 @@ struct ResourceManager {
     NodePool nodes;
 }
 
-fn MeshHandle ResourceManager.malloc_mesh(ResourceManager* this) {
+fn MeshHandle ResourceManager.mallocMesh(ResourceManager* this) {
     return this.meshes.malloc();
 }
 
-fn SkeletalMeshHandle ResourceManager.malloc_skeleton_mesh(ResourceManager* this) {
+fn SkeletalMeshHandle ResourceManager.mallocSkeletonMesh(ResourceManager* this) {
     return this.skeleton_meshes.malloc();
 }
 
-fn MaterialHandle ResourceManager.malloc_material(ResourceManager* this) {
+fn MaterialHandle ResourceManager.mallocMaterial(ResourceManager* this) {
     return this.materials.malloc();
 }
 
-fn TextureHandle ResourceManager.malloc_texture(ResourceManager* this) {
+fn TextureHandle ResourceManager.mallocTexture(ResourceManager* this) {
     return this.textures.malloc();
 }
 
-fn LightHandle ResourceManager.malloc_light(ResourceManager* this) {
+fn LightHandle ResourceManager.mallocLight(ResourceManager* this) {
     LightHandle ret = this.lights.malloc();
     Light* light = &this.lights[ret.index].item;
     light.color = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -107,7 +107,7 @@ fn LightHandle ResourceManager.malloc_light(ResourceManager* this) {
     return ret;
 }
 
-fn NodeHandle ResourceManager.malloc_node(ResourceManager* this, NodeType type = NodeType.GROUP) {
+fn NodeHandle ResourceManager.mallocNode(ResourceManager* this, NodeType type = NodeType.GROUP) {
     NodeHandle ret = this.nodes.malloc();
     Node* node = &this.nodes[ret.index].item;
     node.transform.scale = {1.0f, 1.0f, 1.0f};
@@ -115,7 +115,7 @@ fn NodeHandle ResourceManager.malloc_node(ResourceManager* this, NodeType type =
     return ret;
 }
 
-fn NodeHandle ResourceManager.malloc_static_mesh_node(ResourceManager* this, StaticMeshHandle mesh) {
+fn NodeHandle ResourceManager.mallocStaticMeshNode(ResourceManager* this, StaticMeshHandle mesh) {
     NodeHandle ret = this.nodes.malloc();
     Node* node = &this.nodes[ret.index].item;
     node.transform.scale = {1.0f, 1.0f, 1.0f};
@@ -124,7 +124,7 @@ fn NodeHandle ResourceManager.malloc_static_mesh_node(ResourceManager* this, Sta
     return ret;
 }
 
-fn NodeHandle ResourceManager.malloc_skeletal_mesh_node(ResourceManager* this, SkeletalMeshHandle mesh) {
+fn NodeHandle ResourceManager.mallocSkeletalMeshNode(ResourceManager* this, SkeletalMeshHandle mesh) {
     NodeHandle ret = this.nodes.malloc();
     Node* node = &this.nodes[ret.index].item;
     node.transform.scale = {1.0f, 1.0f, 1.0f};

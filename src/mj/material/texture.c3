@@ -16,29 +16,12 @@ struct Texture {
 // const char[*] DATA = $embed("assets/statue-1275469_1280.jpg");
 // defer stbimage::image_free(pixels);
 
-fn void! createTexture(Renderer* renderer, Texture* texture, char[] data) {
-    texture.pixels = stbimage::load_from_memory(&data, data.len, &texture.width, &texture.height, &texture.channel, stbimage::RGB_ALPHA);
-    texture.channel = 4;
-    usz size = texture.width * texture.height * texture.channel;
-    vk::ImageCreateInfo create_info = {
-        .s_type = vk::STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-        .image_type = vk::IMAGE_TYPE_2D,
-        .extent = {
-            .width = w,
-            .height = h,
-            .depth = 1
-        },
-        .mip_levels = 1,
-        .array_layers = 1,
-        .format = vk::FORMAT_R8G8B8A8_SRGB,
-        .tiling = vk::IMAGE_TILING_OPTIMAL,
-        .usage = { .transfer_dst, .sampled },
-        .sharing_mode = vk::SHARING_MODE_EXCLUSIVE,
-        .initial_layout = vk::IMAGE_LAYOUT_UNDEFINED,
-        .samples = { .n_1 },
-    };
-    texture.gpu.buffer = transferToImage(renderer.device, &createMappedBuffer(engine, data.pixels, size), &create_info);
-    texture.gpu.view = createImageView(texture.gpu.buffer.image, create_info.format)!;
+fn void! Renderer.initTexture(this, Texture* texture, char[] data) {
+    uint width, height;
+    char* pixels = stbimage::load_from_memory(&data, data.len, &texture.width, &texture.height, &texture.channel, stbimage::RGB_ALPHA);
+    uint channel = 4;
+    texture.gpu.buffer = this.makeImageBuffer(pixels, vk::FORMAT_R8G8B8A8_SRGB, width, height, channel);
+    texture.gpu.view = this.createImageView(texture.gpu.buffer)!;
     vk::SamplerCreateInfo sampler_info = {
         .s_type = vk::STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
         .mag_filter = vk::FILTER_LINEAR,
@@ -54,28 +37,28 @@ fn void! createTexture(Renderer* renderer, Texture* texture, char[] data) {
         .compare_op = vk::COMPARE_OP_ALWAYS,
         .mipmap_mode = vk::SAMPLER_MIPMAP_MODE_LINEAR,
     };
-    texture.gpu.sampler = vk::createSampler(renderer.device, &sampler_info)!;
+    texture.gpu.sampler = vk::createSampler(this.device, &sampler_info)!;
 }
 
-fn void destroyTexture(Texture* texture) {
-    vk::destroyImage(renderer.device, texture.gpu.image);
-    vk::destroyImageView(renderer.device, texture.gpu.view, null);
-    vk::destroySampler(renderer.device, texture.gpu.sampler, null);
+fn void Renderer.destroyTexture(this, Texture* texture) {
+    this.destroyImage(texture.gpu.buffer);
+    vk::destroyImageView(this.device, texture.gpu.view);
+    vk::destroySampler(this.device, texture.gpu.sampler);
 }
 
-fn vk::ImageView! createImageView(vk::Image image, vk::Format format) {
+fn vk::ImageView! Renderer.createImageView(this, ImageBuffer buffer) {
     vk::ImageView ret;
     vk::ImageViewCreateInfo info = {
         .s_type = vk::STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-        .image = image,
+        .image = buffer.image,
         .view_type = vk::IMAGE_VIEW_TYPE_2D,
-        .format = format,
+        .format = buffer.format,
         .subresource_range = {
             .aspect_mask = { .color },
             .level_count = 1,
             .layer_count = 1,
         },
     };
-    vk::createImageView(renderer.device, &info, null, &ret)!;
+    vk::createImageView(this.device, &info, null, &ret)!;
     return ret;
 }

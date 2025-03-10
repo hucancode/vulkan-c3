@@ -32,7 +32,7 @@ struct Node {
     Transform transform;
 }
 
-fn Matrix4f Transform.calculate(Transform* this) {
+fn Matrix4f Transform.toMatrix(this) {
     return this.rotation.to_matrix()
         .mul(Matrix4f.translate(this.position))
         .mul(Matrix4f.scale(this.scale));
@@ -44,7 +44,7 @@ fn Transform Transform.new() {
     };
 }
 
-fn void NodePool.parent(NodePool* this, NodeHandle parent, NodeHandle child) {
+fn void NodePool.parent(this, NodeHandle parent, NodeHandle child) {
     Node* p = this.get(parent);
     Node* c = this.get(child);
     if (p == null || c == null) {

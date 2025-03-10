@@ -27,7 +27,7 @@ struct Camera {
     Quaternion rotation;
 }
 
-fn Matrix4f calculate_camera_projection_matrix(Camera camera) {
+fn Matrix4f calculateCameraProjectionMatrix(Camera camera) {
     switch (camera.projection) {
         case CameraProjection.PERSPECTIVE:
             return matrix::perspective(<float>)(camera.fov, camera.aspect_ratio, camera.near, camera.far)
@@ -40,12 +40,12 @@ fn Matrix4f calculate_camera_projection_matrix(Camera camera) {
         .transpose();
 }
 
-fn Matrix4f calculate_camera_lookat_matrix(Camera camera, Position target = {}) {
+fn Matrix4f calculateCameraLookatMatrix(Camera camera, Position target = {}) {
     return matrix::look_at(<float>)(camera.position, target, camera.up)
         .transpose();
 }
 
-fn Matrix4f calculate_camera_view_matrix(Camera camera) {
+fn Matrix4f calculateCameraViewMatrix(Camera camera) {
     return camera.rotation.to_matrix()
         .translate(camera.position)
         .transpose();

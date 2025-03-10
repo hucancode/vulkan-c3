@@ -1,6 +1,6 @@
 module mj;
 
-struct LocalBuffer {
+struct DataBuffer {
     vk::Buffer buffer;
     vk::DeviceMemory memory;
     usz size;
@@ -9,7 +9,9 @@ struct LocalBuffer {
 struct ImageBuffer {
     vk::Image image;
     vk::DeviceMemory memory;
-    usz size;
+    uint width;
+    uint height;
+    vk::Format format;
 }
 
 struct MappedBuffer {
@@ -19,78 +21,114 @@ struct MappedBuffer {
     void* mapped;
 }
 
-fn LocalBuffer! createLocalBuffer(Renderer* renderer, usz size, vk::BufferUsageFlags usage) {
+fn DataBuffer! Renderer.mallocLocalBuffer(this, usz size, vk::BufferUsageFlags usage) {
     vk::BufferCreateInfo create_info = {
         .s_type = vk::STRUCTURE_TYPE_BUFFER_CREATE_INFO,
         .size = (vk::DeviceSize)size,
         .usage = usage,
         .sharing_mode = vk::SHARING_MODE_EXCLUSIVE,
     };
-    LocalBuffer ret = {
-        .buffer = vk::createBuffer(renderer.device, &create_info)!,
-        .memory = allocateMemory(renderer.device, vk::getBufferMemoryRequirements(renderer.device, ret.buffer))!,
-        .size = size,
-    };
-    vk::bindBufferMemory(renderer.device, ret.buffer, ret.memory, 0)!;
+    DataBuffer ret;
+    ret.buffer = vk::createBuffer(this.device, &create_info)!;
+    ret.memory = this.allocateMemory(vk::getBufferMemoryRequirements(this.device, ret.buffer))!;
+    ret.size = size;
+    vk::bindBufferMemory(this.device, ret.buffer, ret.memory, 0)!;
     return ret;
 }
 
-fn LocalBuffer! createLocalBufferInit(Renderer* renderer, void* data, usz size, vk::BufferUsageFlags usage) {
-    MappedBuffer staging = createMappedBuffer(engine, data, size);
-    return transferToLocal(engine, &staging, usage);
-}
-
-fn MappedBuffer! createMappedBuffer(Renderer* renderer, void* data, usz size, vk::BufferUsageFlags usage = { .transfer_src }) {
+fn DataBuffer! Renderer.mallocHostVisibleBuffer(this, usz size, vk::BufferUsageFlags usage = { .transfer_src }) {
     vk::BufferCreateInfo create_info = {
         .s_type = vk::STRUCTURE_TYPE_BUFFER_CREATE_INFO,
         .size = (vk::DeviceSize)size,
         .usage = usage,
         .sharing_mode = vk::SHARING_MODE_EXCLUSIVE,
     };
-    MappedBuffer ret = {
-        .buffer = vk::createBuffer(renderer.device, &create_info)!,
-        .memory = allocateMemory(renderer.device, vk::getBufferMemoryRequirements(renderer.device, ret.buffer), { .host_visible, .host_coherent })!,
-        .mapped = vk::mapMemory(renderer.device, ret.memory, 0, (vk::DeviceSize)size)!,
+    DataBuffer ret = {
+        .buffer = vk::createBuffer(this.device, &create_info)!,
+        .memory = this.allocateMemory(vk::getBufferMemoryRequirements(this.device, ret.buffer), { .host_visible, .host_coherent })!,
     };
-    vk::bindBufferMemory(renderer.device, ret.buffer, ret.memory, 0)!;
-    mem::copy(ret.mapped, data, size);
+    vk::bindBufferMemory(this.device, ret.buffer, ret.memory, 0)!;
     return ret;
 }
 
-fn void! writeToMappedBuffer(void* src, MappedBuffer* dst) {
-    mem::copy(dst.mapped, src, dst.size);
-}
-
-fn LocalBuffer! transferToLocal(Renderer* renderer, MappedBuffer* src, vk::BufferUsageFlags usage) {
-    defer destroyBuffer(engine, src.buffer, src.memory);
-    LocalBuffer dst = createLocalBuffer(engine, src.size, { .transfer_dst } | usage);
-    vk::CommandBuffer command_buffer = beginSingleTimeCommand()!;
-    vk::cmdCopyBuffer(command_buffer, src.buffer, dst.buffer, 1, &&vk::BufferCopy { .size = (vk::DeviceSize)size });
-    endSingleTimeCommand(command_buffer)!;
-    return dst;
-}
-
-fn ImageBuffer! transferToImage(Renderer* renderer, MappedBuffer* src, vk::ImageCreateInfo* image_info) {
-    defer destroyBuffer(engine, src.buffer, src.memory);
-    ImageBuffer ret = {
-        .image = vk::createImage(renderer.device, &image_info),
-        .memory = allocateMemory(engine, vk::getImageMemoryRequirements(renderer.device, ret.image))!,
-        .size = src.size,
+fn ImageBuffer! Renderer.mallocImageBuffer(this, vk::Format format, uint width, uint height) {
+    vk::ImageCreateInfo create_info = {
+        .s_type = vk::STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+        .image_type = vk::IMAGE_TYPE_2D,
+        .extent = {
+            .width = width,
+            .height = height,
+            .depth = 1
+        },
+        .mip_levels = 1,
+        .array_layers = 1,
+        .format = format,
+        .tiling = vk::IMAGE_TILING_OPTIMAL,
+        .usage = { .transfer_dst, .sampled },
+        .sharing_mode = vk::SHARING_MODE_EXCLUSIVE,
+        .initial_layout = vk::IMAGE_LAYOUT_UNDEFINED,
+        .samples = { .n_1 },
     };
-    vk::bindImageMemory(renderer.device, ret.image, ret.memory, 0)!;
-    transitionImageLayout(ret.image, image_info.format, vk::IMAGE_LAYOUT_UNDEFINED, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)!;
-    vk::CommandBuffer command_buffer = beginSingleTimeCommand()!;
+    ImageBuffer ret;
+    ret.image = vk::createImage(this.device, &image_info);
+    ret.memory = this.allocateMemory(vk::getImageMemoryRequirements(this.device, ret.image))!;
+    ret.extent = image_info.extent;
+    ret.format = image_info.format;
+    vk::bindImageMemory(this.device, ret.image, ret.memory, 0)!;
+    return ret;
+}
+
+fn DataBuffer! Renderer.mallocLocalBuffer(this, usz size, vk::BufferUsageFlags usage) {
+    DataBuffer staging = this.makeHostVisibleBuffer(size);
+    DataBuffer ret = this.mallocLocalBuffer(size);
+    this.copyBuffer(&ret, &staging);
+    this.destroyBuffer(&staging);
+    return ret;
+}
+
+fn DataBuffer! Renderer.makeHostVisibleBuffer(this, usz size, vk::BufferUsageFlags usage = { .transfer_src }) {
+    DataBuffer ret = this.createHostVisibleBuffer(size, usage);
+    this.writeBuffer(&ret, data);
+    return ret;
+}
+
+fn ImageBuffer! Renderer.makeImageBuffer(this, void* data, vk::Format format, uint width, uint height, uint channel) {
+    usz size = width * height * channel;
+    DataBuffer staging = this.makeHostVisibleBuffer(data, size);
+    ImageBuffer ret = this.mallocImageBuffer(format, width, height);
+    this.copyImage(&ret, &staging);
+    this.destroyBuffer(&staging);
+    return ret;
+}
+
+fn void! Renderer.writeBuffer(this, DataBuffer* buffer, void* data) {
+    void* mapped = vk::mapMemory(this.device, buffer.memory, 0, (vk::DeviceSize)buffer.size)!;
+    mem::copy(mapped, data, buffer.size);
+}
+
+fn void! Renderer.copyBuffer(this, DataBuffer* dst, DataBuffer* src) {
+    vk::CommandBuffer command_buffer = this.beginSingleTimeCommand()!;
+    vk::cmdCopyBuffer(command_buffer, src.buffer, dst.buffer, 1, &&vk::BufferCopy { .size = (vk::DeviceSize)src.size });
+    this.endSingleTimeCommand(command_buffer)!;
+}
+
+fn void! Renderer.copyImage(this, ImageBuffer* dst, DataBuffer* src) {
+    this.transitionImageLayout(dst.image, dst.format, vk::IMAGE_LAYOUT_UNDEFINED, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)!;
+    vk::CommandBuffer command_buffer = this.beginSingleTimeCommand()!;
     vk::BufferImageCopy copy_region = {
         .image_subresource = {
             .aspect_mask = { .color },
             .layer_count = 1,
         },
-        .image_extent = image_info.extent,
+        .image_extent = {
+            .width = dst.width,
+            .height = dst.height,
+            .depth = 1,
+        },
     };
-    vk::cmdCopyBufferToImage(command_buffer, src.buffer, ret.image, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copy_region);
-    endSingleTimeCommand(command_buffer)!;
-    transitionImageLayout(ret.image, image_info.format, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, vk::IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)!;
-    return ret;
+    vk::cmdCopyBufferToImage(command_buffer, src.buffer, dst.image, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copy_region);
+    this.endSingleTimeCommand(command_buffer)!;
+    this.transitionImageLayout(dst.image, dst.format, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, vk::IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)!;
 }
 
 fn uint! findMemoryType(vk::PhysicalDevice device, uint filter, vk::MemoryPropertyFlags flags) {
@@ -107,23 +145,29 @@ fn uint! findMemoryType(vk::PhysicalDevice device, uint filter, vk::MemoryProper
     return vk::VulkanError.ERROR_UNKNOWN?;
 }
 
-fn vk::DeviceMemory! allocateMemory(Renderer* renderer, vk::MemoryRequirements req, vk::MemoryPropertyFlags properties = { .device_local }) {
+fn vk::DeviceMemory! Renderer.allocateMemory(this, vk::MemoryRequirements req, vk::MemoryPropertyFlags properties = { .device_local }) {
     vk::MemoryAllocateInfo info = {
         .s_type = vk::STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
         .allocation_size = req.size,
-        .memory_type_index = findMemoryType(renderer.physical_device, req.memory_type_bits, properties)!,
+        .memory_type_index = findMemoryType(this.physical_device, req.memory_type_bits, properties)!,
     };
-    return vk::allocateMemory(renderer.device, &info)!;
+    return vk::allocateMemory(this.device, &info)!;
 }
 
-fn void destroyBuffer(Renderer* renderer, vk::Buffer buffer, vk::DeviceMemory memory) {
-    vk::destroyBuffer(renderer.device, buffer);
-    vk::freeMemory(renderer.device, memory);
-    vk::unmapMemory(renderer.device, memory);
+fn void Renderer.destroyImage(this, ImageBuffer* buffer) {
+    vk::destroyImage(this.device, buffer.image);
+    vk::freeMemory(this.device, buffer.memory);
+    vk::unmapMemory(this.device, buffer.memory);
 }
 
-fn void! transitionImageLayout(vk::Image image, vk::Format format, vk::ImageLayout old, vk::ImageLayout new) {
-    vk::CommandBuffer command_buffer = beginSingleTimeCommand()!;
+fn void Renderer.destroyBuffer(this, DataBuffer* buffer) {
+    vk::destroyBuffer(this.device, buffer.buffer);
+    vk::freeMemory(this.device, buffer.memory);
+    vk::unmapMemory(this.device, buffer.memory);
+}
+
+fn void! Renderer.transitionImageLayout(this, vk::Image image, vk::Format format, vk::ImageLayout old, vk::ImageLayout new) {
+    vk::CommandBuffer command_buffer = this.beginSingleTimeCommand()!;
     vk::PipelineStageFlags src_stage;
     vk::PipelineStageFlags dst_stage;
     vk::ImageMemoryBarrier barrier = {
@@ -158,24 +202,5 @@ fn void! transitionImageLayout(vk::Image image, vk::Format format, vk::ImageLayo
         0, null,
         0, null,
         1, &barrier);
-    endSingleTimeCommand(command_buffer)!;
-}
-
-fn void! copyBufferImage(vk::Buffer buffer, vk::Image image, uint width, uint height) {
-    vk::CommandBuffer command_buffer = beginSingleTimeCommand()!;
-    vk::BufferImageCopy copy_region = {
-        .buffer_offset = 0,
-        .buffer_row_length = 0,
-        .buffer_image_height = 0,
-        .image_subresource = {
-            .aspect_mask = { .color },
-            .mip_level = 0,
-            .base_array_layer = 0,
-            .layer_count = 1,
-        },
-        .image_offset = {0, 0, 0},
-        .image_extent = {width, height, 1},
-    };
-    vk::cmdCopyBufferToImage(command_buffer, buffer, image, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copy_region);
-    endSingleTimeCommand(command_buffer)!;
+    this.endSingleTimeCommand(command_buffer)!;
 }
