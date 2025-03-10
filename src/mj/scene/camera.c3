@@ -7,30 +7,36 @@ enum CameraProjection {
 }
 
 struct Camera {
-    CameraProjection projection;
     float fov;
     float aspect_ratio;
     float near;
     float far;
-    float[<4>] up;
-    float[<4>] position;
+    Vec3f up;
+    Position position;
+    CameraProjection projection;
     Quaternion rotation;
 }
 
 fn Matrix4f calculate_camera_projection_matrix(Camera camera) {
     switch (camera.projection) {
         case CameraProjection.PERSPECTIVE:
-            return matrix::perspective(<float>)(camera.fov, camera.aspect_ratio, camera.near, camera.far).transpose();
+            return matrix::perspective(<float>)(camera.fov, camera.aspect_ratio, camera.near, camera.far)
+                .transpose();
         case CameraProjection.ORTHOGRAPHIC:
-            return matrix::perspective(<float>)(camera.fov, camera.aspect_ratio, camera.near, camera.far).transpose();
+            return matrix::perspective(<float>)(camera.fov, camera.aspect_ratio, camera.near, camera.far)
+                .transpose();
     }
-    return matrix::perspective(<float>)(camera.fov, camera.aspect_ratio, camera.near, camera.far).transpose();
+    return matrix::perspective(<float>)(camera.fov, camera.aspect_ratio, camera.near, camera.far)
+        .transpose();
 }
 
-fn Matrix4f calculate_camera_lookat_matrix(Camera camera, float[<4>] target = {0.0, 0.0, 0.0, 1.0}) {
-    return matrix::look_at(<float>)(camera.position, target, camera.up).transpose();
+fn Matrix4f calculate_camera_lookat_matrix(Camera camera, Position target = {}) {
+    return matrix::look_at(<float>)(camera.position, target, camera.up)
+        .transpose();
 }
 
 fn Matrix4f calculate_camera_view_matrix(Camera camera) {
-    return matrix::translate(<float>)(camera.position).transpose() * matrix::rotate(<float>)(camera.rotation).transpose();
+    return camera.rotation.to_matrix()
+        .translate(camera.position)
+        .transpose();
 }

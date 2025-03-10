@@ -1,7 +1,5 @@
 module mj;
 
-def LightHandle = uint;
-
 enum LightType {
     POINT,
     DIRECTIONAL,
