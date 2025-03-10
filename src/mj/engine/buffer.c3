@@ -112,6 +112,7 @@ fn void! Renderer.copyBuffer(this, DataBuffer* dst, DataBuffer* src) {
     this.endSingleTimeCommand(command_buffer)!;
 }
 
+// this procedure is assuming input image is uninitialized
 fn void! Renderer.copyImage(this, ImageBuffer* dst, DataBuffer* src) {
     this.transitionImageLayout(dst.image, dst.format, vk::IMAGE_LAYOUT_UNDEFINED, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)!;
     vk::CommandBuffer command_buffer = this.beginSingleTimeCommand()!;
@@ -166,6 +167,7 @@ fn void Renderer.destroyBuffer(this, DataBuffer* buffer) {
     vk::unmapMemory(this.device, buffer.memory);
 }
 
+// this procedure is assuming image only live in fragment shader
 fn void! Renderer.transitionImageLayout(this, vk::Image image, vk::Format format, vk::ImageLayout old, vk::ImageLayout new) {
     vk::CommandBuffer command_buffer = this.beginSingleTimeCommand()!;
     vk::PipelineStageFlags src_stage;
