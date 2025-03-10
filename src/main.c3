@@ -23,12 +23,15 @@ fn int main(String[] args) {
     io::printfn("Window created %x", window);
     defer glfw::destroyWindow(window);
     Engine engine;
+    Renderer renderer;
+    ResourceManager resource_manager;
+    Scene scene;
     engine.init(window)!!;
     defer engine.destroy();
-    Renderer renderer;
     renderer.init(engine)!!;
     defer renderer.destroy();
-    Scene scene = make_scene();
+    scene.init(resource_manager)!!;
+    defer scene.destroy();
     Node cube = new_static_mesh_node(make_cube());
     add_child(scene.root, cube);
     while (!glfw::windowShouldClose(window)) {

@@ -13,12 +13,12 @@ struct Entry {
     Type item;
 }
 
-struct ResourceManager {
+struct ResourcePool {
     List(<Entry>) entries;
     List(<uint>) free_indices;
 }
 
-fn Handle ResourceManager.malloc(ResourceManager* this) {
+fn Handle ResourcePool.malloc(ResourcePool* this) {
     if (this.free_indices.empty()) {
         uint index = this.entries.size();
         this.entries.push({.generation = 0, .active = true});
@@ -31,7 +31,7 @@ fn Handle ResourceManager.malloc(ResourceManager* this) {
     return {index, gen};
 }
 
-fn void ResourceManager.free(ResourceManager* this, Handle handle) {
+fn void ResourcePool.free(ResourcePool* this, Handle handle) {
     if (handle.index >= this.entries.size()) {
         return;
     }
@@ -43,7 +43,7 @@ fn void ResourceManager.free(ResourceManager* this, Handle handle) {
     this.free_indices.push(handle.index);
 }
 
-fn Type* ResourceManager.get(ResourceManager* this, Handle handle) {
+fn Type* ResourcePool.get(ResourcePool* this, Handle handle) {
     if (handle.index >= this.entries.size()) {
         return null;
     }
@@ -60,8 +60,57 @@ fn Type* ResourceManager.get(ResourceManager* this, Handle handle) {
 module mj;
 import mj::resource;
 
-def StaticMeshManager = ResourceManager(<StaticMesh>);
-def SkeletalMeshManager = ResourceManager(<SkeletalMesh>);
-def MaterialManager = ResourceManager(<Material>);
-def TextureManager = ResourceManager(<Texture>);
-def NodeManager = ResourceManager(<Node>);
+def StaticMeshPool = ResourcePool(<StaticMesh>);
+def SkeletalMeshPool = ResourcePool(<SkeletalMesh>);
+def MaterialPool = ResourcePool(<Material>);
+def TexturePool = ResourcePool(<Texture>);
+def LightPool = ResourcePool(<Light>);
+def NodePool = ResourcePool(<Node>);
+
+def StaticMeshHandle = Handle;
+def SkeletalMeshHandle = Handle;
+def MaterialHandle = Handle;
+def TextureHandle = Handle;
+def LightHandle = Handle;
+def NodeHandle = Handle;
+
+struct ResourceManager {
+    StaticMeshPool meshes;
+    SkeletalMeshPool skeleton_meshes;
+    MaterialPool materials;
+    TexturePool textures;
+    LightPool lights;
+    NodePool nodes;
+}
+
+fn MeshHandle ResourceManager.new_mesh(ResourceManager* this) {
+    return this.meshes.malloc();
+}
+
+fn SkeletalMeshHandle ResourceManager.new_skeleton_mesh(ResourceManager* this) {
+    return this.skeleton_meshes.malloc();
+}
+
+fn MaterialHandle ResourceManager.new_material(ResourceManager* this) {
+    return this.materials.malloc();
+}
+
+fn TextureHandle ResourceManager.new_texture(ResourceManager* this) {
+    return this.textures.malloc();
+}
+
+fn LightHandle ResourceManager.new_light(ResourceManager* this) {
+    LightHandle ret = this.lights.malloc();
+    Light* light = &this.lights[ret.index].item;
+    light.color = {1.0f, 1.0f, 1.0f, 1.0f};
+    light.intensity = 1.0f;
+    return ret;
+}
+
+fn NodeHandle ResourceManager.new_node(ResourceManager* this, NodeType type = NodeType.GROUP) {
+    NodeHandle ret = this.nodes.malloc();
+    Node* node = &this.nodes[ret.index].item;
+    node.transform.scale = {1.0f, 1.0f, 1.0f};
+    node.type = type;
+    return ret;
+}

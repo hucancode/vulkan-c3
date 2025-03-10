@@ -4,6 +4,7 @@ import std::math::quaternion;
 import std::collections::list;
 
 enum NodeType {
+    ROOT,
     GROUP,
     LIGHT,
     SKELETAL_MESH,
@@ -36,39 +37,14 @@ fn Matrix4f Transform.calculate(Transform* this) {
         .mul(Matrix4f.scale(this.scale));
 }
 
-fn Transform new_transform() {
+fn Transform Transform.new() {
     return Transform {
         .scale= {1.0, 1.0, 1.0, 1.0},
     };
 }
 
-fn Node new_node() {
+fn Node Node.new() {
     return Node {
-        .transform = new_transform(),
+        .transform = Transform.new(),
     };
 }
-
-fn Node new_static_mesh_node(uint mesh_handle = 0) {
-    return Node {
-        .type = NodeType.STATIC_MESH,
-        .static_mesh = mesh_handle,
-        .transform = new_transform(),
-    };
-}
-
-
-// fn Node new_light_node(uint light_handle = 0) {
-//     return Node {
-//         .type = NodeType.LIGHT,
-//         .light = light_handle,
-//         .transform = new_transform(),
-//     };
-// }
-
-// fn Node new_skeletal_mesh_node(uint mesh_handle = 0) {
-//     return Node {
-//         .type = NodeType.SKELETAL_MESH,
-//         .skeletal_mesh = mesh_handle,
-//         .transform = new_transform(),
-//     };
-// }

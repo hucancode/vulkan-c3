@@ -174,7 +174,6 @@ fn void! Renderer.frameEnd(Renderer* this, Engine* engine, uint imageIndex) {
     this.current_frame = (this.current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
-
 fn void! Renderer.frameRender(Renderer* this, Engine* engine, Scene* scene, ResourceManager* resource_manager) {
     vk::CommandBuffer command_buffer = this.command_buffers[this.current_frame];
     List(<NodeHandle>) node_stack;

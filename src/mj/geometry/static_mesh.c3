@@ -35,8 +35,7 @@ struct StaticMesh {
     }
 }
 
-
-fn void! make_cube(Engine* engine, StaticMesh* mesh, float[<4>] color = {0.125, 0.25, 0.5, 1.0}) {
+fn void! StaticMesh.init_cube(StaticMesh* mesh, Engine* engine, float[<4>] color = {0.125, 0.25, 0.5, 1.0}) {
     const float[<4>] A =  {-1.0, -1.0, 1.0, 1.0};
     const float[<4>] B =  {1.0, -1.0, 1.0, 1.0};
     const float[<4>] C =  {1.0, 1.0, 1.0, 1.0};
@@ -95,7 +94,7 @@ fn void! make_cube(Engine* engine, StaticMesh* mesh, float[<4>] color = {0.125, 
     mesh.gpu.index = createLocalBufferInit(engine, &mesh.indices, $sizeof(mesh.indices), { .index_buffer });
 }
 
-fn void destroyStaticMesh(Engine* engine, StaticMesh* mesh) {
+fn void StaticMesh.destroy(StaticMesh* mesh, Engine* engine) {
     destroyBuffer(engine.device, mesh.gpu.vertex.buffer, mesh.gpu.vertex.memory);
     destroyBuffer(engine.device, mesh.gpu.index.buffer, mesh.gpu.index.memory);
 }
