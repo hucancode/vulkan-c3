@@ -15,11 +15,11 @@ import glfw;
 
 # Running example
 Install C3C, Vulkan SDK, GLFW, then simply run
-```
+```sh
 c3c run
 ```
 If you don't want to install those dependencies on your system, you can use a nix flake to set them up for you
-```
+```sh
 nix develop
 # inside nix environment
 c3c run
@@ -36,9 +36,36 @@ c3c run
   * Enum values are renamed as follows: `VK_ENUM_VALUE` -> `vk::ENUM_VALUE`
 * Vulkan flags are converted to `bitstruct` and renamed as follows: `VkFlagName` -> `vk::FlagName`
 * All string equivalents (e.g. `char *`) are converted to `ZString`
-* All functions that handle error by returning `VkResult` is now converted to using C3's `fault` system. For example `VkResult vkBeginCommandBuffer(VkCommandBuffer commandBuffer, const VkCommandBufferBeginInfo* pBeginInfo)` is converted to `fn void? beginCommandBuffer(CommandBuffer commandBuffer, CommandBufferBeginInfo* pBeginInfo)`
-* All functions that supposed to extract an array values are converted to return a `slice` instead. For example `VkResult VkEnumerateInstanceExtensionProperties(char* pLayerName, int* count, VkExtensionProperties* properties)` is converted to `fn ExtensionProperties[]? enumerateInstanceExtensionProperties(ZString pLayerName)`
-* All functions that supposed to return a value now return that value and not take the output in function argument in the form of pointer. For example `VkResult vkCreateInstance(const VkInstanceCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkInstance* pInstance)` is converted to `fn Instance? createInstance(InstanceCreateInfo* pCreateInfo, AllocationCallbacks* pAllocator = null)`
+* All functions that handle error by returning `VkResult` is now converted to using C3's `fault` system.
+  For example: 
+  ```cpp
+  VkResult vkBeginCommandBuffer(VkCommandBuffer commandBuffer, const VkCommandBufferBeginInfo* pBeginInfo)
+  ```
+  is converted to
+
+  ```cpp
+  fn void? beginCommandBuffer(CommandBuffer commandBuffer, CommandBufferBeginInfo* pBeginInfo)
+  ```
+  
+* All functions that supposed to extract an array values are converted to return a `slice` instead.
+  For example:
+  ```cpp
+  VkResult VkEnumerateInstanceExtensionProperties(char* pLayerName, int* count, VkExtensionProperties* properties)
+  ```
+  is converted to
+
+  ```cpp
+  fn ExtensionProperties[]? enumerateInstanceExtensionProperties(ZString pLayerName)
+  ```
+* All functions that supposed to return a value now return that value and not take the output in function argument in the form of pointer.
+  For example:
+  ```cpp
+  VkResult vkCreateInstance(const VkInstanceCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkInstance* pInstance)
+  ```
+  is converted to
+  ```c
+  fn Instance? createInstance(InstanceCreateInfo* pCreateInfo, AllocationCallbacks* pAllocator = null)
+  ```
 
 ## Error Handling
 
