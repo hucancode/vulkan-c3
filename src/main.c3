@@ -245,7 +245,7 @@ fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
         }
     $endif
     {
-        vk::ExtensionProperties[]? extensions = vk::enumerateDeviceExtensionProperties(device, null);
+        vk::ExtensionProperties[]? extensions = vk::enumerateDeviceExtensionProperties(device);
         if (catch excuse = extensions) {
             io::printfn("Cound not get extension list for %s", deviceName);
             return 0;
@@ -648,7 +648,7 @@ fn void? createCommandPool() {
 
 fn void destroyCommandPool() {
     vk::freeCommandBuffers(g_device, g_command_pool, g_command_buffers.len, &g_command_buffers);
-    vk::destroyCommandPool(g_device, g_command_pool, null);
+    vk::destroyCommandPool(g_device, g_command_pool);
 }
 
 fn void? createSemaphores() {
@@ -668,9 +668,9 @@ fn void? createSemaphores() {
 
 fn void destroySemaphores() {
     for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        vk::destroySemaphore(g_device, g_image_available_semaphore[i], null);
-        vk::destroySemaphore(g_device, g_render_finished_semaphore[i], null);
-        vk::destroyFence(g_device, g_in_flight_fences[i], null);
+        vk::destroySemaphore(g_device, g_image_available_semaphore[i]);
+        vk::destroySemaphore(g_device, g_render_finished_semaphore[i]);
+        vk::destroyFence(g_device, g_in_flight_fences[i]);
     }
 }
 
@@ -748,8 +748,8 @@ fn void? createBufferInit(void* data, vk::DeviceSize size, vk::BufferUsageFlags 
     vk::DeviceMemory stg_memory;
     createBuffer(size, { .transfer_src }, { .host_visible, .host_coherent }, &stg_buffer, &stg_memory)!;
     defer {
-        vk::destroyBuffer(g_device, stg_buffer, null);
-        vk::freeMemory(g_device, stg_memory, null);
+        vk::destroyBuffer(g_device, stg_buffer);
+        vk::freeMemory(g_device, stg_memory);
     }
     void* mapped = vk::mapMemory(g_device, stg_memory, 0, size)!;
     defer vk::unmapMemory(g_device, stg_memory);
@@ -770,13 +770,13 @@ fn void? createBuffers() {
 }
 
 fn void destroyBuffers() {
-    vk::destroyBuffer(g_device, g_vertex_buffer, null);
-    vk::freeMemory(g_device, g_vertex_memory, null);
-    vk::destroyBuffer(g_device, g_index_buffer, null);
-    vk::freeMemory(g_device, g_index_memory, null);
+    vk::destroyBuffer(g_device, g_vertex_buffer);
+    vk::freeMemory(g_device, g_vertex_memory);
+    vk::destroyBuffer(g_device, g_index_buffer);
+    vk::freeMemory(g_device, g_index_memory);
     for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        vk::destroyBuffer(g_device, g_uniform_buffers[i], null);
-        vk::freeMemory(g_device, g_uniform_memory[i], null);
+        vk::destroyBuffer(g_device, g_uniform_buffers[i]);
+        vk::freeMemory(g_device, g_uniform_memory[i]);
     }
     destroyTextures();
 }
@@ -790,8 +790,8 @@ fn void? createTextures() {
     vk::Buffer stg_buffer;
     vk::DeviceMemory stg_memory;
     createBuffer(size, { .transfer_src }, { .host_visible, .host_coherent }, &stg_buffer, &stg_memory)!;
-    defer vk::freeMemory(g_device, stg_memory, null);
-    defer vk::destroyBuffer(g_device, stg_buffer, null);
+    defer vk::freeMemory(g_device, stg_memory);
+    defer vk::destroyBuffer(g_device, stg_buffer);
     void* image_data_mapped = vk::mapMemory(g_device, stg_memory, 0, size)!;
     mem::copy(image_data_mapped, pixels, (usz)size);
     vk::unmapMemory(g_device, stg_memory);
@@ -916,9 +916,9 @@ fn vk::ImageView? createImageView(vk::Image image, vk::Format format) {
 }
 
 fn void destroyTextures() {
-    vk::destroyImage(g_device, g_texture_image, null);
-    vk::destroyImageView(g_device, g_texture_image_view, null);
-    vk::destroySampler(g_device, g_sampler, null);
+    vk::destroyImage(g_device, g_texture_image);
+    vk::destroyImageView(g_device, g_texture_image_view);
+    vk::destroySampler(g_device, g_sampler);
 }
 
 fn void createUBO() {
@@ -1001,7 +1001,7 @@ fn void? createDescriptorSets() {
 }
 
 fn void destroyDescriptorSets() {
-	vk::destroyDescriptorPool(g_device, g_descriptor_pool, null);
+	vk::destroyDescriptorPool(g_device, g_descriptor_pool);
 }
 
 fn void updateUniforms() {
