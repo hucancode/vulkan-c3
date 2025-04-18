@@ -25,6 +25,8 @@ nix develop
 c3c run
 ```
 
+![screenshot](readme/cube.gif)
+
 ## Usage
 
 * Vulkan functions are renamed as follows: `vkFunctionName` -> `vk::functionName`
