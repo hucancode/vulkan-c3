@@ -22,8 +22,9 @@ import glfw;
   * Enum values are renamed as follows: `VK_ENUM_VALUE` -> `vk::ENUM_VALUE`
 * Vulkan flags are converted to `bitstruct` and renamed as follows: `VkFlagName` -> `vk::FlagName`
 * All string equivalents (e.g. `char *`) are converted to `ZString`
-* All functions that handle error by returning `VkResult` is now converted to using C3's `fault` system. For example `VkResult vkCreateInstance(const VkInstanceCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkInstance* pInstance)` is converted to `fn void! createInstance(InstanceCreateInfo* pCreateInfo, AllocationCallbacks* pAllocator, Instance* pInstance)`
-* All functions that supposed to extract an array values are converted to return a `slice` instead. For example `VkResult VkEnumerateInstanceExtensionProperties(char* pLayerName, int* count, VkExtensionProperties* properties)` is converted to `fn ExtensionProperties[]! enumerateInstanceExtensionProperties(ZString pLayerName)`
+* All functions that handle error by returning `VkResult` is now converted to using C3's `fault` system. For example `VkResult vkBeginCommandBuffer(VkCommandBuffer commandBuffer, const VkCommandBufferBeginInfo* pBeginInfo)` is converted to `fn void? beginCommandBuffer(CommandBuffer commandBuffer, CommandBufferBeginInfo* pBeginInfo)`
+* All functions that supposed to extract an array values are converted to return a `slice` instead. For example `VkResult VkEnumerateInstanceExtensionProperties(char* pLayerName, int* count, VkExtensionProperties* properties)` is converted to `fn ExtensionProperties[]? enumerateInstanceExtensionProperties(ZString pLayerName)`
+* All functions that supposed to return a value now return that value and not take the output in function argument in the form of pointer. For example `VkResult vkCreateInstance(const VkInstanceCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkInstance* pInstance)` is converted to `fn Instance? createInstance(InstanceCreateInfo* pCreateInfo, AllocationCallbacks* pAllocator = null)`
 
 ## Error Handling
 
@@ -41,19 +42,54 @@ vk::InstanceCreateInfo createInfo = {
     },
 };
 fn void create() {
-    anyfault excuse = vk::createInstance(&createInfo, null, &instance);
-    if (excuse == vk::Error::NOT_READY) {
-        io::printfn("not ready to create instance");
+    Instance? instance = vk::createInstance(&createInfo);
+    if (catch excuse == instance) {
+        if (excuse == vk::Error::NOT_READY) {
+            io::printfn("not ready to create instance");
+        } else {
+            io::printfn("something went wrong while creating instance");
+        }
     }
 }
 ```
 Or you can use shorthand like so:
 ```cpp
 fn void create() {
-    vk::createInstance(&createInfo, null, &instance)!!;
+    Instance instance = vk::createInstance(&createInfo)!!;
 }
+```
+
+# Enum handling
+Enum is implemented as follow
+```cpp
+typedef  IndexType = CInt;
+const IndexType INDEX_TYPE_UINT16    = 0;
+const IndexType INDEX_TYPE_UINT32    = 1;
+const IndexType INDEX_TYPE_UINT8     = 1000265000;
+const IndexType INDEX_TYPE_NONE_KHR  = 1000165000;
+const IndexType INDEX_TYPE_NONE_NV   = INDEX_TYPE_NONE_KHR;
+const IndexType INDEX_TYPE_UINT8_EXT = INDEX_TYPE_UINT8;
+const IndexType INDEX_TYPE_UINT8_KHR = INDEX_TYPE_UINT8;
+
+vk::cmdBindIndexBuffer(command_buffer, buffer, 0, vk::INDEX_TYPE_UINT8); // OK
+```
+
+Note: In C3 the following code is more idiomatic and clean, but it is not compatible with Vulkan C library.
+With this implementation `vk::IndexType.UINT8` will be passed as `2` to vulkan instead of the expected `1000265000`
+```cpp
+enum IndexType : CInt (inline CInt v) {
+    UINT16    = 0,
+    UINT32    = 1,
+    UINT8     = 1000265000,
+    NONE_KHR  = 1000165000,
+    NONE_NV   = 1000165000,
+    UINT8_EXT = 1000265000,
+    UINT8_KHR = 1000265000,
+}
+
+vk::cmdBindIndexBuffer(command_buffer, buffer, 0, vk::IndexType.UINT8); // this will cause GPU to read trash values!!
 ```
 
 # Credits
 
-This binding was mostly generated using a python script based on [Odin](https://github.com/odin-lang/Odin/tree/master/vendor/vulkan)'s.
+This binding was made possible thank to the initial effort from [Odin](https://github.com/odin-lang/Odin/tree/master/vendor/vulkan)'s.

@@ -8,9 +8,9 @@ const int GREY_ALPHA = 2;
 const int RGB        = 3;
 const int RGB_ALPHA  = 4;
 
-def ProcRead = fn int(void* user, char* data, int size);
-def ProcSkip = fn void(void* user, int n);
-def ProcEof = fn int(void* user);
+alias ProcRead = fn int(void* user, char* data, int size);
+alias ProcSkip = fn void(void* user, int n);
+alias ProcEof = fn int(void* user);
 struct IOCallbacks {
     ProcRead read;
     ProcSkip skip;

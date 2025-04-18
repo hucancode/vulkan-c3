@@ -7,12 +7,12 @@ import std::core::cinterop;
 import std::collections::bitset;
 
 // Enums
-distinct AccelerationStructureBuildTypeKHR = CInt;
+typedef AccelerationStructureBuildTypeKHR = CInt;
 const AccelerationStructureBuildTypeKHR ACCELERATION_STRUCTURE_BUILD_TYPE_HOST_KHR           = 0;
 const AccelerationStructureBuildTypeKHR ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR         = 1;
 const AccelerationStructureBuildTypeKHR ACCELERATION_STRUCTURE_BUILD_TYPE_HOST_OR_DEVICE_KHR = 2;
 
-distinct AccelerationStructureCompatibilityKHR = CInt;
+typedef AccelerationStructureCompatibilityKHR = CInt;
 const AccelerationStructureCompatibilityKHR ACCELERATION_STRUCTURE_COMPATIBILITY_COMPATIBLE_KHR   = 0;
 const AccelerationStructureCompatibilityKHR ACCELERATION_STRUCTURE_COMPATIBILITY_INCOMPATIBLE_KHR = 1;
 
@@ -22,17 +22,17 @@ bitstruct AccelerationStructureCreateFlagsKHR : Flags @overlap {
 	bool motion_nv                            : 2;
 }
 
-distinct AccelerationStructureMemoryRequirementsTypeNV = CInt;
+typedef AccelerationStructureMemoryRequirementsTypeNV = CInt;
 const AccelerationStructureMemoryRequirementsTypeNV ACCELERATION_STRUCTURE_MEMORY_REQUIREMENTS_TYPE_OBJECT_NV         = 0;
 const AccelerationStructureMemoryRequirementsTypeNV ACCELERATION_STRUCTURE_MEMORY_REQUIREMENTS_TYPE_BUILD_SCRATCH_NV  = 1;
 const AccelerationStructureMemoryRequirementsTypeNV ACCELERATION_STRUCTURE_MEMORY_REQUIREMENTS_TYPE_UPDATE_SCRATCH_NV = 2;
 
-distinct AccelerationStructureMotionInstanceTypeNV = CInt;
+typedef AccelerationStructureMotionInstanceTypeNV = CInt;
 const AccelerationStructureMotionInstanceTypeNV ACCELERATION_STRUCTURE_MOTION_INSTANCE_TYPE_STATIC_NV        = 0;
 const AccelerationStructureMotionInstanceTypeNV ACCELERATION_STRUCTURE_MOTION_INSTANCE_TYPE_MATRIX_MOTION_NV = 1;
 const AccelerationStructureMotionInstanceTypeNV ACCELERATION_STRUCTURE_MOTION_INSTANCE_TYPE_SRT_MOTION_NV    = 2;
 
-distinct AccelerationStructureTypeKHR = CInt;
+typedef AccelerationStructureTypeKHR = CInt;
 const AccelerationStructureTypeKHR ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR    = 0;
 const AccelerationStructureTypeKHR ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR = 1;
 const AccelerationStructureTypeKHR ACCELERATION_STRUCTURE_TYPE_GENERIC_KHR      = 2;
@@ -80,12 +80,12 @@ bitstruct AccessFlags : Flags @overlap {
 bitstruct AcquireProfilingLockFlagsKHR : Flags @overlap {
 }
 
-distinct AntiLagModeAMD = CInt;
+typedef AntiLagModeAMD = CInt;
 const AntiLagModeAMD ANTI_LAG_MODE_DRIVER_CONTROL_AMD = 0;
 const AntiLagModeAMD ANTI_LAG_MODE_ON_AMD             = 1;
 const AntiLagModeAMD ANTI_LAG_MODE_OFF_AMD            = 2;
 
-distinct AntiLagStageAMD = CInt;
+typedef AntiLagStageAMD = CInt;
 const AntiLagStageAMD ANTI_LAG_STAGE_INPUT_AMD   = 0;
 const AntiLagStageAMD ANTI_LAG_STAGE_PRESENT_AMD = 1;
 
@@ -93,7 +93,7 @@ bitstruct AttachmentDescriptionFlags : Flags @overlap {
 	bool may_alias : 0;
 }
 
-distinct AttachmentLoadOp = CInt;
+typedef AttachmentLoadOp = CInt;
 const AttachmentLoadOp ATTACHMENT_LOAD_OP_LOAD      = 0;
 const AttachmentLoadOp ATTACHMENT_LOAD_OP_CLEAR     = 1;
 const AttachmentLoadOp ATTACHMENT_LOAD_OP_DONT_CARE = 2;
@@ -101,7 +101,7 @@ const AttachmentLoadOp ATTACHMENT_LOAD_OP_NONE      = 1000400000;
 const AttachmentLoadOp ATTACHMENT_LOAD_OP_NONE_EXT  = ATTACHMENT_LOAD_OP_NONE;
 const AttachmentLoadOp ATTACHMENT_LOAD_OP_NONE_KHR  = ATTACHMENT_LOAD_OP_NONE;
 
-distinct AttachmentStoreOp = CInt;
+typedef AttachmentStoreOp = CInt;
 const AttachmentStoreOp ATTACHMENT_STORE_OP_STORE     = 0;
 const AttachmentStoreOp ATTACHMENT_STORE_OP_DONT_CARE = 1;
 const AttachmentStoreOp ATTACHMENT_STORE_OP_NONE      = 1000301000;
@@ -109,7 +109,7 @@ const AttachmentStoreOp ATTACHMENT_STORE_OP_NONE_KHR  = ATTACHMENT_STORE_OP_NONE
 const AttachmentStoreOp ATTACHMENT_STORE_OP_NONE_QCOM = ATTACHMENT_STORE_OP_NONE;
 const AttachmentStoreOp ATTACHMENT_STORE_OP_NONE_EXT  = ATTACHMENT_STORE_OP_NONE;
 
-distinct BlendFactor = CInt;
+typedef BlendFactor = CInt;
 const BlendFactor BLEND_FACTOR_ZERO                     = 0;
 const BlendFactor BLEND_FACTOR_ONE                      = 1;
 const BlendFactor BLEND_FACTOR_SRC_COLOR                = 2;
@@ -130,7 +130,7 @@ const BlendFactor BLEND_FACTOR_ONE_MINUS_SRC1_COLOR     = 16;
 const BlendFactor BLEND_FACTOR_SRC1_ALPHA               = 17;
 const BlendFactor BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA     = 18;
 
-distinct BlendOp = CInt;
+typedef BlendOp = CInt;
 const BlendOp BLEND_OP_ADD                    = 0;
 const BlendOp BLEND_OP_SUBTRACT               = 1;
 const BlendOp BLEND_OP_REVERSE_SUBTRACT       = 2;
@@ -183,16 +183,16 @@ const BlendOp BLEND_OP_RED_EXT                = 1000148043;
 const BlendOp BLEND_OP_GREEN_EXT              = 1000148044;
 const BlendOp BLEND_OP_BLUE_EXT               = 1000148045;
 
-distinct BlendOverlapEXT = CInt;
+typedef BlendOverlapEXT = CInt;
 const BlendOverlapEXT BLEND_OVERLAP_UNCORRELATED_EXT = 0;
 const BlendOverlapEXT BLEND_OVERLAP_DISJOINT_EXT     = 1;
 const BlendOverlapEXT BLEND_OVERLAP_CONJOINT_EXT     = 2;
 
-distinct BlockMatchWindowCompareModeQCOM = CInt;
+typedef BlockMatchWindowCompareModeQCOM = CInt;
 const BlockMatchWindowCompareModeQCOM BLOCK_MATCH_WINDOW_COMPARE_MODE_MIN_QCOM = 0;
 const BlockMatchWindowCompareModeQCOM BLOCK_MATCH_WINDOW_COMPARE_MODE_MAX_QCOM = 1;
 
-distinct BorderColor = CInt;
+typedef BorderColor = CInt;
 const BorderColor BORDER_COLOR_FLOAT_TRANSPARENT_BLACK = 0;
 const BorderColor BORDER_COLOR_INT_TRANSPARENT_BLACK   = 1;
 const BorderColor BORDER_COLOR_FLOAT_OPAQUE_BLACK      = 2;
@@ -265,7 +265,7 @@ bitstruct BuildAccelerationStructureFlagsKHR : Flags @overlap {
 	bool low_memory_nv                          : 4;
 }
 
-distinct BuildAccelerationStructureModeKHR = CInt;
+typedef BuildAccelerationStructureModeKHR = CInt;
 const BuildAccelerationStructureModeKHR BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR  = 0;
 const BuildAccelerationStructureModeKHR BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR = 1;
 
@@ -275,10 +275,10 @@ bitstruct BuildMicromapFlagsEXT : Flags @overlap {
 	bool allow_compaction  : 2;
 }
 
-distinct BuildMicromapModeEXT = CInt;
+typedef BuildMicromapModeEXT = CInt;
 const BuildMicromapModeEXT BUILD_MICROMAP_MODE_BUILD_EXT = 0;
 
-distinct ChromaLocation = CInt;
+typedef ChromaLocation = CInt;
 const ChromaLocation CHROMA_LOCATION_COSITED_EVEN     = 0;
 const ChromaLocation CHROMA_LOCATION_MIDPOINT         = 1;
 const ChromaLocation CHROMA_LOCATION_COSITED_EVEN_KHR = CHROMA_LOCATION_COSITED_EVEN;
@@ -309,24 +309,24 @@ bitstruct ClusterAccelerationStructureIndexFormatFlagsNV : Flags @overlap {
 	bool n_32bit : 2;
 }
 
-distinct ClusterAccelerationStructureOpModeNV = CInt;
+typedef ClusterAccelerationStructureOpModeNV = CInt;
 const ClusterAccelerationStructureOpModeNV CLUSTER_ACCELERATION_STRUCTURE_OP_MODE_IMPLICIT_DESTINATIONS_NV = 0;
 const ClusterAccelerationStructureOpModeNV CLUSTER_ACCELERATION_STRUCTURE_OP_MODE_EXPLICIT_DESTINATIONS_NV = 1;
 const ClusterAccelerationStructureOpModeNV CLUSTER_ACCELERATION_STRUCTURE_OP_MODE_COMPUTE_SIZES_NV         = 2;
 
-distinct ClusterAccelerationStructureOpTypeNV = CInt;
+typedef ClusterAccelerationStructureOpTypeNV = CInt;
 const ClusterAccelerationStructureOpTypeNV CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_MOVE_OBJECTS_NV                    = 0;
 const ClusterAccelerationStructureOpTypeNV CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_BUILD_CLUSTERS_BOTTOM_LEVEL_NV     = 1;
 const ClusterAccelerationStructureOpTypeNV CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_BUILD_TRIANGLE_CLUSTER_NV          = 2;
 const ClusterAccelerationStructureOpTypeNV CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_BUILD_TRIANGLE_CLUSTER_TEMPLATE_NV = 3;
 const ClusterAccelerationStructureOpTypeNV CLUSTER_ACCELERATION_STRUCTURE_OP_TYPE_INSTANTIATE_TRIANGLE_CLUSTER_NV    = 4;
 
-distinct ClusterAccelerationStructureTypeNV = CInt;
+typedef ClusterAccelerationStructureTypeNV = CInt;
 const ClusterAccelerationStructureTypeNV CLUSTER_ACCELERATION_STRUCTURE_TYPE_CLUSTERS_BOTTOM_LEVEL_NV     = 0;
 const ClusterAccelerationStructureTypeNV CLUSTER_ACCELERATION_STRUCTURE_TYPE_TRIANGLE_CLUSTER_NV          = 1;
 const ClusterAccelerationStructureTypeNV CLUSTER_ACCELERATION_STRUCTURE_TYPE_TRIANGLE_CLUSTER_TEMPLATE_NV = 2;
 
-distinct CoarseSampleOrderTypeNV = CInt;
+typedef CoarseSampleOrderTypeNV = CInt;
 const CoarseSampleOrderTypeNV COARSE_SAMPLE_ORDER_TYPE_DEFAULT_NV      = 0;
 const CoarseSampleOrderTypeNV COARSE_SAMPLE_ORDER_TYPE_CUSTOM_NV       = 1;
 const CoarseSampleOrderTypeNV COARSE_SAMPLE_ORDER_TYPE_PIXEL_MAJOR_NV  = 2;
@@ -339,7 +339,7 @@ bitstruct ColorComponentFlags : Flags @overlap {
 	bool a : 3;
 }
 
-distinct ColorSpaceKHR = CInt;
+typedef ColorSpaceKHR = CInt;
 const ColorSpaceKHR COLOR_SPACE_SRGB_NONLINEAR_KHR          = 0;
 const ColorSpaceKHR COLOR_SPACE_DISPLAY_P3_NONLINEAR_EXT    = 1000104001;
 const ColorSpaceKHR COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT    = 1000104002;
@@ -359,7 +359,7 @@ const ColorSpaceKHR COLOR_SPACE_DISPLAY_NATIVE_AMD          = 1000213000;
 const ColorSpaceKHR COLORSPACE_SRGB_NONLINEAR_KHR           = COLOR_SPACE_SRGB_NONLINEAR_KHR;
 const ColorSpaceKHR COLOR_SPACE_DCI_P3_LINEAR_EXT           = COLOR_SPACE_DISPLAY_P3_LINEAR_EXT;
 
-distinct CommandBufferLevel = CInt;
+typedef CommandBufferLevel = CInt;
 const CommandBufferLevel COMMAND_BUFFER_LEVEL_PRIMARY   = 0;
 const CommandBufferLevel COMMAND_BUFFER_LEVEL_SECONDARY = 1;
 
@@ -383,7 +383,7 @@ bitstruct CommandPoolResetFlags : Flags @overlap {
 	bool release_resources : 0;
 }
 
-distinct CompareOp = CInt;
+typedef CompareOp = CInt;
 const CompareOp COMPARE_OP_NEVER            = 0;
 const CompareOp COMPARE_OP_LESS             = 1;
 const CompareOp COMPARE_OP_EQUAL            = 2;
@@ -393,7 +393,7 @@ const CompareOp COMPARE_OP_NOT_EQUAL        = 5;
 const CompareOp COMPARE_OP_GREATER_OR_EQUAL = 6;
 const CompareOp COMPARE_OP_ALWAYS           = 7;
 
-distinct ComponentSwizzle = CInt;
+typedef ComponentSwizzle = CInt;
 const ComponentSwizzle COMPONENT_SWIZZLE_IDENTITY = 0;
 const ComponentSwizzle COMPONENT_SWIZZLE_ZERO     = 1;
 const ComponentSwizzle COMPONENT_SWIZZLE_ONE      = 2;
@@ -402,7 +402,7 @@ const ComponentSwizzle COMPONENT_SWIZZLE_G        = 4;
 const ComponentSwizzle COMPONENT_SWIZZLE_B        = 5;
 const ComponentSwizzle COMPONENT_SWIZZLE_A        = 6;
 
-distinct ComponentTypeKHR = CInt;
+typedef ComponentTypeKHR = CInt;
 const ComponentTypeKHR COMPONENT_TYPE_FLOAT16_KHR     = 0;
 const ComponentTypeKHR COMPONENT_TYPE_FLOAT32_KHR     = 1;
 const ComponentTypeKHR COMPONENT_TYPE_FLOAT64_KHR     = 2;
@@ -441,18 +441,18 @@ bitstruct ConditionalRenderingFlagsEXT : Flags @overlap {
 	bool inverted : 0;
 }
 
-distinct ConservativeRasterizationModeEXT = CInt;
+typedef ConservativeRasterizationModeEXT = CInt;
 const ConservativeRasterizationModeEXT CONSERVATIVE_RASTERIZATION_MODE_DISABLED_EXT      = 0;
 const ConservativeRasterizationModeEXT CONSERVATIVE_RASTERIZATION_MODE_OVERESTIMATE_EXT  = 1;
 const ConservativeRasterizationModeEXT CONSERVATIVE_RASTERIZATION_MODE_UNDERESTIMATE_EXT = 2;
 
-distinct CooperativeVectorMatrixLayoutNV = CInt;
+typedef CooperativeVectorMatrixLayoutNV = CInt;
 const CooperativeVectorMatrixLayoutNV COOPERATIVE_VECTOR_MATRIX_LAYOUT_ROW_MAJOR_NV           = 0;
 const CooperativeVectorMatrixLayoutNV COOPERATIVE_VECTOR_MATRIX_LAYOUT_COLUMN_MAJOR_NV        = 1;
 const CooperativeVectorMatrixLayoutNV COOPERATIVE_VECTOR_MATRIX_LAYOUT_INFERENCING_OPTIMAL_NV = 2;
 const CooperativeVectorMatrixLayoutNV COOPERATIVE_VECTOR_MATRIX_LAYOUT_TRAINING_OPTIMAL_NV    = 3;
 
-distinct CopyAccelerationStructureModeKHR = CInt;
+typedef CopyAccelerationStructureModeKHR = CInt;
 const CopyAccelerationStructureModeKHR COPY_ACCELERATION_STRUCTURE_MODE_CLONE_KHR       = 0;
 const CopyAccelerationStructureModeKHR COPY_ACCELERATION_STRUCTURE_MODE_COMPACT_KHR     = 1;
 const CopyAccelerationStructureModeKHR COPY_ACCELERATION_STRUCTURE_MODE_SERIALIZE_KHR   = 2;
@@ -460,23 +460,23 @@ const CopyAccelerationStructureModeKHR COPY_ACCELERATION_STRUCTURE_MODE_DESERIAL
 const CopyAccelerationStructureModeKHR COPY_ACCELERATION_STRUCTURE_MODE_CLONE_NV        = COPY_ACCELERATION_STRUCTURE_MODE_CLONE_KHR;
 const CopyAccelerationStructureModeKHR COPY_ACCELERATION_STRUCTURE_MODE_COMPACT_NV      = COPY_ACCELERATION_STRUCTURE_MODE_COMPACT_KHR;
 
-distinct CopyMicromapModeEXT = CInt;
+typedef CopyMicromapModeEXT = CInt;
 const CopyMicromapModeEXT COPY_MICROMAP_MODE_CLONE_EXT       = 0;
 const CopyMicromapModeEXT COPY_MICROMAP_MODE_SERIALIZE_EXT   = 1;
 const CopyMicromapModeEXT COPY_MICROMAP_MODE_DESERIALIZE_EXT = 2;
 const CopyMicromapModeEXT COPY_MICROMAP_MODE_COMPACT_EXT     = 3;
 
-distinct CoverageModulationModeNV = CInt;
+typedef CoverageModulationModeNV = CInt;
 const CoverageModulationModeNV COVERAGE_MODULATION_MODE_NONE_NV  = 0;
 const CoverageModulationModeNV COVERAGE_MODULATION_MODE_RGB_NV   = 1;
 const CoverageModulationModeNV COVERAGE_MODULATION_MODE_ALPHA_NV = 2;
 const CoverageModulationModeNV COVERAGE_MODULATION_MODE_RGBA_NV  = 3;
 
-distinct CoverageReductionModeNV = CInt;
+typedef CoverageReductionModeNV = CInt;
 const CoverageReductionModeNV COVERAGE_REDUCTION_MODE_MERGE_NV    = 0;
 const CoverageReductionModeNV COVERAGE_REDUCTION_MODE_TRUNCATE_NV = 1;
 
-distinct CubicFilterWeightsQCOM = CInt;
+typedef CubicFilterWeightsQCOM = CInt;
 const CubicFilterWeightsQCOM CUBIC_FILTER_WEIGHTS_CATMULL_ROM_QCOM           = 0;
 const CubicFilterWeightsQCOM CUBIC_FILTER_WEIGHTS_ZERO_TANGENT_CARDINAL_QCOM = 1;
 const CubicFilterWeightsQCOM CUBIC_FILTER_WEIGHTS_B_SPLINE_QCOM              = 2;
@@ -497,7 +497,7 @@ bitstruct DebugReportFlagsEXT : Flags @overlap {
 	bool debug               : 4;
 }
 
-distinct DebugReportObjectTypeEXT = CInt;
+typedef DebugReportObjectTypeEXT = CInt;
 const DebugReportObjectTypeEXT DEBUG_REPORT_OBJECT_TYPE_UNKNOWN_EXT                        = 0;
 const DebugReportObjectTypeEXT DEBUG_REPORT_OBJECT_TYPE_INSTANCE_EXT                       = 1;
 const DebugReportObjectTypeEXT DEBUG_REPORT_OBJECT_TYPE_PHYSICAL_DEVICE_EXT                = 2;
@@ -568,12 +568,12 @@ bitstruct DependencyFlags : Flags @overlap {
 	bool device_group_khr                                   : 2;
 }
 
-distinct DepthBiasRepresentationEXT = CInt;
+typedef DepthBiasRepresentationEXT = CInt;
 const DepthBiasRepresentationEXT DEPTH_BIAS_REPRESENTATION_LEAST_REPRESENTABLE_VALUE_FORMAT_EXT      = 0;
 const DepthBiasRepresentationEXT DEPTH_BIAS_REPRESENTATION_LEAST_REPRESENTABLE_VALUE_FORCE_UNORM_EXT = 1;
 const DepthBiasRepresentationEXT DEPTH_BIAS_REPRESENTATION_FLOAT_EXT                                 = 2;
 
-distinct DepthClampModeEXT = CInt;
+typedef DepthClampModeEXT = CInt;
 const DepthClampModeEXT DEPTH_CLAMP_MODE_VIEWPORT_RANGE_EXT     = 0;
 const DepthClampModeEXT DEPTH_CLAMP_MODE_USER_DEFINED_RANGE_EXT = 1;
 
@@ -611,7 +611,7 @@ bitstruct DescriptorSetLayoutCreateFlags : Flags @overlap {
 	bool host_only_pool_valve            : 2;
 }
 
-distinct DescriptorType = CInt;
+typedef DescriptorType = CInt;
 const DescriptorType DESCRIPTOR_TYPE_SAMPLER                               = 0;
 const DescriptorType DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER                = 1;
 const DescriptorType DESCRIPTOR_TYPE_SAMPLED_IMAGE                         = 2;
@@ -633,7 +633,7 @@ const DescriptorType DESCRIPTOR_TYPE_PARTITIONED_ACCELERATION_STRUCTURE_NV = 100
 const DescriptorType DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT              = DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK;
 const DescriptorType DESCRIPTOR_TYPE_MUTABLE_VALVE                         = DESCRIPTOR_TYPE_MUTABLE_EXT;
 
-distinct DescriptorUpdateTemplateType = CInt;
+typedef DescriptorUpdateTemplateType = CInt;
 const DescriptorUpdateTemplateType DESCRIPTOR_UPDATE_TEMPLATE_TYPE_DESCRIPTOR_SET       = 0;
 const DescriptorUpdateTemplateType DESCRIPTOR_UPDATE_TEMPLATE_TYPE_PUSH_DESCRIPTORS     = 1;
 const DescriptorUpdateTemplateType DESCRIPTOR_UPDATE_TEMPLATE_TYPE_PUSH_DESCRIPTORS_KHR = DESCRIPTOR_UPDATE_TEMPLATE_TYPE_PUSH_DESCRIPTORS;
@@ -643,7 +643,7 @@ bitstruct DeviceAddressBindingFlagsEXT : Flags @overlap {
 	bool internal_object : 0;
 }
 
-distinct DeviceAddressBindingTypeEXT = CInt;
+typedef DeviceAddressBindingTypeEXT = CInt;
 const DeviceAddressBindingTypeEXT DEVICE_ADDRESS_BINDING_TYPE_BIND_EXT   = 0;
 const DeviceAddressBindingTypeEXT DEVICE_ADDRESS_BINDING_TYPE_UNBIND_EXT = 1;
 
@@ -654,10 +654,10 @@ bitstruct DeviceDiagnosticsConfigFlagsNV : Flags @overlap {
 	bool enable_shader_error_reporting : 3;
 }
 
-distinct DeviceEventTypeEXT = CInt;
+typedef DeviceEventTypeEXT = CInt;
 const DeviceEventTypeEXT DEVICE_EVENT_TYPE_DISPLAY_HOTPLUG_EXT = 0;
 
-distinct DeviceFaultAddressTypeEXT = CInt;
+typedef DeviceFaultAddressTypeEXT = CInt;
 const DeviceFaultAddressTypeEXT DEVICE_FAULT_ADDRESS_TYPE_NONE_EXT                        = 0;
 const DeviceFaultAddressTypeEXT DEVICE_FAULT_ADDRESS_TYPE_READ_INVALID_EXT                = 1;
 const DeviceFaultAddressTypeEXT DEVICE_FAULT_ADDRESS_TYPE_WRITE_INVALID_EXT               = 2;
@@ -666,7 +666,7 @@ const DeviceFaultAddressTypeEXT DEVICE_FAULT_ADDRESS_TYPE_INSTRUCTION_POINTER_UN
 const DeviceFaultAddressTypeEXT DEVICE_FAULT_ADDRESS_TYPE_INSTRUCTION_POINTER_INVALID_EXT = 5;
 const DeviceFaultAddressTypeEXT DEVICE_FAULT_ADDRESS_TYPE_INSTRUCTION_POINTER_FAULT_EXT   = 6;
 
-distinct DeviceFaultVendorBinaryHeaderVersionEXT = CInt;
+typedef DeviceFaultVendorBinaryHeaderVersionEXT = CInt;
 const DeviceFaultVendorBinaryHeaderVersionEXT DEVICE_FAULT_VENDOR_BINARY_HEADER_VERSION_ONE_EXT = 1;
 
 bitstruct DeviceGroupPresentModeFlagsKHR : Flags @overlap {
@@ -676,7 +676,7 @@ bitstruct DeviceGroupPresentModeFlagsKHR : Flags @overlap {
 	bool local_multi_device : 3;
 }
 
-distinct DeviceMemoryReportEventTypeEXT = CInt;
+typedef DeviceMemoryReportEventTypeEXT = CInt;
 const DeviceMemoryReportEventTypeEXT DEVICE_MEMORY_REPORT_EVENT_TYPE_ALLOCATE_EXT          = 0;
 const DeviceMemoryReportEventTypeEXT DEVICE_MEMORY_REPORT_EVENT_TYPE_FREE_EXT              = 1;
 const DeviceMemoryReportEventTypeEXT DEVICE_MEMORY_REPORT_EVENT_TYPE_IMPORT_EXT            = 2;
@@ -687,15 +687,15 @@ bitstruct DeviceQueueCreateFlags : Flags @overlap {
 	bool protected : 0;
 }
 
-distinct DirectDriverLoadingModeLUNARG = CInt;
+typedef DirectDriverLoadingModeLUNARG = CInt;
 const DirectDriverLoadingModeLUNARG DIRECT_DRIVER_LOADING_MODE_EXCLUSIVE_LUNARG = 0;
 const DirectDriverLoadingModeLUNARG DIRECT_DRIVER_LOADING_MODE_INCLUSIVE_LUNARG = 1;
 
-distinct DiscardRectangleModeEXT = CInt;
+typedef DiscardRectangleModeEXT = CInt;
 const DiscardRectangleModeEXT DISCARD_RECTANGLE_MODE_INCLUSIVE_EXT = 0;
 const DiscardRectangleModeEXT DISCARD_RECTANGLE_MODE_EXCLUSIVE_EXT = 1;
 
-distinct DisplayEventTypeEXT = CInt;
+typedef DisplayEventTypeEXT = CInt;
 const DisplayEventTypeEXT DISPLAY_EVENT_TYPE_FIRST_PIXEL_OUT_EXT = 0;
 
 bitstruct DisplayPlaneAlphaFlagsKHR : Flags @overlap {
@@ -705,18 +705,18 @@ bitstruct DisplayPlaneAlphaFlagsKHR : Flags @overlap {
 	bool per_pixel_premultiplied : 3;
 }
 
-distinct DisplayPowerStateEXT = CInt;
+typedef DisplayPowerStateEXT = CInt;
 const DisplayPowerStateEXT DISPLAY_POWER_STATE_OFF_EXT     = 0;
 const DisplayPowerStateEXT DISPLAY_POWER_STATE_SUSPEND_EXT = 1;
 const DisplayPowerStateEXT DISPLAY_POWER_STATE_ON_EXT      = 2;
 
-distinct DisplaySurfaceStereoTypeNV = CInt;
+typedef DisplaySurfaceStereoTypeNV = CInt;
 const DisplaySurfaceStereoTypeNV DISPLAY_SURFACE_STEREO_TYPE_NONE_NV               = 0;
 const DisplaySurfaceStereoTypeNV DISPLAY_SURFACE_STEREO_TYPE_ONBOARD_DIN_NV        = 1;
 const DisplaySurfaceStereoTypeNV DISPLAY_SURFACE_STEREO_TYPE_HDMI_3D_NV            = 2;
 const DisplaySurfaceStereoTypeNV DISPLAY_SURFACE_STEREO_TYPE_INBAND_DISPLAYPORT_NV = 3;
 
-distinct DriverId = CInt;
+typedef DriverId = CInt;
 const DriverId DRIVER_ID_AMD_PROPRIETARY               = 1;
 const DriverId DRIVER_ID_AMD_OPEN_SOURCE               = 2;
 const DriverId DRIVER_ID_MESA_RADV                     = 3;
@@ -757,7 +757,7 @@ const DriverId DRIVER_ID_GOOGLE_SWIFTSHADER_KHR        = DRIVER_ID_GOOGLE_SWIFTS
 const DriverId DRIVER_ID_GGP_PROPRIETARY_KHR           = DRIVER_ID_GGP_PROPRIETARY;
 const DriverId DRIVER_ID_BROADCOM_PROPRIETARY_KHR      = DRIVER_ID_BROADCOM_PROPRIETARY;
 
-distinct DynamicState = CInt;
+typedef DynamicState = CInt;
 const DynamicState DYNAMIC_STATE_VIEWPORT                                = 0;
 const DynamicState DYNAMIC_STATE_SCISSOR                                 = 1;
 const DynamicState DYNAMIC_STATE_LINE_WIDTH                              = 2;
@@ -961,13 +961,13 @@ bitstruct FenceImportFlags : Flags @overlap {
 	bool temporary_khr : 0;
 }
 
-distinct Filter = CInt;
+typedef Filter = CInt;
 const Filter FILTER_NEAREST   = 0;
 const Filter FILTER_LINEAR    = 1;
 const Filter FILTER_CUBIC_EXT = 1000015000;
 const Filter FILTER_CUBIC_IMG = FILTER_CUBIC_EXT;
 
-distinct Format = CInt;
+typedef Format = CInt;
 const Format FORMAT_UNDEFINED                                      = 0;
 const Format FORMAT_R4G4_UNORM_PACK8                               = 1;
 const Format FORMAT_R4G4B4A4_UNORM_PACK16                          = 2;
@@ -1321,14 +1321,14 @@ bitstruct FormatFeatureFlags : Flags @overlap {
 	bool cosited_chroma_samples_khr                                                  : 23;
 }
 
-distinct FragmentShadingRateCombinerOpKHR = CInt;
+typedef FragmentShadingRateCombinerOpKHR = CInt;
 const FragmentShadingRateCombinerOpKHR FRAGMENT_SHADING_RATE_COMBINER_OP_KEEP_KHR    = 0;
 const FragmentShadingRateCombinerOpKHR FRAGMENT_SHADING_RATE_COMBINER_OP_REPLACE_KHR = 1;
 const FragmentShadingRateCombinerOpKHR FRAGMENT_SHADING_RATE_COMBINER_OP_MIN_KHR     = 2;
 const FragmentShadingRateCombinerOpKHR FRAGMENT_SHADING_RATE_COMBINER_OP_MAX_KHR     = 3;
 const FragmentShadingRateCombinerOpKHR FRAGMENT_SHADING_RATE_COMBINER_OP_MUL_KHR     = 4;
 
-distinct FragmentShadingRateNV = CInt;
+typedef FragmentShadingRateNV = CInt;
 const FragmentShadingRateNV FRAGMENT_SHADING_RATE_1_INVOCATION_PER_PIXEL_NV      = 0;
 const FragmentShadingRateNV FRAGMENT_SHADING_RATE_1_INVOCATION_PER_1X2_PIXELS_NV = 1;
 const FragmentShadingRateNV FRAGMENT_SHADING_RATE_1_INVOCATION_PER_2X1_PIXELS_NV = 4;
@@ -1342,7 +1342,7 @@ const FragmentShadingRateNV FRAGMENT_SHADING_RATE_8_INVOCATIONS_PER_PIXEL_NV    
 const FragmentShadingRateNV FRAGMENT_SHADING_RATE_16_INVOCATIONS_PER_PIXEL_NV    = 14;
 const FragmentShadingRateNV FRAGMENT_SHADING_RATE_NO_INVOCATIONS_NV              = 15;
 
-distinct FragmentShadingRateTypeNV = CInt;
+typedef FragmentShadingRateTypeNV = CInt;
 const FragmentShadingRateTypeNV FRAGMENT_SHADING_RATE_TYPE_FRAGMENT_SIZE_NV = 0;
 const FragmentShadingRateTypeNV FRAGMENT_SHADING_RATE_TYPE_ENUMS_NV         = 1;
 
@@ -1355,11 +1355,11 @@ bitstruct FramebufferCreateFlags : Flags @overlap {
 	bool imageless_khr : 0;
 }
 
-distinct FrontFace = CInt;
+typedef FrontFace = CInt;
 const FrontFace FRONT_FACE_COUNTER_CLOCKWISE = 0;
 const FrontFace FRONT_FACE_CLOCKWISE         = 1;
 
-distinct FullScreenExclusiveEXT = CInt;
+typedef FullScreenExclusiveEXT = CInt;
 const FullScreenExclusiveEXT FULL_SCREEN_EXCLUSIVE_DEFAULT_EXT                = 0;
 const FullScreenExclusiveEXT FULL_SCREEN_EXCLUSIVE_ALLOWED_EXT                = 1;
 const FullScreenExclusiveEXT FULL_SCREEN_EXCLUSIVE_DISALLOWED_EXT             = 2;
@@ -1386,7 +1386,7 @@ bitstruct GeometryInstanceFlagsKHR : Flags @overlap {
 	bool force_no_opaque_nv                 : 3;
 }
 
-distinct GeometryTypeKHR = CInt;
+typedef GeometryTypeKHR = CInt;
 const GeometryTypeKHR GEOMETRY_TYPE_TRIANGLES_KHR           = 0;
 const GeometryTypeKHR GEOMETRY_TYPE_AABBS_KHR               = 1;
 const GeometryTypeKHR GEOMETRY_TYPE_INSTANCES_KHR           = 2;
@@ -1469,7 +1469,7 @@ bitstruct ImageCreateFlags : Flags @overlap {
 	bool sparse_aliased                            : 2;
 	bool mutable_format                            : 3;
 	bool cube_compatible                           : 4;
-	bool alias                                     : 10;
+	bool alias_                                    : 10;
 	bool split_instance_bind_regions               : 6;
 	bool d2_array_compatible                       : 5;
 	bool block_texel_view_compatible               : 7;
@@ -1492,7 +1492,7 @@ bitstruct ImageCreateFlags : Flags @overlap {
 	bool alias_khr                                 : 10;
 }
 
-distinct ImageLayout = CInt;
+typedef ImageLayout = CInt;
 const ImageLayout IMAGE_LAYOUT_UNDEFINED                                      = 0;
 const ImageLayout IMAGE_LAYOUT_GENERAL                                        = 1;
 const ImageLayout IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL                       = 2;
@@ -1534,12 +1534,12 @@ const ImageLayout IMAGE_LAYOUT_STENCIL_READ_ONLY_OPTIMAL_KHR                  = 
 const ImageLayout IMAGE_LAYOUT_READ_ONLY_OPTIMAL_KHR                          = IMAGE_LAYOUT_READ_ONLY_OPTIMAL;
 const ImageLayout IMAGE_LAYOUT_ATTACHMENT_OPTIMAL_KHR                         = IMAGE_LAYOUT_ATTACHMENT_OPTIMAL;
 
-distinct ImageTiling = CInt;
+typedef ImageTiling = CInt;
 const ImageTiling IMAGE_TILING_OPTIMAL                 = 0;
 const ImageTiling IMAGE_TILING_LINEAR                  = 1;
 const ImageTiling IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT = 1000158000;
 
-distinct ImageType = CInt;
+typedef ImageType = CInt;
 const ImageType IMAGE_TYPE_1D = 0;
 const ImageType IMAGE_TYPE_2D = 1;
 const ImageType IMAGE_TYPE_3D = 2;
@@ -1578,7 +1578,7 @@ bitstruct ImageViewCreateFlags : Flags @overlap {
 	bool fragment_density_map_deferred_ext    : 1;
 }
 
-distinct ImageViewType = CInt;
+typedef ImageViewType = CInt;
 const ImageViewType IMAGE_VIEW_TYPE_1D         = 0;
 const ImageViewType IMAGE_VIEW_TYPE_2D         = 1;
 const ImageViewType IMAGE_VIEW_TYPE_3D         = 2;
@@ -1587,7 +1587,7 @@ const ImageViewType IMAGE_VIEW_TYPE_1D_ARRAY   = 4;
 const ImageViewType IMAGE_VIEW_TYPE_2D_ARRAY   = 5;
 const ImageViewType IMAGE_VIEW_TYPE_CUBE_ARRAY = 6;
 
-distinct IndexType = CInt;
+typedef IndexType = CInt;
 const IndexType INDEX_TYPE_UINT16    = 0;
 const IndexType INDEX_TYPE_UINT32    = 1;
 const IndexType INDEX_TYPE_UINT8     = 1000265000;
@@ -1595,6 +1595,19 @@ const IndexType INDEX_TYPE_NONE_KHR  = 1000165000;
 const IndexType INDEX_TYPE_NONE_NV   = INDEX_TYPE_NONE_KHR;
 const IndexType INDEX_TYPE_UINT8_EXT = INDEX_TYPE_UINT8;
 const IndexType INDEX_TYPE_UINT8_KHR = INDEX_TYPE_UINT8;
+
+// Note: In C3 the following code is more idiomatic and clean, but it is not compatible with Vulkan C library
+// with this implementation IndexType.UINT8 will be passed as `2` to vulkan instead of the expected `1000265000`
+//
+// enum IndexType : CInt (inline CInt v) {
+// 	UINT16    = 0,
+// 	UINT32    = 1,
+// 	UINT8     = 1000265000,
+// 	NONE_KHR  = 1000165000,
+// 	NONE_NV   = 1000165000,
+// 	UINT8_EXT = 1000265000,
+// 	UINT8_KHR = 1000265000,
+// }
 
 bitstruct IndirectCommandsInputModeFlagsEXT : Flags @overlap {
 	bool vulkan_index_buffer : 0;
@@ -1612,7 +1625,7 @@ bitstruct IndirectCommandsLayoutUsageFlagsNV : Flags @overlap {
 	bool unordered_sequences : 2;
 }
 
-distinct IndirectCommandsTokenTypeEXT = CInt;
+typedef IndirectCommandsTokenTypeEXT = CInt;
 const IndirectCommandsTokenTypeEXT INDIRECT_COMMANDS_TOKEN_TYPE_EXECUTION_SET_EXT            = 0;
 const IndirectCommandsTokenTypeEXT INDIRECT_COMMANDS_TOKEN_TYPE_PUSH_CONSTANT_EXT            = 1;
 const IndirectCommandsTokenTypeEXT INDIRECT_COMMANDS_TOKEN_TYPE_SEQUENCE_INDEX_EXT           = 2;
@@ -1629,7 +1642,7 @@ const IndirectCommandsTokenTypeEXT INDIRECT_COMMANDS_TOKEN_TYPE_DRAW_MESH_TASKS_
 const IndirectCommandsTokenTypeEXT INDIRECT_COMMANDS_TOKEN_TYPE_DRAW_MESH_TASKS_COUNT_EXT    = 1000328001;
 const IndirectCommandsTokenTypeEXT INDIRECT_COMMANDS_TOKEN_TYPE_TRACE_RAYS2_EXT              = 1000386004;
 
-distinct IndirectCommandsTokenTypeNV = CInt;
+typedef IndirectCommandsTokenTypeNV = CInt;
 const IndirectCommandsTokenTypeNV INDIRECT_COMMANDS_TOKEN_TYPE_SHADER_GROUP_NV    = 0;
 const IndirectCommandsTokenTypeNV INDIRECT_COMMANDS_TOKEN_TYPE_STATE_FLAGS_NV     = 1;
 const IndirectCommandsTokenTypeNV INDIRECT_COMMANDS_TOKEN_TYPE_INDEX_BUFFER_NV    = 2;
@@ -1642,7 +1655,7 @@ const IndirectCommandsTokenTypeNV INDIRECT_COMMANDS_TOKEN_TYPE_DRAW_MESH_TASKS_N
 const IndirectCommandsTokenTypeNV INDIRECT_COMMANDS_TOKEN_TYPE_PIPELINE_NV        = 1000428003;
 const IndirectCommandsTokenTypeNV INDIRECT_COMMANDS_TOKEN_TYPE_DISPATCH_NV        = 1000428004;
 
-distinct IndirectExecutionSetInfoTypeEXT = CInt;
+typedef IndirectExecutionSetInfoTypeEXT = CInt;
 const IndirectExecutionSetInfoTypeEXT INDIRECT_EXECUTION_SET_INFO_TYPE_PIPELINES_EXT      = 0;
 const IndirectExecutionSetInfoTypeEXT INDIRECT_EXECUTION_SET_INFO_TYPE_SHADER_OBJECTS_EXT = 1;
 
@@ -1654,10 +1667,10 @@ bitstruct InstanceCreateFlags : Flags @overlap {
 	bool enumerate_portability_khr : 0;
 }
 
-distinct InternalAllocationType = CInt;
+typedef InternalAllocationType = CInt;
 const InternalAllocationType INTERNAL_ALLOCATION_TYPE_EXECUTABLE = 0;
 
-distinct LatencyMarkerNV = CInt;
+typedef LatencyMarkerNV = CInt;
 const LatencyMarkerNV LATENCY_MARKER_SIMULATION_START_NV               = 0;
 const LatencyMarkerNV LATENCY_MARKER_SIMULATION_END_NV                 = 1;
 const LatencyMarkerNV LATENCY_MARKER_RENDERSUBMIT_START_NV             = 2;
@@ -1671,7 +1684,7 @@ const LatencyMarkerNV LATENCY_MARKER_OUT_OF_BAND_RENDERSUBMIT_END_NV   = 9;
 const LatencyMarkerNV LATENCY_MARKER_OUT_OF_BAND_PRESENT_START_NV      = 10;
 const LatencyMarkerNV LATENCY_MARKER_OUT_OF_BAND_PRESENT_END_NV        = 11;
 
-distinct LayerSettingTypeEXT = CInt;
+typedef LayerSettingTypeEXT = CInt;
 const LayerSettingTypeEXT LAYER_SETTING_TYPE_BOOL32_EXT  = 0;
 const LayerSettingTypeEXT LAYER_SETTING_TYPE_INT32_EXT   = 1;
 const LayerSettingTypeEXT LAYER_SETTING_TYPE_INT64_EXT   = 2;
@@ -1681,11 +1694,11 @@ const LayerSettingTypeEXT LAYER_SETTING_TYPE_FLOAT32_EXT = 5;
 const LayerSettingTypeEXT LAYER_SETTING_TYPE_FLOAT64_EXT = 6;
 const LayerSettingTypeEXT LAYER_SETTING_TYPE_STRING_EXT  = 7;
 
-distinct LayeredDriverUnderlyingApiMSFT = CInt;
+typedef LayeredDriverUnderlyingApiMSFT = CInt;
 const LayeredDriverUnderlyingApiMSFT LAYERED_DRIVER_UNDERLYING_API_NONE_MSFT  = 0;
 const LayeredDriverUnderlyingApiMSFT LAYERED_DRIVER_UNDERLYING_API_D3D12_MSFT = 1;
 
-distinct LineRasterizationMode = CInt;
+typedef LineRasterizationMode = CInt;
 const LineRasterizationMode LINE_RASTERIZATION_MODE_DEFAULT                = 0;
 const LineRasterizationMode LINE_RASTERIZATION_MODE_RECTANGULAR            = 1;
 const LineRasterizationMode LINE_RASTERIZATION_MODE_BRESENHAM              = 2;
@@ -1699,7 +1712,7 @@ const LineRasterizationMode LINE_RASTERIZATION_MODE_RECTANGULAR_KHR        = LIN
 const LineRasterizationMode LINE_RASTERIZATION_MODE_BRESENHAM_KHR          = LINE_RASTERIZATION_MODE_BRESENHAM;
 const LineRasterizationMode LINE_RASTERIZATION_MODE_RECTANGULAR_SMOOTH_KHR = LINE_RASTERIZATION_MODE_RECTANGULAR_SMOOTH;
 
-distinct LogicOp = CInt;
+typedef LogicOp = CInt;
 const LogicOp LOGIC_OP_CLEAR         = 0;
 const LogicOp LOGIC_OP_AND           = 1;
 const LogicOp LOGIC_OP_AND_REVERSE   = 2;
@@ -1736,7 +1749,7 @@ bitstruct MemoryMapFlags : Flags @overlap {
 	bool placed_ext : 0;
 }
 
-distinct MemoryOverallocationBehaviorAMD = CInt;
+typedef MemoryOverallocationBehaviorAMD = CInt;
 const MemoryOverallocationBehaviorAMD MEMORY_OVERALLOCATION_BEHAVIOR_DEFAULT_AMD    = 0;
 const MemoryOverallocationBehaviorAMD MEMORY_OVERALLOCATION_BEHAVIOR_ALLOWED_AMD    = 1;
 const MemoryOverallocationBehaviorAMD MEMORY_OVERALLOCATION_BEHAVIOR_DISALLOWED_AMD = 2;
@@ -1761,11 +1774,11 @@ bitstruct MicromapCreateFlagsEXT : Flags @overlap {
 	bool device_address_capture_replay : 0;
 }
 
-distinct MicromapTypeEXT = CInt;
+typedef MicromapTypeEXT = CInt;
 const MicromapTypeEXT MICROMAP_TYPE_OPACITY_MICROMAP_EXT     = 0;
 const MicromapTypeEXT MICROMAP_TYPE_DISPLACEMENT_MICROMAP_NV = 1000397000;
 
-distinct ObjectType = CInt;
+typedef ObjectType = CInt;
 const ObjectType OBJECT_TYPE_UNKNOWN                         = 0;
 const ObjectType OBJECT_TYPE_INSTANCE                        = 1;
 const ObjectType OBJECT_TYPE_PHYSICAL_DEVICE                 = 2;
@@ -1824,11 +1837,11 @@ const ObjectType OBJECT_TYPE_DESCRIPTOR_UPDATE_TEMPLATE_KHR  = OBJECT_TYPE_DESCR
 const ObjectType OBJECT_TYPE_SAMPLER_YCBCR_CONVERSION_KHR    = OBJECT_TYPE_SAMPLER_YCBCR_CONVERSION;
 const ObjectType OBJECT_TYPE_PRIVATE_DATA_SLOT_EXT           = OBJECT_TYPE_PRIVATE_DATA_SLOT;
 
-distinct OpacityMicromapFormatEXT = CInt;
+typedef OpacityMicromapFormatEXT = CInt;
 const OpacityMicromapFormatEXT OPACITY_MICROMAP_FORMAT_2_STATE_EXT = 1;
 const OpacityMicromapFormatEXT OPACITY_MICROMAP_FORMAT_4_STATE_EXT = 2;
 
-distinct OpacityMicromapSpecialIndexEXT = CInt;
+typedef OpacityMicromapSpecialIndexEXT = CInt;
 const OpacityMicromapSpecialIndexEXT OPACITY_MICROMAP_SPECIAL_INDEX_FULLY_TRANSPARENT_EXT                        = -1;
 const OpacityMicromapSpecialIndexEXT OPACITY_MICROMAP_SPECIAL_INDEX_FULLY_OPAQUE_EXT                             = -2;
 const OpacityMicromapSpecialIndexEXT OPACITY_MICROMAP_SPECIAL_INDEX_FULLY_UNKNOWN_TRANSPARENT_EXT                = -3;
@@ -1848,13 +1861,13 @@ bitstruct OpticalFlowGridSizeFlagsNV : Flags @overlap {
 
 
 
-distinct OpticalFlowPerformanceLevelNV = CInt;
+typedef OpticalFlowPerformanceLevelNV = CInt;
 const OpticalFlowPerformanceLevelNV OPTICAL_FLOW_PERFORMANCE_LEVEL_UNKNOWN_NV = 0;
 const OpticalFlowPerformanceLevelNV OPTICAL_FLOW_PERFORMANCE_LEVEL_SLOW_NV    = 1;
 const OpticalFlowPerformanceLevelNV OPTICAL_FLOW_PERFORMANCE_LEVEL_MEDIUM_NV  = 2;
 const OpticalFlowPerformanceLevelNV OPTICAL_FLOW_PERFORMANCE_LEVEL_FAST_NV    = 3;
 
-distinct OpticalFlowSessionBindingPointNV = CInt;
+typedef OpticalFlowSessionBindingPointNV = CInt;
 const OpticalFlowSessionBindingPointNV OPTICAL_FLOW_SESSION_BINDING_POINT_UNKNOWN_NV              = 0;
 const OpticalFlowSessionBindingPointNV OPTICAL_FLOW_SESSION_BINDING_POINT_INPUT_NV                = 1;
 const OpticalFlowSessionBindingPointNV OPTICAL_FLOW_SESSION_BINDING_POINT_REFERENCE_NV            = 2;
@@ -1883,7 +1896,7 @@ bitstruct OpticalFlowUsageFlagsNV : Flags @overlap {
 
 
 
-distinct OutOfBandQueueTypeNV = CInt;
+typedef OutOfBandQueueTypeNV = CInt;
 const OutOfBandQueueTypeNV OUT_OF_BAND_QUEUE_TYPE_RENDER_NV  = 0;
 const OutOfBandQueueTypeNV OUT_OF_BAND_QUEUE_TYPE_PRESENT_NV = 1;
 
@@ -1895,7 +1908,7 @@ bitstruct PartitionedAccelerationStructureInstanceFlagsNV : Flags @overlap {
 	bool flag_enable_explicit_bounding_box : 4;
 }
 
-distinct PartitionedAccelerationStructureOpTypeNV = CInt;
+typedef PartitionedAccelerationStructureOpTypeNV = CInt;
 const PartitionedAccelerationStructureOpTypeNV PARTITIONED_ACCELERATION_STRUCTURE_OP_TYPE_WRITE_INSTANCE_NV              = 0;
 const PartitionedAccelerationStructureOpTypeNV PARTITIONED_ACCELERATION_STRUCTURE_OP_TYPE_UPDATE_INSTANCE_NV             = 1;
 const PartitionedAccelerationStructureOpTypeNV PARTITIONED_ACCELERATION_STRUCTURE_OP_TYPE_WRITE_PARTITION_TRANSLATION_NV = 2;
@@ -1911,7 +1924,7 @@ bitstruct PeerMemoryFeatureFlags : Flags @overlap {
 	bool generic_dst_khr : 3;
 }
 
-distinct PerformanceConfigurationTypeINTEL = CInt;
+typedef PerformanceConfigurationTypeINTEL = CInt;
 const PerformanceConfigurationTypeINTEL PERFORMANCE_CONFIGURATION_TYPE_COMMAND_QUEUE_METRICS_DISCOVERY_ACTIVATED_INTEL = 0;
 
 bitstruct PerformanceCounterDescriptionFlagsKHR : Flags @overlap {
@@ -1919,7 +1932,7 @@ bitstruct PerformanceCounterDescriptionFlagsKHR : Flags @overlap {
 	bool concurrently_impacted : 1;
 }
 
-distinct PerformanceCounterScopeKHR = CInt;
+typedef PerformanceCounterScopeKHR = CInt;
 const PerformanceCounterScopeKHR PERFORMANCE_COUNTER_SCOPE_COMMAND_BUFFER_KHR = 0;
 const PerformanceCounterScopeKHR PERFORMANCE_COUNTER_SCOPE_RENDER_PASS_KHR    = 1;
 const PerformanceCounterScopeKHR PERFORMANCE_COUNTER_SCOPE_COMMAND_KHR        = 2;
@@ -1927,7 +1940,7 @@ const PerformanceCounterScopeKHR QUERY_SCOPE_COMMAND_BUFFER_KHR               = 
 const PerformanceCounterScopeKHR QUERY_SCOPE_RENDER_PASS_KHR                  = PERFORMANCE_COUNTER_SCOPE_RENDER_PASS_KHR;
 const PerformanceCounterScopeKHR QUERY_SCOPE_COMMAND_KHR                      = PERFORMANCE_COUNTER_SCOPE_COMMAND_KHR;
 
-distinct PerformanceCounterStorageKHR = CInt;
+typedef PerformanceCounterStorageKHR = CInt;
 const PerformanceCounterStorageKHR PERFORMANCE_COUNTER_STORAGE_INT32_KHR   = 0;
 const PerformanceCounterStorageKHR PERFORMANCE_COUNTER_STORAGE_INT64_KHR   = 1;
 const PerformanceCounterStorageKHR PERFORMANCE_COUNTER_STORAGE_UINT32_KHR  = 2;
@@ -1935,7 +1948,7 @@ const PerformanceCounterStorageKHR PERFORMANCE_COUNTER_STORAGE_UINT64_KHR  = 3;
 const PerformanceCounterStorageKHR PERFORMANCE_COUNTER_STORAGE_FLOAT32_KHR = 4;
 const PerformanceCounterStorageKHR PERFORMANCE_COUNTER_STORAGE_FLOAT64_KHR = 5;
 
-distinct PerformanceCounterUnitKHR = CInt;
+typedef PerformanceCounterUnitKHR = CInt;
 const PerformanceCounterUnitKHR PERFORMANCE_COUNTER_UNIT_GENERIC_KHR          = 0;
 const PerformanceCounterUnitKHR PERFORMANCE_COUNTER_UNIT_PERCENTAGE_KHR       = 1;
 const PerformanceCounterUnitKHR PERFORMANCE_COUNTER_UNIT_NANOSECONDS_KHR      = 2;
@@ -1948,36 +1961,36 @@ const PerformanceCounterUnitKHR PERFORMANCE_COUNTER_UNIT_AMPS_KHR             = 
 const PerformanceCounterUnitKHR PERFORMANCE_COUNTER_UNIT_HERTZ_KHR            = 9;
 const PerformanceCounterUnitKHR PERFORMANCE_COUNTER_UNIT_CYCLES_KHR           = 10;
 
-distinct PerformanceOverrideTypeINTEL = CInt;
+typedef PerformanceOverrideTypeINTEL = CInt;
 const PerformanceOverrideTypeINTEL PERFORMANCE_OVERRIDE_TYPE_NULL_HARDWARE_INTEL    = 0;
 const PerformanceOverrideTypeINTEL PERFORMANCE_OVERRIDE_TYPE_FLUSH_GPU_CACHES_INTEL = 1;
 
-distinct PerformanceParameterTypeINTEL = CInt;
+typedef PerformanceParameterTypeINTEL = CInt;
 const PerformanceParameterTypeINTEL PERFORMANCE_PARAMETER_TYPE_HW_COUNTERS_SUPPORTED_INTEL    = 0;
 const PerformanceParameterTypeINTEL PERFORMANCE_PARAMETER_TYPE_STREAM_MARKER_VALID_BITS_INTEL = 1;
 
-distinct PerformanceValueTypeINTEL = CInt;
+typedef PerformanceValueTypeINTEL = CInt;
 const PerformanceValueTypeINTEL PERFORMANCE_VALUE_TYPE_UINT32_INTEL = 0;
 const PerformanceValueTypeINTEL PERFORMANCE_VALUE_TYPE_UINT64_INTEL = 1;
 const PerformanceValueTypeINTEL PERFORMANCE_VALUE_TYPE_FLOAT_INTEL  = 2;
 const PerformanceValueTypeINTEL PERFORMANCE_VALUE_TYPE_BOOL_INTEL   = 3;
 const PerformanceValueTypeINTEL PERFORMANCE_VALUE_TYPE_STRING_INTEL = 4;
 
-distinct PhysicalDeviceLayeredApiKHR = CInt;
+typedef PhysicalDeviceLayeredApiKHR = CInt;
 const PhysicalDeviceLayeredApiKHR PHYSICAL_DEVICE_LAYERED_API_VULKAN_KHR   = 0;
 const PhysicalDeviceLayeredApiKHR PHYSICAL_DEVICE_LAYERED_API_D3D12_KHR    = 1;
 const PhysicalDeviceLayeredApiKHR PHYSICAL_DEVICE_LAYERED_API_METAL_KHR    = 2;
 const PhysicalDeviceLayeredApiKHR PHYSICAL_DEVICE_LAYERED_API_OPENGL_KHR   = 3;
 const PhysicalDeviceLayeredApiKHR PHYSICAL_DEVICE_LAYERED_API_OPENGLES_KHR = 4;
 
-distinct PhysicalDeviceType = CInt;
+typedef PhysicalDeviceType = CInt;
 const PhysicalDeviceType PHYSICAL_DEVICE_TYPE_OTHER          = 0;
 const PhysicalDeviceType PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU = 1;
 const PhysicalDeviceType PHYSICAL_DEVICE_TYPE_DISCRETE_GPU   = 2;
 const PhysicalDeviceType PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU    = 3;
 const PhysicalDeviceType PHYSICAL_DEVICE_TYPE_CPU            = 4;
 
-distinct PipelineBindPoint = CInt;
+typedef PipelineBindPoint = CInt;
 const PipelineBindPoint PIPELINE_BIND_POINT_GRAPHICS               = 0;
 const PipelineBindPoint PIPELINE_BIND_POINT_COMPUTE                = 1;
 const PipelineBindPoint PIPELINE_BIND_POINT_EXECUTION_GRAPH_AMDX   = 1000134000;
@@ -1991,7 +2004,7 @@ bitstruct PipelineCacheCreateFlags : Flags @overlap {
 	bool externally_synchronized_ext       : 0;
 }
 
-distinct PipelineCacheHeaderVersion = CInt;
+typedef PipelineCacheHeaderVersion = CInt;
 const PipelineCacheHeaderVersion PIPELINE_CACHE_HEADER_VERSION_ONE = 1;
 
 bitstruct PipelineColorBlendStateCreateFlags : Flags @overlap {
@@ -2060,7 +2073,7 @@ bitstruct PipelineDepthStencilStateCreateFlags : Flags @overlap {
 	bool rasterization_order_attachment_stencil_access_arm : 1;
 }
 
-distinct PipelineExecutableStatisticFormatKHR = CInt;
+typedef PipelineExecutableStatisticFormatKHR = CInt;
 const PipelineExecutableStatisticFormatKHR PIPELINE_EXECUTABLE_STATISTIC_FORMAT_BOOL32_KHR  = 0;
 const PipelineExecutableStatisticFormatKHR PIPELINE_EXECUTABLE_STATISTIC_FORMAT_INT64_KHR   = 1;
 const PipelineExecutableStatisticFormatKHR PIPELINE_EXECUTABLE_STATISTIC_FORMAT_UINT64_KHR  = 2;
@@ -2070,7 +2083,7 @@ bitstruct PipelineLayoutCreateFlags : Flags @overlap {
 	bool independent_sets_ext : 1;
 }
 
-distinct PipelineRobustnessBufferBehavior = CInt;
+typedef PipelineRobustnessBufferBehavior = CInt;
 const PipelineRobustnessBufferBehavior PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_DEVICE_DEFAULT             = 0;
 const PipelineRobustnessBufferBehavior PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_DISABLED                   = 1;
 const PipelineRobustnessBufferBehavior PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS       = 2;
@@ -2080,7 +2093,7 @@ const PipelineRobustnessBufferBehavior PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_DISAB
 const PipelineRobustnessBufferBehavior PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS_EXT   = PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS;
 const PipelineRobustnessBufferBehavior PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS_2_EXT = PIPELINE_ROBUSTNESS_BUFFER_BEHAVIOR_ROBUST_BUFFER_ACCESS_2;
 
-distinct PipelineRobustnessImageBehavior = CInt;
+typedef PipelineRobustnessImageBehavior = CInt;
 const PipelineRobustnessImageBehavior PIPELINE_ROBUSTNESS_IMAGE_BEHAVIOR_DEVICE_DEFAULT            = 0;
 const PipelineRobustnessImageBehavior PIPELINE_ROBUSTNESS_IMAGE_BEHAVIOR_DISABLED                  = 1;
 const PipelineRobustnessImageBehavior PIPELINE_ROBUSTNESS_IMAGE_BEHAVIOR_ROBUST_IMAGE_ACCESS       = 2;
@@ -2134,13 +2147,13 @@ bitstruct PipelineStageFlags : Flags @overlap {
 
 
 
-distinct PointClippingBehavior = CInt;
+typedef PointClippingBehavior = CInt;
 const PointClippingBehavior POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES           = 0;
 const PointClippingBehavior POINT_CLIPPING_BEHAVIOR_USER_CLIP_PLANES_ONLY     = 1;
 const PointClippingBehavior POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES_KHR       = POINT_CLIPPING_BEHAVIOR_ALL_CLIP_PLANES;
 const PointClippingBehavior POINT_CLIPPING_BEHAVIOR_USER_CLIP_PLANES_ONLY_KHR = POINT_CLIPPING_BEHAVIOR_USER_CLIP_PLANES_ONLY;
 
-distinct PolygonMode = CInt;
+typedef PolygonMode = CInt;
 const PolygonMode POLYGON_MODE_FILL              = 0;
 const PolygonMode POLYGON_MODE_LINE              = 1;
 const PolygonMode POLYGON_MODE_POINT             = 2;
@@ -2152,7 +2165,7 @@ bitstruct PresentGravityFlagsEXT : Flags @overlap {
 	bool centered : 2;
 }
 
-distinct PresentModeKHR = CInt;
+typedef PresentModeKHR = CInt;
 const PresentModeKHR PRESENT_MODE_IMMEDIATE_KHR                 = 0;
 const PresentModeKHR PRESENT_MODE_MAILBOX_KHR                   = 1;
 const PresentModeKHR PRESENT_MODE_FIFO_KHR                      = 2;
@@ -2167,7 +2180,7 @@ bitstruct PresentScalingFlagsEXT : Flags @overlap {
 	bool stretch              : 2;
 }
 
-distinct PrimitiveTopology = CInt;
+typedef PrimitiveTopology = CInt;
 const PrimitiveTopology PRIMITIVE_TOPOLOGY_POINT_LIST                    = 0;
 const PrimitiveTopology PRIMITIVE_TOPOLOGY_LINE_LIST                     = 1;
 const PrimitiveTopology PRIMITIVE_TOPOLOGY_LINE_STRIP                    = 2;
@@ -2180,7 +2193,7 @@ const PrimitiveTopology PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY  = 8;
 const PrimitiveTopology PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY = 9;
 const PrimitiveTopology PRIMITIVE_TOPOLOGY_PATCH_LIST                    = 10;
 
-distinct ProvokingVertexModeEXT = CInt;
+typedef ProvokingVertexModeEXT = CInt;
 const ProvokingVertexModeEXT PROVOKING_VERTEX_MODE_FIRST_VERTEX_EXT = 0;
 const ProvokingVertexModeEXT PROVOKING_VERTEX_MODE_LAST_VERTEX_EXT  = 1;
 
@@ -2205,7 +2218,7 @@ bitstruct QueryPipelineStatisticFlags : Flags @overlap {
 	bool cluster_culling_shader_invocations_huawei  : 13;
 }
 
-distinct QueryPoolSamplingModeINTEL = CInt;
+typedef QueryPoolSamplingModeINTEL = CInt;
 const QueryPoolSamplingModeINTEL QUERY_POOL_SAMPLING_MODE_MANUAL_INTEL = 0;
 
 bitstruct QueryResultFlags : Flags @overlap {
@@ -2216,13 +2229,13 @@ bitstruct QueryResultFlags : Flags @overlap {
 	bool with_status_khr   : 4;
 }
 
-distinct QueryResultStatusKHR = CInt;
+typedef QueryResultStatusKHR = CInt;
 const QueryResultStatusKHR QUERY_RESULT_STATUS_ERROR_KHR                               = -1;
 const QueryResultStatusKHR QUERY_RESULT_STATUS_NOT_READY_KHR                           = 0;
 const QueryResultStatusKHR QUERY_RESULT_STATUS_COMPLETE_KHR                            = 1;
 const QueryResultStatusKHR QUERY_RESULT_STATUS_INSUFFICIENT_BITSTREAM_BUFFER_RANGE_KHR = -1000299000;
 
-distinct QueryType = CInt;
+typedef QueryType = CInt;
 const QueryType QUERY_TYPE_OCCLUSION                                                      = 0;
 const QueryType QUERY_TYPE_PIPELINE_STATISTICS                                            = 1;
 const QueryType QUERY_TYPE_TIMESTAMP                                                      = 2;
@@ -2252,7 +2265,7 @@ bitstruct QueueFlags : Flags @overlap {
 	bool optical_flow_nv  : 8;
 }
 
-distinct QueueGlobalPriority = CInt;
+typedef QueueGlobalPriority = CInt;
 const QueueGlobalPriority QUEUE_GLOBAL_PRIORITY_LOW          = 128;
 const QueueGlobalPriority QUEUE_GLOBAL_PRIORITY_MEDIUM       = 256;
 const QueueGlobalPriority QUEUE_GLOBAL_PRIORITY_HIGH         = 512;
@@ -2266,23 +2279,23 @@ const QueueGlobalPriority QUEUE_GLOBAL_PRIORITY_MEDIUM_KHR   = QUEUE_GLOBAL_PRIO
 const QueueGlobalPriority QUEUE_GLOBAL_PRIORITY_HIGH_KHR     = QUEUE_GLOBAL_PRIORITY_HIGH;
 const QueueGlobalPriority QUEUE_GLOBAL_PRIORITY_REALTIME_KHR = QUEUE_GLOBAL_PRIORITY_REALTIME;
 
-distinct RasterizationOrderAMD = CInt;
+typedef RasterizationOrderAMD = CInt;
 const RasterizationOrderAMD RASTERIZATION_ORDER_STRICT_AMD  = 0;
 const RasterizationOrderAMD RASTERIZATION_ORDER_RELAXED_AMD = 1;
 
-distinct RayTracingInvocationReorderModeNV = CInt;
+typedef RayTracingInvocationReorderModeNV = CInt;
 const RayTracingInvocationReorderModeNV RAY_TRACING_INVOCATION_REORDER_MODE_NONE_NV    = 0;
 const RayTracingInvocationReorderModeNV RAY_TRACING_INVOCATION_REORDER_MODE_REORDER_NV = 1;
 
-distinct RayTracingLssIndexingModeNV = CInt;
+typedef RayTracingLssIndexingModeNV = CInt;
 const RayTracingLssIndexingModeNV RAY_TRACING_LSS_INDEXING_MODE_LIST_NV       = 0;
 const RayTracingLssIndexingModeNV RAY_TRACING_LSS_INDEXING_MODE_SUCCESSIVE_NV = 1;
 
-distinct RayTracingLssPrimitiveEndCapsModeNV = CInt;
+typedef RayTracingLssPrimitiveEndCapsModeNV = CInt;
 const RayTracingLssPrimitiveEndCapsModeNV RAY_TRACING_LSS_PRIMITIVE_END_CAPS_MODE_NONE_NV    = 0;
 const RayTracingLssPrimitiveEndCapsModeNV RAY_TRACING_LSS_PRIMITIVE_END_CAPS_MODE_CHAINED_NV = 1;
 
-distinct RayTracingShaderGroupTypeKHR = CInt;
+typedef RayTracingShaderGroupTypeKHR = CInt;
 const RayTracingShaderGroupTypeKHR RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR              = 0;
 const RayTracingShaderGroupTypeKHR RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR  = 1;
 const RayTracingShaderGroupTypeKHR RAY_TRACING_SHADER_GROUP_TYPE_PROCEDURAL_HIT_GROUP_KHR = 2;
@@ -2320,7 +2333,7 @@ bitstruct ResolveModeFlags : Flags @overlap {
 
 
 
-distinct Result = CInt;
+typedef Result = CInt;
 const Result SUCCESS                                            = 0;
 const Result NOT_READY                                          = 1;
 const Result TIMEOUT                                            = 2;
@@ -2391,7 +2404,7 @@ bitstruct SampleCountFlags : Flags @overlap {
 	bool n_64 : 6;
 }
 
-distinct SamplerAddressMode = CInt;
+typedef SamplerAddressMode = CInt;
 const SamplerAddressMode SAMPLER_ADDRESS_MODE_REPEAT                   = 0;
 const SamplerAddressMode SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT          = 1;
 const SamplerAddressMode SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE            = 2;
@@ -2407,11 +2420,11 @@ bitstruct SamplerCreateFlags : Flags @overlap {
 	bool image_processing_qcom                : 4;
 }
 
-distinct SamplerMipmapMode = CInt;
+typedef SamplerMipmapMode = CInt;
 const SamplerMipmapMode SAMPLER_MIPMAP_MODE_NEAREST = 0;
 const SamplerMipmapMode SAMPLER_MIPMAP_MODE_LINEAR  = 1;
 
-distinct SamplerReductionMode = CInt;
+typedef SamplerReductionMode = CInt;
 const SamplerReductionMode SAMPLER_REDUCTION_MODE_WEIGHTED_AVERAGE                 = 0;
 const SamplerReductionMode SAMPLER_REDUCTION_MODE_MIN                              = 1;
 const SamplerReductionMode SAMPLER_REDUCTION_MODE_MAX                              = 2;
@@ -2420,7 +2433,7 @@ const SamplerReductionMode SAMPLER_REDUCTION_MODE_WEIGHTED_AVERAGE_EXT          
 const SamplerReductionMode SAMPLER_REDUCTION_MODE_MIN_EXT                          = SAMPLER_REDUCTION_MODE_MIN;
 const SamplerReductionMode SAMPLER_REDUCTION_MODE_MAX_EXT                          = SAMPLER_REDUCTION_MODE_MAX;
 
-distinct SamplerYcbcrModelConversion = CInt;
+typedef SamplerYcbcrModelConversion = CInt;
 const SamplerYcbcrModelConversion SAMPLER_YCBCR_MODEL_CONVERSION_RGB_IDENTITY       = 0;
 const SamplerYcbcrModelConversion SAMPLER_YCBCR_MODEL_CONVERSION_YCBCR_IDENTITY     = 1;
 const SamplerYcbcrModelConversion SAMPLER_YCBCR_MODEL_CONVERSION_YCBCR_709          = 2;
@@ -2432,13 +2445,13 @@ const SamplerYcbcrModelConversion SAMPLER_YCBCR_MODEL_CONVERSION_YCBCR_709_KHR  
 const SamplerYcbcrModelConversion SAMPLER_YCBCR_MODEL_CONVERSION_YCBCR_601_KHR      = SAMPLER_YCBCR_MODEL_CONVERSION_YCBCR_601;
 const SamplerYcbcrModelConversion SAMPLER_YCBCR_MODEL_CONVERSION_YCBCR_2020_KHR     = SAMPLER_YCBCR_MODEL_CONVERSION_YCBCR_2020;
 
-distinct SamplerYcbcrRange = CInt;
+typedef SamplerYcbcrRange = CInt;
 const SamplerYcbcrRange SAMPLER_YCBCR_RANGE_ITU_FULL       = 0;
 const SamplerYcbcrRange SAMPLER_YCBCR_RANGE_ITU_NARROW     = 1;
 const SamplerYcbcrRange SAMPLER_YCBCR_RANGE_ITU_FULL_KHR   = SAMPLER_YCBCR_RANGE_ITU_FULL;
 const SamplerYcbcrRange SAMPLER_YCBCR_RANGE_ITU_NARROW_KHR = SAMPLER_YCBCR_RANGE_ITU_NARROW;
 
-distinct ScopeKHR = CInt;
+typedef ScopeKHR = CInt;
 const ScopeKHR SCOPE_DEVICE_KHR       = 1;
 const ScopeKHR SCOPE_WORKGROUP_KHR    = 2;
 const ScopeKHR SCOPE_SUBGROUP_KHR     = 3;
@@ -2453,7 +2466,7 @@ bitstruct SemaphoreImportFlags : Flags @overlap {
 	bool temporary_khr : 0;
 }
 
-distinct SemaphoreType = CInt;
+typedef SemaphoreType = CInt;
 const SemaphoreType SEMAPHORE_TYPE_BINARY       = 0;
 const SemaphoreType SEMAPHORE_TYPE_TIMELINE     = 1;
 const SemaphoreType SEMAPHORE_TYPE_BINARY_KHR   = SEMAPHORE_TYPE_BINARY;
@@ -2464,7 +2477,7 @@ bitstruct SemaphoreWaitFlags : Flags @overlap {
 	bool any_khr : 0;
 }
 
-distinct ShaderCodeTypeEXT = CInt;
+typedef ShaderCodeTypeEXT = CInt;
 const ShaderCodeTypeEXT SHADER_CODE_TYPE_BINARY_EXT = 0;
 const ShaderCodeTypeEXT SHADER_CODE_TYPE_SPIRV_EXT  = 1;
 
@@ -2482,7 +2495,7 @@ bitstruct ShaderCreateFlagsEXT : Flags @overlap {
 	bool indirect_bindable                : 7;
 }
 
-distinct ShaderFloatControlsIndependence = CInt;
+typedef ShaderFloatControlsIndependence = CInt;
 const ShaderFloatControlsIndependence SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY     = 0;
 const ShaderFloatControlsIndependence SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL             = 1;
 const ShaderFloatControlsIndependence SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE            = 2;
@@ -2490,13 +2503,13 @@ const ShaderFloatControlsIndependence SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_
 const ShaderFloatControlsIndependence SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL_KHR         = SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL;
 const ShaderFloatControlsIndependence SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE_KHR        = SHADER_FLOAT_CONTROLS_INDEPENDENCE_NONE;
 
-distinct ShaderGroupShaderKHR = CInt;
+typedef ShaderGroupShaderKHR = CInt;
 const ShaderGroupShaderKHR SHADER_GROUP_SHADER_GENERAL_KHR      = 0;
 const ShaderGroupShaderKHR SHADER_GROUP_SHADER_CLOSEST_HIT_KHR  = 1;
 const ShaderGroupShaderKHR SHADER_GROUP_SHADER_ANY_HIT_KHR      = 2;
 const ShaderGroupShaderKHR SHADER_GROUP_SHADER_INTERSECTION_KHR = 3;
 
-distinct ShaderInfoTypeAMD = CInt;
+typedef ShaderInfoTypeAMD = CInt;
 const ShaderInfoTypeAMD SHADER_INFO_TYPE_STATISTICS_AMD  = 0;
 const ShaderInfoTypeAMD SHADER_INFO_TYPE_BINARY_AMD      = 1;
 const ShaderInfoTypeAMD SHADER_INFO_TYPE_DISASSEMBLY_AMD = 2;
@@ -2531,7 +2544,7 @@ bitstruct ShaderStageFlags : Flags @overlap {
 
 
 
-distinct ShadingRatePaletteEntryNV = CInt;
+typedef ShadingRatePaletteEntryNV = CInt;
 const ShadingRatePaletteEntryNV SHADING_RATE_PALETTE_ENTRY_NO_INVOCATIONS_NV              = 0;
 const ShadingRatePaletteEntryNV SHADING_RATE_PALETTE_ENTRY_16_INVOCATIONS_PER_PIXEL_NV    = 1;
 const ShadingRatePaletteEntryNV SHADING_RATE_PALETTE_ENTRY_8_INVOCATIONS_PER_PIXEL_NV     = 2;
@@ -2545,7 +2558,7 @@ const ShadingRatePaletteEntryNV SHADING_RATE_PALETTE_ENTRY_1_INVOCATION_PER_4X2_
 const ShadingRatePaletteEntryNV SHADING_RATE_PALETTE_ENTRY_1_INVOCATION_PER_2X4_PIXELS_NV = 10;
 const ShadingRatePaletteEntryNV SHADING_RATE_PALETTE_ENTRY_1_INVOCATION_PER_4X4_PIXELS_NV = 11;
 
-distinct SharingMode = CInt;
+typedef SharingMode = CInt;
 const SharingMode SHARING_MODE_EXCLUSIVE  = 0;
 const SharingMode SHARING_MODE_CONCURRENT = 1;
 
@@ -2566,7 +2579,7 @@ bitstruct StencilFaceFlags : Flags @overlap {
 
 
 
-distinct StencilOp = CInt;
+typedef StencilOp = CInt;
 const StencilOp STENCIL_OP_KEEP                = 0;
 const StencilOp STENCIL_OP_ZERO                = 1;
 const StencilOp STENCIL_OP_REPLACE             = 2;
@@ -2576,7 +2589,7 @@ const StencilOp STENCIL_OP_INVERT              = 5;
 const StencilOp STENCIL_OP_INCREMENT_AND_WRAP  = 6;
 const StencilOp STENCIL_OP_DECREMENT_AND_WRAP  = 7;
 
-distinct StructureType = CInt;
+typedef StructureType = CInt;
 const StructureType STRUCTURE_TYPE_APPLICATION_INFO                                                    = 0;
 const StructureType STRUCTURE_TYPE_INSTANCE_CREATE_INFO                                                = 1;
 const StructureType STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO                                            = 2;
@@ -3833,7 +3846,7 @@ bitstruct SubmitFlags : Flags @overlap {
 	bool protected_khr : 0;
 }
 
-distinct SubpassContents = CInt;
+typedef SubpassContents = CInt;
 const SubpassContents SUBPASS_CONTENTS_INLINE                                   = 0;
 const SubpassContents SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS                = 1;
 const SubpassContents SUBPASS_CONTENTS_INLINE_AND_SECONDARY_COMMAND_BUFFERS_KHR = 1000451000;
@@ -3853,7 +3866,7 @@ bitstruct SubpassDescriptionFlags : Flags @overlap {
 	bool rasterization_order_attachment_stencil_access_arm : 6;
 }
 
-distinct SubpassMergeStatusEXT = CInt;
+typedef SubpassMergeStatusEXT = CInt;
 const SubpassMergeStatusEXT SUBPASS_MERGE_STATUS_MERGED_EXT                                   = 0;
 const SubpassMergeStatusEXT SUBPASS_MERGE_STATUS_DISALLOWED_EXT                               = 1;
 const SubpassMergeStatusEXT SUBPASS_MERGE_STATUS_NOT_MERGED_SIDE_EFFECTS_EXT                  = 2;
@@ -3892,20 +3905,20 @@ bitstruct SwapchainCreateFlagsKHR : Flags @overlap {
 	bool deferred_memory_allocation_ext : 3;
 }
 
-distinct SystemAllocationScope = CInt;
+typedef SystemAllocationScope = CInt;
 const SystemAllocationScope SYSTEM_ALLOCATION_SCOPE_COMMAND  = 0;
 const SystemAllocationScope SYSTEM_ALLOCATION_SCOPE_OBJECT   = 1;
 const SystemAllocationScope SYSTEM_ALLOCATION_SCOPE_CACHE    = 2;
 const SystemAllocationScope SYSTEM_ALLOCATION_SCOPE_DEVICE   = 3;
 const SystemAllocationScope SYSTEM_ALLOCATION_SCOPE_INSTANCE = 4;
 
-distinct TessellationDomainOrigin = CInt;
+typedef TessellationDomainOrigin = CInt;
 const TessellationDomainOrigin TESSELLATION_DOMAIN_ORIGIN_UPPER_LEFT     = 0;
 const TessellationDomainOrigin TESSELLATION_DOMAIN_ORIGIN_LOWER_LEFT     = 1;
 const TessellationDomainOrigin TESSELLATION_DOMAIN_ORIGIN_UPPER_LEFT_KHR = TESSELLATION_DOMAIN_ORIGIN_UPPER_LEFT;
 const TessellationDomainOrigin TESSELLATION_DOMAIN_ORIGIN_LOWER_LEFT_KHR = TESSELLATION_DOMAIN_ORIGIN_LOWER_LEFT;
 
-distinct TimeDomainKHR = CInt;
+typedef TimeDomainKHR = CInt;
 const TimeDomainKHR TIME_DOMAIN_DEVICE_KHR                    = 0;
 const TimeDomainKHR TIME_DOMAIN_CLOCK_MONOTONIC_KHR           = 1;
 const TimeDomainKHR TIME_DOMAIN_CLOCK_MONOTONIC_RAW_KHR       = 2;
@@ -3930,14 +3943,14 @@ bitstruct ToolPurposeFlags : Flags @overlap {
 	bool modifying_features_ext  : 4;
 }
 
-distinct ValidationCacheHeaderVersionEXT = CInt;
+typedef ValidationCacheHeaderVersionEXT = CInt;
 const ValidationCacheHeaderVersionEXT VALIDATION_CACHE_HEADER_VERSION_ONE_EXT = 1;
 
-distinct ValidationCheckEXT = CInt;
+typedef ValidationCheckEXT = CInt;
 const ValidationCheckEXT VALIDATION_CHECK_ALL_EXT     = 0;
 const ValidationCheckEXT VALIDATION_CHECK_SHADERS_EXT = 1;
 
-distinct ValidationFeatureDisableEXT = CInt;
+typedef ValidationFeatureDisableEXT = CInt;
 const ValidationFeatureDisableEXT VALIDATION_FEATURE_DISABLE_ALL_EXT                     = 0;
 const ValidationFeatureDisableEXT VALIDATION_FEATURE_DISABLE_SHADERS_EXT                 = 1;
 const ValidationFeatureDisableEXT VALIDATION_FEATURE_DISABLE_THREAD_SAFETY_EXT           = 2;
@@ -3947,14 +3960,14 @@ const ValidationFeatureDisableEXT VALIDATION_FEATURE_DISABLE_CORE_CHECKS_EXT    
 const ValidationFeatureDisableEXT VALIDATION_FEATURE_DISABLE_UNIQUE_HANDLES_EXT          = 6;
 const ValidationFeatureDisableEXT VALIDATION_FEATURE_DISABLE_SHADER_VALIDATION_CACHE_EXT = 7;
 
-distinct ValidationFeatureEnableEXT = CInt;
+typedef ValidationFeatureEnableEXT = CInt;
 const ValidationFeatureEnableEXT VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT                      = 0;
 const ValidationFeatureEnableEXT VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_RESERVE_BINDING_SLOT_EXT = 1;
 const ValidationFeatureEnableEXT VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT                    = 2;
 const ValidationFeatureEnableEXT VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT                      = 3;
 const ValidationFeatureEnableEXT VALIDATION_FEATURE_ENABLE_SYNCHRONIZATION_VALIDATION_EXT        = 4;
 
-distinct VendorId = CInt;
+typedef VendorId = CInt;
 const VendorId VENDOR_ID_KHRONOS  = 0X10000;
 const VendorId VENDOR_ID_VIV      = 0X10001;
 const VendorId VENDOR_ID_VSI      = 0X10002;
@@ -3964,31 +3977,31 @@ const VendorId VENDOR_ID_MESA     = 0X10005;
 const VendorId VENDOR_ID_POCL     = 0X10006;
 const VendorId VENDOR_ID_MOBILEYE = 0X10007;
 
-distinct VertexInputRate = CInt;
+typedef VertexInputRate = CInt;
 const VertexInputRate VERTEX_INPUT_RATE_VERTEX   = 0;
 const VertexInputRate VERTEX_INPUT_RATE_INSTANCE = 1;
 
-distinct VideoAV1ChromaSamplePosition = CInt;
+typedef VideoAV1ChromaSamplePosition = CInt;
 
-distinct VideoAV1ColorPrimaries = CInt;
+typedef VideoAV1ColorPrimaries = CInt;
 
-distinct VideoAV1FrameRestorationType = CInt;
+typedef VideoAV1FrameRestorationType = CInt;
 
-distinct VideoAV1FrameType = CInt;
+typedef VideoAV1FrameType = CInt;
 
-distinct VideoAV1InterpolationFilter = CInt;
+typedef VideoAV1InterpolationFilter = CInt;
 
-distinct VideoAV1Level = CInt;
+typedef VideoAV1Level = CInt;
 
-distinct VideoAV1MatrixCoefficients = CInt;
+typedef VideoAV1MatrixCoefficients = CInt;
 
-distinct VideoAV1Profile = CInt;
+typedef VideoAV1Profile = CInt;
 
-distinct VideoAV1ReferenceName = CInt;
+typedef VideoAV1ReferenceName = CInt;
 
-distinct VideoAV1TransferCharacteristics = CInt;
+typedef VideoAV1TransferCharacteristics = CInt;
 
-distinct VideoAV1TxMode = CInt;
+typedef VideoAV1TxMode = CInt;
 
 bitstruct VideoCapabilityFlagsKHR : Flags @overlap {
 	bool protected_content         : 0;
@@ -4031,10 +4044,10 @@ bitstruct VideoComponentBitDepthFlagsKHR : Flags @overlap {
 
 bitstruct VideoDecodeCapabilityFlagsKHR : Flags @overlap {
 	bool dpb_and_output_coincide : 0;
-	bool dpb_and_output_distinct : 1;
+	bool dpb_and_output_typedef : 1;
 }
 
-distinct VideoDecodeH264FieldOrderCount = CInt;
+typedef VideoDecodeH264FieldOrderCount = CInt;
 
 bitstruct VideoDecodeH264PictureLayoutFlagsKHR : Flags @overlap {
 	bool interlaced_interleaved_lines : 0;
@@ -4059,7 +4072,7 @@ bitstruct VideoEncodeAV1CapabilityFlagsKHR : Flags @overlap {
 	bool motion_vector_scaling                  : 4;
 }
 
-distinct VideoEncodeAV1PredictionModeKHR = CInt;
+typedef VideoEncodeAV1PredictionModeKHR = CInt;
 const VideoEncodeAV1PredictionModeKHR VIDEO_ENCODE_AV1_PREDICTION_MODE_INTRA_ONLY_KHR              = 0;
 const VideoEncodeAV1PredictionModeKHR VIDEO_ENCODE_AV1_PREDICTION_MODE_SINGLE_REFERENCE_KHR        = 1;
 const VideoEncodeAV1PredictionModeKHR VIDEO_ENCODE_AV1_PREDICTION_MODE_UNIDIRECTIONAL_COMPOUND_KHR = 2;
@@ -4072,7 +4085,7 @@ bitstruct VideoEncodeAV1RateControlFlagsKHR : Flags @overlap {
 	bool reference_pattern_dyadic      : 3;
 }
 
-distinct VideoEncodeAV1RateControlGroupKHR = CInt;
+typedef VideoEncodeAV1RateControlGroupKHR = CInt;
 const VideoEncodeAV1RateControlGroupKHR VIDEO_ENCODE_AV1_RATE_CONTROL_GROUP_INTRA_KHR        = 0;
 const VideoEncodeAV1RateControlGroupKHR VIDEO_ENCODE_AV1_RATE_CONTROL_GROUP_PREDICTIVE_KHR   = 1;
 const VideoEncodeAV1RateControlGroupKHR VIDEO_ENCODE_AV1_RATE_CONTROL_GROUP_BIPREDICTIVE_KHR = 2;
@@ -4226,7 +4239,7 @@ bitstruct VideoEncodeRateControlModeFlagsKHR : Flags @overlap {
 
 
 
-distinct VideoEncodeTuningModeKHR = CInt;
+typedef VideoEncodeTuningModeKHR = CInt;
 const VideoEncodeTuningModeKHR VIDEO_ENCODE_TUNING_MODE_DEFAULT_KHR           = 0;
 const VideoEncodeTuningModeKHR VIDEO_ENCODE_TUNING_MODE_HIGH_QUALITY_KHR      = 1;
 const VideoEncodeTuningModeKHR VIDEO_ENCODE_TUNING_MODE_LOW_LATENCY_KHR       = 2;
@@ -4242,43 +4255,43 @@ bitstruct VideoEncodeUsageFlagsKHR : Flags @overlap {
 
 
 
-distinct VideoH264AspectRatioIdc = CInt;
+typedef VideoH264AspectRatioIdc = CInt;
 
-distinct VideoH264CabacInitIdc = CInt;
+typedef VideoH264CabacInitIdc = CInt;
 
-distinct VideoH264ChromaFormatIdc = CInt;
+typedef VideoH264ChromaFormatIdc = CInt;
 
-distinct VideoH264DisableDeblockingFilterIdc = CInt;
+typedef VideoH264DisableDeblockingFilterIdc = CInt;
 
-distinct VideoH264LevelIdc = CInt;
+typedef VideoH264LevelIdc = CInt;
 
-distinct VideoH264MemMgmtControlOp = CInt;
+typedef VideoH264MemMgmtControlOp = CInt;
 
-distinct VideoH264ModificationOfPicNumsIdc = CInt;
+typedef VideoH264ModificationOfPicNumsIdc = CInt;
 
-distinct VideoH264NonVclNaluType = CInt;
+typedef VideoH264NonVclNaluType = CInt;
 
-distinct VideoH264PictureType = CInt;
+typedef VideoH264PictureType = CInt;
 
-distinct VideoH264PocType = CInt;
+typedef VideoH264PocType = CInt;
 
-distinct VideoH264ProfileIdc = CInt;
+typedef VideoH264ProfileIdc = CInt;
 
-distinct VideoH264SliceType = CInt;
+typedef VideoH264SliceType = CInt;
 
-distinct VideoH264WeightedBipredIdc = CInt;
+typedef VideoH264WeightedBipredIdc = CInt;
 
-distinct VideoH265AspectRatioIdc = CInt;
+typedef VideoH265AspectRatioIdc = CInt;
 
-distinct VideoH265ChromaFormatIdc = CInt;
+typedef VideoH265ChromaFormatIdc = CInt;
 
-distinct VideoH265LevelIdc = CInt;
+typedef VideoH265LevelIdc = CInt;
 
-distinct VideoH265PictureType = CInt;
+typedef VideoH265PictureType = CInt;
 
-distinct VideoH265ProfileIdc = CInt;
+typedef VideoH265ProfileIdc = CInt;
 
-distinct VideoH265SliceType = CInt;
+typedef VideoH265SliceType = CInt;
 
 bitstruct VideoSessionCreateFlagsKHR : Flags @overlap {
 	bool protected_content                    : 0;
@@ -4293,7 +4306,7 @@ bitstruct VideoSessionParametersCreateFlagsKHR : Flags @overlap {
 	bool quantization_map_compatible : 0;
 }
 
-distinct ViewportCoordinateSwizzleNV = CInt;
+typedef ViewportCoordinateSwizzleNV = CInt;
 const ViewportCoordinateSwizzleNV VIEWPORT_COORDINATE_SWIZZLE_POSITIVE_X_NV = 0;
 const ViewportCoordinateSwizzleNV VIEWPORT_COORDINATE_SWIZZLE_NEGATIVE_X_NV = 1;
 const ViewportCoordinateSwizzleNV VIEWPORT_COORDINATE_SWIZZLE_POSITIVE_Y_NV = 2;
@@ -4663,6 +4676,3 @@ bitstruct PipelineStageFlags2 : Flags64 @overlap {
 	bool optical_flow_nv                      : 29;
 	bool convert_cooperative_vector_matrix_nv : 44;
 }
-
-
-

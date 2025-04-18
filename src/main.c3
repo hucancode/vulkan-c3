@@ -146,7 +146,7 @@ fn int main(String[] args) {
     while (!glfw::windowShouldClose(g_window)) {
         glfw::pollEvents();
         update();
-        anyfault excuse = @catch(render());
+        fault excuse = @catch(render());
         if (excuse) {
             io::printfn("Error: while rendering");
         };
@@ -154,23 +154,24 @@ fn int main(String[] args) {
     return 0;
 }
 
-fn void! createVulkanInstance() {
+fn void? createVulkanInstance() {
     vk::loadProcAddressesGlobal(&glfw::getInstanceProcAddress);
     ulong extensionCount;
     ZString* glfwExtensions = glfw::getRequiredInstanceExtensions(&extensionCount);
     ZString* extensions = (ZString*)malloc(extensionCount * ZString.sizeof);
     mem::copy(extensions, glfwExtensions, extensionCount * ZString.sizeof);
     defer free(extensions);
+    vk::ApplicationInfo app_info = {
+        .s_type = vk::STRUCTURE_TYPE_APPLICATION_INFO,
+        .p_application_name = TITLE,
+        .application_version = vk::@make_version(1, 0, 0),
+        .p_engine_name = ENGINE_NAME,
+        .engine_version = vk::@make_version(1, 0, 0),
+        .api_version = vk::API_VERSION_1_3,
+    };
     vk::InstanceCreateInfo createInfo = {
         .s_type = vk::STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-        .p_application_info = &&vk::ApplicationInfo {
-            .s_type = vk::STRUCTURE_TYPE_APPLICATION_INFO,
-            .p_application_name = TITLE,
-            .application_version = vk::@make_version(1, 0, 0),
-            .p_engine_name = ENGINE_NAME,
-            .engine_version = vk::@make_version(1, 0, 0),
-            .api_version = vk::API_VERSION_1_3,
-        },
+        .p_application_info = &app_info,
     };
     $if env::DARWIN:
         // Mandatory on macOS
@@ -188,8 +189,8 @@ fn void! createVulkanInstance() {
         extensions[extensionCount - 1] = vk::EXT_DEBUG_UTILS_EXTENSION_NAME;
         vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo = {
             .s_type = vk::STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-            .message_severity = vk::DebugUtilsMessageSeverityFlagsEXT { .error, .warning, .info },
-            .message_type = vk::DebugUtilsMessageTypeFlagsEXT { .general, .validation, .performance, .device_address_binding },
+            .message_severity = { .error, .warning, .info },
+            .message_type = { .general, .validation, .performance, .device_address_binding },
             .pfn_user_callback = fn uint(vk::DebugUtilsMessageSeverityFlagsEXT messageSeverity,
                 vk::DebugUtilsMessageTypeFlagsEXT messageType,
                 vk::DebugUtilsMessengerCallbackDataEXT* pCallbackData,
@@ -206,49 +207,45 @@ fn void! createVulkanInstance() {
     for (uint i = 0; i < extensionCount; i++) {
         io::printfn("Required extension: %s", extensions[i]);
     }
-    vk::createInstance(&createInfo, null, &g_instance)!;
+    g_instance = vk::createInstance(&createInfo)!;
     vk::loadProcAddressesInstance(g_instance);
     $if ENABLE_VALIDATION_LAYERS:
-        vk::createDebugUtilsMessengerEXT(
+        g_debug_messenger = vk::createDebugUtilsMessengerEXT(
             g_instance,
             &debugCreateInfo,
-            null,
-            &g_debug_messenger
         )!;
     $endif
 }
 
 fn void destroyVulkanInstance() {
     $if ENABLE_VALIDATION_LAYERS:
-        vk::destroyDebugUtilsMessengerEXT(g_instance, g_debug_messenger, null);
+        vk::destroyDebugUtilsMessengerEXT(g_instance, g_debug_messenger);
     $endif
-    vk::destroyInstance(g_instance, null);
+    vk::destroyInstance(g_instance);
 }
 
-fn void! createWindowSurface() {
+fn void? createWindowSurface() {
     vk::check(glfw::createWindowSurface(g_instance, g_window, null, &g_surface))!;
 }
 
 fn void destroySurface() {
-    vk::destroySurfaceKHR(g_instance, g_surface, null);
+    vk::destroySurfaceKHR(g_instance, g_surface);
 }
 
 fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
     uint score = 0;
-    vk::PhysicalDeviceProperties properties;
-    vk::PhysicalDeviceFeatures features;
-    vk::getPhysicalDeviceProperties(device, &properties);
+    vk::PhysicalDeviceProperties properties = vk::getPhysicalDeviceProperties(device);
+    vk::PhysicalDeviceFeatures features = vk::getPhysicalDeviceFeatures(device);
     ZString deviceName = (ZString)properties.device_name[0..];
     io::printfn("Scoring device %s", deviceName);
-    defer io::printfn("Device %s scored %d", score);
-    vk::getPhysicalDeviceFeatures(device, &features);
+    defer io::printfn("Device %s scored %d", deviceName, score);
     $if !env::DARWIN:
         if (!features.geometry_shader) {
             return 0;
         }
     $endif
     {
-        vk::ExtensionProperties[]! extensions = vk::enumerateDeviceExtensionProperties(device, null);
+        vk::ExtensionProperties[]? extensions = vk::enumerateDeviceExtensionProperties(device, null);
         if (catch excuse = extensions) {
             io::printfn("Cound not get extension list for %s", deviceName);
             return 0;
@@ -273,7 +270,7 @@ fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
         }
     }
     {
-        SwapchainSupportDetails! support = querySwapchainSupport(device);
+        SwapchainSupportDetails? support = querySwapchainSupport(device);
         if (catch excuse = support) {
             io::printfn("Cound not get swapchain support for %s", deviceName);
             return 0;
@@ -281,7 +278,7 @@ fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
         support.free();
     }
     {
-        QueueFamilyIndices! indices = findQueueFamilies(device);
+        QueueFamilyIndices? indices = findQueueFamilies(device);
         if (catch excuse = indices) {
             io::printfn("Cound not get queue families for %s", deviceName);
             return 0;
@@ -303,7 +300,7 @@ fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
     return score;
 }
 
-fn void! pickPhysicalDevice() {
+fn void? pickPhysicalDevice() {
     vk::PhysicalDevice[] devices = vk::enumeratePhysicalDevices(g_instance)!;
     defer free(devices);
     g_physical_device = devices[0];
@@ -333,9 +330,9 @@ fn void SwapchainSupportDetails.free(SwapchainSupportDetails* self) {
     free(self.present_modes);
 }
 
-fn SwapchainSupportDetails! querySwapchainSupport(vk::PhysicalDevice device) {
+fn SwapchainSupportDetails? querySwapchainSupport(vk::PhysicalDevice device) {
     SwapchainSupportDetails ret;
-    vk::getPhysicalDeviceSurfaceCapabilitiesKHR(device, g_surface, &ret.capabilities)!;
+    ret.capabilities = vk::getPhysicalDeviceSurfaceCapabilitiesKHR(device, g_surface)!;
     ret.formats = vk::getPhysicalDeviceSurfaceFormatsKHR(device, g_surface)!;
     ret.present_modes = vk::getPhysicalDeviceSurfacePresentModesKHR(device, g_surface)!;
     return ret;
@@ -346,7 +343,7 @@ struct QueueFamilyIndices {
     uint present_family;
 }
 
-fn QueueFamilyIndices! findQueueFamilies(vk::PhysicalDevice device) {
+fn QueueFamilyIndices? findQueueFamilies(vk::PhysicalDevice device) {
     vk::QueueFamilyProperties[] queueFamilies = vk::getPhysicalDeviceQueueFamilyProperties(device);
     QueueFamilyIndices indices;
     bool foundGraphics = false;
@@ -368,10 +365,10 @@ fn QueueFamilyIndices! findQueueFamilies(vk::PhysicalDevice device) {
             return indices;
         }
     }
-    return vk::VulkanError.ERROR_UNKNOWN?;
+    return vk::error::ERROR_UNKNOWN?;
 }
 
-fn void! createLogicalDevice() {
+fn void? createLogicalDevice() {
     QueueFamilyIndices indices = findQueueFamilies(g_physical_device)!;
     ZString[] layers;
     $if ENABLE_VALIDATION_LAYERS:
@@ -396,9 +393,9 @@ fn void! createLogicalDevice() {
         createInfo.enabled_layer_count = layers.len;
         createInfo.pp_enabled_layer_names = layers.ptr;
     $endif
-    vk::createDevice(g_physical_device, &createInfo, null, &g_device)!;
-    vk::getDeviceQueue(g_device, indices.graphics_family, 0, &g_graphics_queue);
-    vk::getDeviceQueue(g_device, indices.present_family, 0, &g_present_queue);
+    g_device = vk::createDevice(g_physical_device, &createInfo)!;
+    g_graphics_queue = vk::getDeviceQueue(g_device, indices.graphics_family, 0);
+    g_present_queue = vk::getDeviceQueue(g_device, indices.present_family, 0);
 }
 
 fn vk::SurfaceFormatKHR pickSwapSurfaceFormat(vk::SurfaceFormatKHR[] formats) {
@@ -432,7 +429,7 @@ fn vk::Extent2D pickSwapExtent(vk::SurfaceCapabilitiesKHR capabilities) {
     return actualExtent;
 }
 
-fn void! createSwapchain() {
+fn void? createSwapchain() {
     QueueFamilyIndices indices = findQueueFamilies(g_physical_device)!;
     SwapchainSupportDetails swapChainSupport = querySwapchainSupport(g_physical_device)!;
     vk::PresentModeKHR presentMode = pickSwapPresentMode(swapChainSupport.present_modes);
@@ -452,12 +449,12 @@ fn void! createSwapchain() {
         .image_color_space = g_swap_chain_format.color_space,
         .image_extent = g_swap_chain_extent,
         .image_array_layers = 1,
-        .image_usage = vk::ImageUsageFlags { .color_attachment },
+        .image_usage = { .color_attachment },
         .image_sharing_mode = vk::SHARING_MODE_EXCLUSIVE,
         .queue_family_index_count = 2,
         .p_queue_family_indices = &indiceArray,
         .pre_transform = swapChainSupport.capabilities.current_transform,
-        .composite_alpha = vk::CompositeAlphaFlagsKHR { .opaque },
+        .composite_alpha = { .opaque },
         .present_mode = presentMode,
         .clipped = (uint)true,
     };
@@ -466,7 +463,7 @@ fn void! createSwapchain() {
         createInfo.queue_family_index_count = indiceArray.len;
         createInfo.p_queue_family_indices = &indiceArray;
     }
-    vk::createSwapchainKHR(g_device, &createInfo, null, &g_swap_chain)!;
+    g_swap_chain = vk::createSwapchainKHR(g_device, &createInfo)!;
     g_swap_chain_images = vk::getSwapchainImagesKHR(g_device, g_swap_chain)!;
     vk::ImageView* buffer = (vk::ImageView*)malloc(g_swap_chain_images.len * vk::ImageView.sizeof);
     g_swap_chain_image_views = buffer[:g_swap_chain_images.len];
@@ -477,36 +474,34 @@ fn void! createSwapchain() {
 
 fn void destroySwapchain() {
     foreach (view:g_swap_chain_image_views) {
-        vk::destroyImageView(g_device, view, null);
+        vk::destroyImageView(g_device, view);
     }
-    vk::destroySwapchainKHR(g_device, g_swap_chain, null);
+    vk::destroySwapchainKHR(g_device, g_swap_chain);
     free(g_swap_chain_image_views);
     free(g_swap_chain_images);
 }
 
-fn vk::ShaderModule! createShaderModule(char[] code) {
+fn vk::ShaderModule? createShaderModule(char[] code) {
     vk::ShaderModuleCreateInfo createInfo = {
         .s_type = vk::STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
         .code_size = code.len,
         .p_code = (uint*)code.ptr,
     };
-    vk::ShaderModule ret;
-    vk::createShaderModule(g_device, &createInfo, null, &ret)!;
-    return ret;
+    return vk::createShaderModule(g_device, &createInfo)!;
 }
 
-fn void! createDescriptorSetLayout() {
+fn void? createDescriptorSetLayout() {
     vk::DescriptorSetLayoutBinding ubo_binding = {
         .binding = 0,
         .descriptor_type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
         .descriptor_count = 1,
-        .stage_flags = vk::ShaderStageFlags{.vertex},
+        .stage_flags = {.vertex},
     };
     vk::DescriptorSetLayoutBinding sampler_binding = {
         .binding = 1,
         .descriptor_type = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
         .descriptor_count = 1,
-        .stage_flags = vk::ShaderStageFlags{.fragment},
+        .stage_flags = {.fragment},
     };
     vk::DescriptorSetLayoutBinding[*] bindings = {
         ubo_binding, sampler_binding
@@ -516,31 +511,26 @@ fn void! createDescriptorSetLayout() {
 		.binding_count = bindings.len,
 		.p_bindings    = &bindings,
 	};
-	vk::createDescriptorSetLayout(
-		g_device,
-		&info,
-		null,
-		&g_descriptor_set_layout,
-	)!;
+	g_descriptor_set_layout = vk::createDescriptorSetLayout(g_device, &info)!;
 }
 
 fn void destroyDescriptorSetLayout() {
-    vk::destroyDescriptorSetLayout(g_device, g_descriptor_set_layout, null);
+    vk::destroyDescriptorSetLayout(g_device, g_descriptor_set_layout);
 }
 
-fn void! createGraphicsPipeline() {
+fn void? createGraphicsPipeline() {
     vk::ShaderModule v = createShaderModule(&VERTEX_CODE)!;
-    defer vk::destroyShaderModule(g_device, v, null);
+    defer vk::destroyShaderModule(g_device, v);
     vk::ShaderModule f = createShaderModule(&FRAGMENT_CODE)!;
-    defer vk::destroyShaderModule(g_device, f, null);
+    defer vk::destroyShaderModule(g_device, f);
     vk::PipelineShaderStageCreateInfo[*] shader_stages = {{
         .s_type = vk::STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-        .stage = vk::ShaderStageFlags { .vertex },
+        .stage = { .vertex },
         .module_ = v,
         .p_name = "main",
     }, {
         .s_type = vk::STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-        .stage = vk::ShaderStageFlags { .fragment },
+        .stage = { .fragment },
         .module_ = f,
         .p_name = "main",
     }};
@@ -586,32 +576,31 @@ fn void! createGraphicsPipeline() {
     vk::PipelineRasterizationStateCreateInfo rasterizer = {
         .s_type = vk::STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
         .polygon_mode = vk::POLYGON_MODE_FILL,
-        .cull_mode = vk::CullModeFlags { .back },
+        .cull_mode = { .back },
         .front_face = vk::FRONT_FACE_CLOCKWISE,
         .line_width = 1.0,
     };
     vk::PipelineMultisampleStateCreateInfo multisampling = {
         .s_type = vk::STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
-        .rasterization_samples = vk::SampleCountFlags { .n_1 },
+        .rasterization_samples = { .n_1 },
         .min_sample_shading = 1.0,
     };
     vk::PipelineColorBlendAttachmentState colorBlendAttachment = {
-        .color_write_mask = vk::ColorComponentFlags { .r, .g, .b, .a },
+        .color_write_mask = { .r, .g, .b, .a },
     };
     vk::PipelineColorBlendStateCreateInfo colorBlending = {
         .s_type = vk::STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
         .attachment_count = 1,
         .p_attachments = &colorBlendAttachment,
     };
-    vk::createPipelineLayout(
+    vk::PipelineLayoutCreateInfo create_info = {
+        .s_type = vk::STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+        .set_layout_count = 1,
+        .p_set_layouts = &g_descriptor_set_layout,
+    };
+    g_pipeline_layout = vk::createPipelineLayout(
         g_device,
-        &&vk::PipelineLayoutCreateInfo {
-            .s_type = vk::STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-            .set_layout_count = 1,
-            .p_set_layouts = &g_descriptor_set_layout,
-        },
-        null,
-        &g_pipeline_layout)!;
+        &create_info)!;
     vk::PipelineRenderingCreateInfoKHR dynamic_rendering_info = {
         .s_type = vk::STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,
         .color_attachment_count = 1,
@@ -632,22 +621,22 @@ fn void! createGraphicsPipeline() {
         .base_pipeline_index = -1,
         .p_next = &dynamic_rendering_info,
     };
-    vk::createGraphicsPipelines(g_device, (vk::PipelineCache)0, 1, &pipelineInfo, null, &g_graphics_pipeline)!;
+    g_graphics_pipeline = vk::createGraphicsPipelines(g_device, (vk::PipelineCache)0, 1, &pipelineInfo)!;
 }
 
 fn void destroyGraphicsPipeline() {
-    vk::destroyPipeline(g_device, g_graphics_pipeline, null);
-    vk::destroyPipelineLayout(g_device, g_pipeline_layout, null);
+    vk::destroyPipeline(g_device, g_graphics_pipeline);
+    vk::destroyPipelineLayout(g_device, g_pipeline_layout);
 }
 
-fn void! createCommandPool() {
+fn void? createCommandPool() {
     QueueFamilyIndices queueFamilyIndices = findQueueFamilies(g_physical_device)!;
     vk::CommandPoolCreateInfo poolInfo = {
         .s_type = vk::STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-        .flags = vk::CommandPoolCreateFlags { .reset_command_buffer },
+        .flags = { .reset_command_buffer },
         .queue_family_index = queueFamilyIndices.graphics_family,
     };
-    vk::createCommandPool(g_device, &poolInfo, null, &g_command_pool)!;
+    g_command_pool = vk::createCommandPool(g_device, &poolInfo)!;
     vk::CommandBufferAllocateInfo allocInfo = {
         .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
         .command_pool = g_command_pool,
@@ -662,18 +651,18 @@ fn void destroyCommandPool() {
     vk::destroyCommandPool(g_device, g_command_pool, null);
 }
 
-fn void! createSemaphores() {
+fn void? createSemaphores() {
     vk::SemaphoreCreateInfo semaphoreInfo = {
         .s_type = vk::STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
     };
     vk::FenceCreateInfo fenceInfo = {
         .s_type = vk::STRUCTURE_TYPE_FENCE_CREATE_INFO,
-        .flags = vk::FenceCreateFlags { .signaled },
+        .flags = { .signaled },
     };
     for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        vk::createSemaphore(g_device, &semaphoreInfo, null, &g_image_available_semaphore[i])!;
-        vk::createSemaphore(g_device, &semaphoreInfo, null, &g_render_finished_semaphore[i])!;
-        vk::createFence(g_device, &fenceInfo, null, &g_in_flight_fences[i])!;
+        g_image_available_semaphore[i] = vk::createSemaphore(g_device, &semaphoreInfo)!;
+        g_render_finished_semaphore[i] = vk::createSemaphore(g_device, &semaphoreInfo)!;
+        g_in_flight_fences[i] = vk::createFence(g_device, &fenceInfo)!;
     }
 }
 
@@ -685,9 +674,8 @@ fn void destroySemaphores() {
     }
 }
 
-fn uint! findMemoryType(uint filter, vk::MemoryPropertyFlags flags) {
-    vk::PhysicalDeviceMemoryProperties props;
-    vk::getPhysicalDeviceMemoryProperties(g_physical_device, &props);
+fn uint? findMemoryType(uint filter, vk::MemoryPropertyFlags flags) {
+    vk::PhysicalDeviceMemoryProperties props = vk::getPhysicalDeviceMemoryProperties(g_physical_device);
     for (uint i = 0; i < props.memory_type_count; i++) {
         if (filter & (1 << i) == 0) {
             continue;
@@ -697,81 +685,86 @@ fn uint! findMemoryType(uint filter, vk::MemoryPropertyFlags flags) {
         }
         return i;
     }
-    return vk::VulkanError.ERROR_UNKNOWN?;
+    return vk::error::ERROR_UNKNOWN?;
 }
-fn void! createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Buffer* buffer, vk::DeviceMemory* memory) {
+fn void? createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Buffer* buffer, vk::DeviceMemory* memory) {
     vk::BufferCreateInfo bufferInfo = {
         .s_type = vk::STRUCTURE_TYPE_BUFFER_CREATE_INFO,
         .size = size,
         .usage = usage,
         .sharing_mode = vk::SHARING_MODE_EXCLUSIVE,
     };
-    vk::createBuffer(g_device, &bufferInfo, null, buffer)!;
-    vk::MemoryRequirements requirements;
-    vk::getBufferMemoryRequirements(g_device, *buffer, &requirements);
+    *buffer = vk::createBuffer(g_device, &bufferInfo)!;
+    vk::MemoryRequirements requirements = vk::getBufferMemoryRequirements(g_device, *buffer);
     vk::MemoryAllocateInfo allocInfo = {
         .s_type = vk::STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
         .allocation_size = requirements.size,
         .memory_type_index = findMemoryType(requirements.memory_type_bits, properties)!,
     };
-    vk::allocateMemory(g_device, &allocInfo, null, memory)!;
+    *memory = vk::allocateMemory(g_device, &allocInfo)!;
     vk::bindBufferMemory(g_device, *buffer, *memory, 0)!;
 }
 
-fn vk::CommandBuffer! beginSingleTimeCommand() {
+fn vk::CommandBuffer? beginSingleTimeCommand() {
     vk::CommandBuffer command_buffer;
-    vk::allocateCommandBuffers(g_device, &&vk::CommandBufferAllocateInfo {
+    vk::CommandBufferAllocateInfo alloc_info = {
         .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
         .level = vk::COMMAND_BUFFER_LEVEL_PRIMARY,
         .command_pool = g_command_pool,
         .command_buffer_count = 1,
-    }, &command_buffer)!;
-    vk::beginCommandBuffer(command_buffer, &&vk::CommandBufferBeginInfo {
+    };
+    vk::allocateCommandBuffers(g_device, &alloc_info, &command_buffer)!;
+    vk::CommandBufferBeginInfo begin_info = {
         .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-        .flags = vk::CommandBufferUsageFlags { .one_time_submit },
-    })!;
+        .flags = { .one_time_submit },
+    };
+    vk::beginCommandBuffer(command_buffer, &begin_info)!;
     return command_buffer;
 }
 
-fn void! endSingleTimeCommand(vk::CommandBuffer command_buffer) {
+fn void? endSingleTimeCommand(vk::CommandBuffer command_buffer) {
     defer vk::freeCommandBuffers(g_device, g_command_pool, 1, &command_buffer);
     vk::endCommandBuffer(command_buffer)!;
-    vk::queueSubmit(g_graphics_queue, 1, &&vk::SubmitInfo {
+    vk::SubmitInfo submit_info = {
         .s_type = vk::STRUCTURE_TYPE_SUBMIT_INFO,
         .command_buffer_count = 1,
         .p_command_buffers = &command_buffer,
-    }, (vk::Fence)0)!;
+    };
+    vk::queueSubmit(g_graphics_queue, 1, &submit_info, (vk::Fence)0)!;
     vk::queueWaitIdle(g_graphics_queue)!;
 }
 
-fn void! copyBuffer(vk::Buffer dst, vk::Buffer src, vk::DeviceSize size) {
+fn void? copyBuffer(vk::Buffer dst, vk::Buffer src, vk::DeviceSize size) {
     vk::CommandBuffer command_buffer = beginSingleTimeCommand()!;
-    vk::cmdCopyBuffer(command_buffer, src, dst, 1, &&vk::BufferCopy { .size = size });
+    vk::BufferCopy copy_region = {
+        .size =size,
+    };
+    vk::cmdCopyBuffer(command_buffer, src, dst, 1, &copy_region);
     endSingleTimeCommand(command_buffer)!;
 }
 
-fn void! createBufferInit(void* data, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags flags, vk::Buffer* buffer, vk::DeviceMemory* memory) {
+fn void? createBufferInit(void* data, vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags flags, vk::Buffer* buffer, vk::DeviceMemory* memory) {
     vk::Buffer stg_buffer;
     vk::DeviceMemory stg_memory;
-    createBuffer(size, vk::BufferUsageFlags { .transfer_src }, vk::MemoryPropertyFlags { .host_visible, .host_coherent }, &stg_buffer, &stg_memory)!;
+    createBuffer(size, { .transfer_src }, { .host_visible, .host_coherent }, &stg_buffer, &stg_memory)!;
     defer {
         vk::destroyBuffer(g_device, stg_buffer, null);
         vk::freeMemory(g_device, stg_memory, null);
     }
-    void* mapped;
-    vk::mapMemory(g_device, stg_memory, 0, size, vk::MemoryMapFlags{}, &mapped)!;
+    void* mapped = vk::mapMemory(g_device, stg_memory, 0, size)!;
     defer vk::unmapMemory(g_device, stg_memory);
     mem::copy(mapped, data, (usz)size);
-    createBuffer(size, vk::BufferUsageFlags { .transfer_dst } | usage, flags, buffer, memory)!;
+    vk::BufferUsageFlags usage_flags = { .transfer_dst };
+    createBuffer(size, usage_flags | usage, flags, buffer, memory)!;
     copyBuffer(*buffer, stg_buffer, size)!;
 }
 
-fn void! createBuffers() {
-    createBufferInit(&VERTICES, (vk::DeviceSize)($sizeof(VERTICES)), vk::BufferUsageFlags { .vertex_buffer }, vk::MemoryPropertyFlags { .device_local }, &g_vertex_buffer, &g_vertex_memory)!;
-    createBufferInit(&INDICES, (vk::DeviceSize)($sizeof(INDICES)), vk::BufferUsageFlags { .index_buffer }, vk::MemoryPropertyFlags { .device_local }, &g_index_buffer, &g_index_memory)!;
+fn void? createBuffers() {
+    createBufferInit(&VERTICES, (vk::DeviceSize)($sizeof(VERTICES)), { .vertex_buffer }, { .device_local }, &g_vertex_buffer, &g_vertex_memory)!;
+    createBufferInit(&INDICES, (vk::DeviceSize)($sizeof(INDICES)), { .index_buffer }, { .device_local }, &g_index_buffer, &g_index_memory)!;
     for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        createBufferInit(&g_ubo, UniformBuffer.sizeof, vk::BufferUsageFlags { .uniform_buffer }, vk::MemoryPropertyFlags { .host_visible, .host_coherent }, &g_uniform_buffers[i], &g_uniform_memory[i])!;
-        vk::mapMemory(g_device, g_uniform_memory[i], 0, UniformBuffer.sizeof, vk::MemoryMapFlags{}, &g_uniform_buffer_mapped[i])!;
+        createBufferInit(&g_ubo, UniformBuffer.sizeof, { .uniform_buffer }, { .host_visible, .host_coherent }, &g_uniform_buffers[i], &g_uniform_memory[i])!;
+        g_uniform_buffer_mapped[i] = vk::mapMemory(g_device, g_uniform_memory[i], 0, UniformBuffer.sizeof)!;
     }
     createTextures()!;
 }
@@ -788,7 +781,7 @@ fn void destroyBuffers() {
     destroyTextures();
 }
 
-fn void! createTextures() {
+fn void? createTextures() {
     int w, h, channel;
     const char[*] DATA = $embed("assets/statue-1275469_1280.jpg");
     char* pixels = stbimage::load_from_memory(&DATA, DATA.len, &w, &h, &channel, stbimage::RGB_ALPHA);
@@ -796,11 +789,10 @@ fn void! createTextures() {
     vk::DeviceSize size = (vk::DeviceSize)(w * h * 4);
     vk::Buffer stg_buffer;
     vk::DeviceMemory stg_memory;
-    createBuffer(size, vk::BufferUsageFlags { .transfer_src }, vk::MemoryPropertyFlags { .host_visible, .host_coherent }, &stg_buffer, &stg_memory)!;
+    createBuffer(size, { .transfer_src }, { .host_visible, .host_coherent }, &stg_buffer, &stg_memory)!;
     defer vk::freeMemory(g_device, stg_memory, null);
     defer vk::destroyBuffer(g_device, stg_buffer, null);
-    void* image_data_mapped;
-    vk::mapMemory(g_device, stg_memory, 0, size, vk::MemoryMapFlags{}, &image_data_mapped)!;
+    void* image_data_mapped = vk::mapMemory(g_device, stg_memory, 0, size)!;
     mem::copy(image_data_mapped, pixels, (usz)size);
     vk::unmapMemory(g_device, stg_memory);
     vk::ImageCreateInfo create_info = {
@@ -815,19 +807,18 @@ fn void! createTextures() {
         .array_layers = 1,
         .format = vk::FORMAT_R8G8B8A8_SRGB,
         .tiling = vk::IMAGE_TILING_OPTIMAL,
-        .usage = vk::ImageUsageFlags { .transfer_dst, .sampled },
+        .usage = { .transfer_dst, .sampled },
         .sharing_mode = vk::SHARING_MODE_EXCLUSIVE,
         .initial_layout = vk::IMAGE_LAYOUT_UNDEFINED,
-        .samples = vk::SampleCountFlags { .n_1 },
+        .samples = { .n_1 },
     };
-    vk::MemoryRequirements requirements;
-    vk::createImage(g_device, &create_info, null, &g_texture_image)!;
-    vk::getImageMemoryRequirements(g_device, g_texture_image, &requirements);
+    g_texture_image = vk::createImage(g_device, &create_info)!;
+    vk::MemoryRequirements requirements = vk::getImageMemoryRequirements(g_device, g_texture_image);
     vk::MemoryAllocateInfo allocate_info = {
         .allocation_size = requirements.size,
-        .memory_type_index = findMemoryType(requirements.memory_type_bits, vk::MemoryPropertyFlags { .device_local })!,
+        .memory_type_index = findMemoryType(requirements.memory_type_bits, { .device_local })!,
     };
-    vk::allocateMemory(g_device, &allocate_info, null, &g_texture_image_memory)!;
+    g_texture_image_memory = vk::allocateMemory(g_device, &allocate_info)!;
     vk::bindImageMemory(g_device, g_texture_image, g_texture_image_memory, 0)!;
     transitionImageLayout(g_texture_image, vk::FORMAT_R8G8B8A8_SRGB, vk::IMAGE_LAYOUT_UNDEFINED, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)!;
     copyBufferImage(stg_buffer, g_texture_image, (uint)w, (uint)h)!;
@@ -848,10 +839,10 @@ fn void! createTextures() {
         .compare_op = vk::COMPARE_OP_ALWAYS,
         .mipmap_mode = vk::SAMPLER_MIPMAP_MODE_LINEAR,
     };
-    vk::createSampler(g_device, &sampler_info, null, &g_sampler)!;
+    g_sampler = vk::createSampler(g_device, &sampler_info)!;
 }
 
-fn void! transitionImageLayout(vk::Image image, vk::Format format, vk::ImageLayout oldLayout, vk::ImageLayout newLayout) {
+fn void? transitionImageLayout(vk::Image image, vk::Format format, vk::ImageLayout oldLayout, vk::ImageLayout newLayout) {
     vk::CommandBuffer command_buffer = beginSingleTimeCommand()!;
     vk::PipelineStageFlags src_stage;
     vk::PipelineStageFlags dst_stage;
@@ -863,7 +854,7 @@ fn void! transitionImageLayout(vk::Image image, vk::Format format, vk::ImageLayo
         .dst_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
         .image = image,
         .subresource_range = {
-            .aspect_mask = vk::ImageAspectFlags { .color },
+            .aspect_mask = { .color },
             .base_mip_level = 0,
             .level_count = 1,
             .base_array_layer = 0,
@@ -871,33 +862,33 @@ fn void! transitionImageLayout(vk::Image image, vk::Format format, vk::ImageLayo
         },
     };
     if(oldLayout == vk::IMAGE_LAYOUT_UNDEFINED && newLayout == vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-        barrier.dst_access_mask = vk::AccessFlags { .transfer_write };
-        src_stage = vk::PipelineStageFlags { .top_of_pipe };
-        dst_stage = vk::PipelineStageFlags { .transfer };
+        barrier.dst_access_mask = { .transfer_write };
+        src_stage = { .top_of_pipe };
+        dst_stage = { .transfer };
     } else if(oldLayout == vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == vk::IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-        barrier.src_access_mask = vk::AccessFlags { .transfer_write };
-        barrier.dst_access_mask = vk::AccessFlags { .shader_read };
-        src_stage = vk::PipelineStageFlags { .transfer };
-        dst_stage = vk::PipelineStageFlags { .fragment_shader };
+        barrier.src_access_mask = { .transfer_write };
+        barrier.dst_access_mask = { .shader_read };
+        src_stage = { .transfer };
+        dst_stage = { .fragment_shader };
     }
     vk::cmdPipelineBarrier(
         command_buffer,
         src_stage, dst_stage,
-        vk::DependencyFlags {},
+        {},
         0, null,
         0, null,
         1, &barrier);
     endSingleTimeCommand(command_buffer)!;
 }
 
-fn void! copyBufferImage(vk::Buffer buffer, vk::Image image, uint width, uint height) {
+fn void? copyBufferImage(vk::Buffer buffer, vk::Image image, uint width, uint height) {
     vk::CommandBuffer command_buffer = beginSingleTimeCommand()!;
     vk::BufferImageCopy copy_region = {
         .buffer_offset = 0,
         .buffer_row_length = 0,
         .buffer_image_height = 0,
         .image_subresource = {
-            .aspect_mask = vk::ImageAspectFlags { .color },
+            .aspect_mask = { .color },
             .mip_level = 0,
             .base_array_layer = 0,
             .layer_count = 1,
@@ -909,21 +900,19 @@ fn void! copyBufferImage(vk::Buffer buffer, vk::Image image, uint width, uint he
     endSingleTimeCommand(command_buffer)!;
 }
 
-fn vk::ImageView! createImageView(vk::Image image, vk::Format format) {
-    vk::ImageView ret;
+fn vk::ImageView? createImageView(vk::Image image, vk::Format format) {
     vk::ImageViewCreateInfo info = {
         .s_type = vk::STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
         .image = image,
         .view_type = vk::IMAGE_VIEW_TYPE_2D,
         .format = format,
         .subresource_range = {
-            .aspect_mask = vk::ImageAspectFlags { .color },
+            .aspect_mask = { .color },
             .level_count = 1,
             .layer_count = 1,
         },
     };
-    vk::createImageView(g_device, &info, null, &ret)!;
-    return ret;
+    return vk::createImageView(g_device, &info)!;
 }
 
 fn void destroyTextures() {
@@ -938,14 +927,14 @@ fn void createUBO() {
     if(height <= 0) {
         return;
     }
-    g_ubo.model = matrix::IDENTITY4(<float>);
-    g_ubo.view = matrix::look_at(<float>)({0.0, 5.0, 5.0}, {}, {0.0, 1.0, 0.0}).transpose();
-    g_ubo.projection = matrix::perspective(<float>)((float)math::deg_to_rad(45), (float)width/(float)height, 0.1, 10000.0).transpose();
+    g_ubo.model = matrix::IDENTITY4{float};
+    g_ubo.view = matrix::look_at{float}({0.0, 5.0, 5.0}, {}, {0.0, 1.0, 0.0}).transpose();
+    g_ubo.projection = matrix::perspective{float}((float)math::deg_to_rad(45), (float)width/(float)height, 0.1, 10000.0).transpose();
     g_ubo.time = 0.0;
     updateUniforms();
 }
 
-fn void! createDescriptorSets() {
+fn void? createDescriptorSets() {
     vk::DescriptorPoolSize ubo_size = {
         .type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
         .descriptor_count = MAX_FRAMES_IN_FLIGHT,
@@ -964,7 +953,7 @@ fn void! createDescriptorSets() {
         .p_pool_sizes    = &pool_sizes,
         .max_sets       = MAX_FRAMES_IN_FLIGHT,
     };
-    vk::createDescriptorPool(g_device, &create_info, null, &g_descriptor_pool)!;
+    g_descriptor_pool = vk::createDescriptorPool(g_device, &create_info)!;
 	vk::DescriptorSetLayout* set_layouts = (vk::DescriptorSetLayout*) malloc(vk::DescriptorSetLayout.sizeof* MAX_FRAMES_IN_FLIGHT);
 	for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         set_layouts[i] = g_descriptor_set_layout;
@@ -977,29 +966,31 @@ fn void! createDescriptorSets() {
 	};
 	vk::allocateDescriptorSets(g_device, &alloc_info, &g_descriptor_sets)!;
 	for (uint i =0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		vk::DescriptorBufferInfo uniform_buffer_info = {
+			.buffer = g_uniform_buffers[i],
+			.offset = 0,
+			.range = UniformBuffer.sizeof,
+		};
 		vk::WriteDescriptorSet uniform_desc = {
     		.s_type           = vk::STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
     		.dst_set          = g_descriptor_sets[i],
     		.dst_binding      = 0,
     		.descriptor_type  = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
     		.descriptor_count = 1,
-    		.p_buffer_info     = &&vk::DescriptorBufferInfo {
-    			.buffer = g_uniform_buffers[i],
-    			.offset = 0,
-    			.range = UniformBuffer.sizeof,
-			},
+    		.p_buffer_info     = &uniform_buffer_info,
 		};
+		vk::DescriptorImageInfo texture_image_info = {
+                .sampler = g_sampler,
+                .image_view = g_texture_image_view,
+                .image_layout = vk::IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            };
 		vk::WriteDescriptorSet sampler_desc = {
             .s_type           = vk::STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
             .dst_set          = g_descriptor_sets[i],
             .dst_binding      = 1,
             .descriptor_type  = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
             .descriptor_count = 1,
-            .p_image_info     = &&vk::DescriptorImageInfo {
-                .sampler = g_sampler,
-                .image_view = g_texture_image_view,
-                .image_layout = vk::IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-            },
+            .p_image_info     = &texture_image_info,
 		};
 		vk::WriteDescriptorSet[*] descriptors = {
 			uniform_desc,
@@ -1017,26 +1008,25 @@ fn void updateUniforms() {
     mem::copy(g_uniform_buffer_mapped[g_current_frame], &g_ubo, UniformBuffer.sizeof);
 }
 
-fn void! render() {
+fn void? render() {
     vk::waitForFences(g_device, 1, &g_in_flight_fences[g_current_frame], vk::TRUE, ulong.max)!;
-    uint imageIndex;
-    anyfault excuse = @catch(vk::acquireNextImageKHR(g_device, g_swap_chain, ulong.max, g_image_available_semaphore[g_current_frame], (vk::Fence)0, &imageIndex));
-    if (excuse == vk::VulkanError.ERROR_OUT_OF_DATE_KHR || excuse == vk::VulkanError.SUBOPTIMAL_KHR) {
-        recreateSwapchain()!;
-        return;
-    }
-    if (excuse) {
+    uint? imageIndex = vk::acquireNextImageKHR(g_device, g_swap_chain, ulong.max, g_image_available_semaphore[g_current_frame]);
+    if (catch excuse = imageIndex) {
+        if (excuse == vk::error::ERROR_OUT_OF_DATE_KHR || excuse == vk::error::SUBOPTIMAL_KHR) {
+            recreateSwapchain()!;
+            return;
+        }
         return excuse?;
     }
     vk::resetFences(g_device, 1, &g_in_flight_fences[g_current_frame])!;
-    vk::resetCommandBuffer(g_command_buffers[g_current_frame], CommandBufferResetFlags{})!;
+    vk::resetCommandBuffer(g_command_buffers[g_current_frame], {})!;
     recordCommandBuffer(g_command_buffers[g_current_frame], imageIndex)!;
-
+    vk::PipelineStageFlags wait_dst_stage_mask = {.color_attachment_output};
     vk::SubmitInfo submitInfo = {
         .s_type = vk::STRUCTURE_TYPE_SUBMIT_INFO,
         .wait_semaphore_count = 1,
         .p_wait_semaphores = &g_image_available_semaphore[g_current_frame],
-        .p_wait_dst_stage_mask = &&vk::PipelineStageFlags { .color_attachment_output },
+        .p_wait_dst_stage_mask = &wait_dst_stage_mask,
         .command_buffer_count = 1,
         .p_command_buffers = &g_command_buffers[g_current_frame],
         .signal_semaphore_count = 1,
@@ -1051,8 +1041,8 @@ fn void! render() {
         .p_swapchains = &g_swap_chain,
         .p_image_indices = &imageIndex,
     };
-    excuse = @catch(vk::queuePresentKHR(g_present_queue, &presentInfo));
-    if (excuse == vk::VulkanError.ERROR_OUT_OF_DATE_KHR || excuse == vk::VulkanError.SUBOPTIMAL_KHR) {
+    fault excuse = @catch(vk::queuePresentKHR(g_present_queue, &presentInfo));
+    if (excuse == vk::error::ERROR_OUT_OF_DATE_KHR || excuse == vk::error::SUBOPTIMAL_KHR) {
         recreateSwapchain()!;
     } else if (excuse) {
         return excuse?;
@@ -1060,10 +1050,11 @@ fn void! render() {
     g_current_frame = (g_current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
-fn void! recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
-    vk::beginCommandBuffer(commandBuffer, &&vk::CommandBufferBeginInfo {
+fn void? recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
+    vk::CommandBufferBeginInfo beginInfo = {
         .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-    })!;
+    };
+    vk::beginCommandBuffer(commandBuffer, &beginInfo)!;
     vk::ImageMemoryBarrier barrier_before = {
         .s_type = vk::STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
         .old_layout = vk::IMAGE_LAYOUT_UNDEFINED,
@@ -1072,21 +1063,21 @@ fn void! recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
         .dst_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
         .image = g_swap_chain_images[imageIndex],
         .subresource_range = {
-            .aspect_mask = vk::ImageAspectFlags {.color},
+            .aspect_mask =  {.color},
             .base_mip_level = 0,
             .level_count = 1,
             .base_array_layer = 0,
             .layer_count = 1
         },
-        .src_access_mask = vk::AccessFlags{},
-        .dst_access_mask = vk::AccessFlags{.color_attachment_write},
+        .src_access_mask = {},
+        .dst_access_mask = {.color_attachment_write},
     };
 
     vk::cmdPipelineBarrier(
         commandBuffer,
-        vk::PipelineStageFlags{.top_of_pipe},
-        vk::PipelineStageFlags{.color_attachment_output},
-        vk::DependencyFlags{},
+        {.top_of_pipe},
+        {.color_attachment_output},
+        {},
         0, null,
         0, null,
         1, &barrier_before
@@ -1112,14 +1103,16 @@ fn void! recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
 
     vk::cmdBeginRenderingKHR(commandBuffer, &render_info);
     vk::cmdBindPipeline(commandBuffer, vk::PIPELINE_BIND_POINT_GRAPHICS, g_graphics_pipeline);
-    vk::cmdSetViewport(commandBuffer, 0, 1, &&vk::Viewport {
+    vk::Viewport viewport = {
         .width = g_swap_chain_extent.width,
         .height = g_swap_chain_extent.height,
         .max_depth = 1.0,
-    });
-    vk::cmdSetScissor(commandBuffer, 0, 1, &&vk::Rect2D {
+    };
+    vk::cmdSetViewport(commandBuffer, 0, 1, &viewport);
+    vk::Rect2D scissor = {
         .extent = g_swap_chain_extent,
-    });
+    };
+    vk::cmdSetScissor(commandBuffer, 0, 1, &scissor);
     draw(commandBuffer);
     vk::cmdEndRenderingKHR(commandBuffer);
     // Transition to PRESENT_SRC_KHR
@@ -1131,21 +1124,21 @@ fn void! recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
         .dst_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
         .image = g_swap_chain_images[imageIndex],
         .subresource_range = {
-            .aspect_mask = vk::ImageAspectFlags{.color},
+            .aspect_mask = {.color},
             .base_mip_level = 0,
             .level_count = 1,
             .base_array_layer = 0,
             .layer_count = 1
         },
-        .src_access_mask = vk::AccessFlags{.color_attachment_write},
-        .dst_access_mask = vk::AccessFlags{}
+        .src_access_mask = {.color_attachment_write},
+        .dst_access_mask = {}
     };
 
     vk::cmdPipelineBarrier(
         commandBuffer,
-        vk::PipelineStageFlags{.color_attachment_output},
-        vk::PipelineStageFlags{.bottom_of_pipe},
-        vk::DependencyFlags{},
+        {.color_attachment_output},
+        {.bottom_of_pipe},
+        {},
         0, null,
         0, null,
         1, &barrier_after
@@ -1162,7 +1155,7 @@ fn void draw(vk::CommandBuffer commandBuffer) {
 
 fn void update() {
     g_ubo.time = (float)time::now().diff_sec(g_start_timestamp);
-    g_ubo.model = matrix::IDENTITY4(<float>)
+    g_ubo.model = matrix::IDENTITY4{float}
         .rotate_x((float)math::sin(g_ubo.time*0.53))
         .rotate_y((float)math::sin(g_ubo.time*0.97))
         .rotate_z((float)math::sin(g_ubo.time*1.17))
@@ -1171,13 +1164,13 @@ fn void update() {
     updateUniforms();
 }
 
-fn void! recreateSwapchain() {
+fn void? recreateSwapchain() {
     vk::deviceWaitIdle(g_device)!;
     destroySwapchain();
     createSwapchain()!;
 }
 
-fn void! init() {
+fn void? init() {
     g_start_timestamp = time::now();
     g_last_frame_timestamp = g_start_timestamp;
     createVulkanInstance()!;
