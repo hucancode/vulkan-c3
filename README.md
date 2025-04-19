@@ -28,63 +28,39 @@ c3c run
 ![screenshot](readme/cube.gif)
 
 ## Usage
-
-* Vulkan functions are renamed as follows: `vkFunctionName` -> `vk::functionName`
-* Vulkan constants are renamed as follows: `VK_CONSTANT_NAME` -> `vk::CONSTANT_NAME`
-* Vulkan structs are renamed as follows: `VkStructName` -> `vk::StructName`
-* Vulkan enums are renamed as follows: `VkEnumName` -> `vk::EnumName`
-  * Enum values are renamed as follows: `VK_ENUM_VALUE` -> `vk::ENUM_VALUE`
-* Vulkan flags are converted to `bitstruct` and renamed as follows: `VkFlagName` -> `vk::FlagName`
-* All string equivalents (e.g. `char *`) are converted to `ZString`
-* All functions that handle error by returning `VkResult` is now converted to using C3's `fault` system.
-  For example: 
-  ```cpp
-  VkResult vkBeginCommandBuffer(VkCommandBuffer commandBuffer, const VkCommandBufferBeginInfo* pBeginInfo)
-  ```
-  is converted to
-
-  ```cpp
-  fn void? beginCommandBuffer(CommandBuffer commandBuffer, CommandBufferBeginInfo* pBeginInfo)
-  ```
-  
-* All functions that supposed to extract an array values are converted to return a `slice` instead.
-  For example:
-  ```cpp
-  VkResult VkEnumerateInstanceExtensionProperties(char* pLayerName, int* count, VkExtensionProperties* properties)
-  ```
-  is converted to
-
-  ```cpp
-  fn ExtensionProperties[]? enumerateInstanceExtensionProperties(ZString pLayerName)
-  ```
-* All functions that supposed to return a value now return that value and not take the output in function argument in the form of pointer.
-  For example:
-  ```cpp
-  VkResult vkCreateInstance(const VkInstanceCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkInstance* pInstance)
-  ```
-  is converted to
-  ```c
-  fn Instance? createInstance(InstanceCreateInfo* pCreateInfo, AllocationCallbacks* pAllocator = null)
-  ```
+| Description                                               | C                                              | C3 Equivalent                                           |
+|-----------------------------------------------------------|------------------------------------------------------------------|----------------------------------------------------------------|
+| Function naming                                           | `vkFunctionName`                                                 | `vk::functionName`                                             |
+| Constant naming                                           | `VK_CONSTANT_NAME`                                               | `vk::CONSTANT_NAME`                                            |
+| Struct naming                                             | `VkStructName`                                                   | `vk::StructName`                                               |
+| Enum type                                          | `VkEnumName`                                                     | `vk::EnumName`                                                 |
+| Enum value                                         | `VK_ENUM_VALUE`                                                  | `vk::ENUM_VALUE`                                               |
+| Flag type                                      | `VkFlagName`                                                     | `vk::FlagName` as `bitstruct`                                  |
+| String type                                    | `char *`                                                         | `ZString`                                                      |
+| Error handling rewrite                                    | `VkResult vkBeginCommandBuffer(VkCommandBuffer, const VkCommandBufferBeginInfo*)` | `fn void? beginCommandBuffer(CommandBuffer, CommandBufferBeginInfo*)` |
+| Array extraction functions                         | `VkResult VkEnumerateInstanceExtensionProperties(char*, int*, VkExtensionProperties*)` | `fn ExtensionProperties[]? enumerateInstanceExtensionProperties(ZString)` |
+| Output value return simplification                        | `VkResult vkCreateInstance(const VkInstanceCreateInfo*, const VkAllocationCallbacks*, VkInstance*)` | `fn Instance? createInstance(InstanceCreateInfo*, AllocationCallbacks* = null)` |
 
 ## Error Handling
 
 You can handle errors manually like this:
 ```cpp
+vk::ApplicationInfo app_info = {
+    .s_type = vk::STRUCTURE_TYPE_APPLICATION_INFO,
+    .p_application_name = "Fortknight",
+    .application_version = vk::@make_version(1, 0, 0),
+    .p_engine_name = "Soreal Engine",
+    .engine_version = vk::@make_version(1, 0, 0),
+    .api_version = vk::API_VERSION_1_3,
+};
 vk::InstanceCreateInfo createInfo = {
     .s_type = vk::STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-    .p_application_info = &&vk::ApplicationInfo {
-        .s_type = vk::STRUCTURE_TYPE_APPLICATION_INFO,
-        .p_application_name = "Hello",
-        .application_version = vk::@make_version(1, 0, 0),
-        .p_engine_name = "Soreal Engine",
-        .engine_version = vk::@make_version(1, 0, 0),
-        .api_version = vk::API_VERSION_1_3,
-    },
+    .p_application_info = &app_info,
 };
+
 fn void create() {
     Instance? instance = vk::createInstance(&createInfo);
-    if (catch excuse == instance) {
+    if (catch excuse = instance) {
         if (excuse == vk::Error::NOT_READY) {
             io::printfn("not ready to create instance");
         } else {
