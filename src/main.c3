@@ -11,6 +11,20 @@ import glfw;
 import stbimage;
 import vk;
 
+struct UniformBuffer @align(16) {
+	Matrix4x4{float} projection;
+	Matrix4x4{float} view;
+	Matrix4x4{float} model;
+	float time;
+}
+
+struct Vertex {
+	float[<4>] position;
+	float[<4>] color;
+	float[<4>] normal;
+	float[<2>] uv;
+}
+
 const WIDTH = 1024;
 const HEIGHT = 768;
 const TITLE = "Hello Vulkan!";

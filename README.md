@@ -14,7 +14,13 @@ import glfw;
 ```
 
 # Running example
-Install C3C, Vulkan SDK, GLFW, then simply run
+Install C3C, Vulkan SDK, GLFW.
+Compile Shader
+```sh
+glslc src/shaders/shader.frag -o src/shaders/frag.spv
+glslc src/shaders/shader.vert -o src/shaders/vert.spv
+```
+Then run
 ```sh
 c3c run
 ```
@@ -22,13 +28,15 @@ If you don't want to install those dependencies on your system, you can use a ni
 ```sh
 nix develop
 # inside nix environment
+glslc src/shaders/shader.frag -o src/shaders/frag.spv
+glslc src/shaders/shader.vert -o src/shaders/vert.spv
 c3c run
 ```
 
-![screenshot](readme/cube.gif)
+![screenshot](docs/cube.gif)
 
 ## Usage
-| Description                                               | C                                              | C3 Equivalent                                           |
+| Use case                                               | C                                              | C3 Equivalent                                           |
 |-----------------------------------------------------------|------------------------------------------------------------------|----------------------------------------------------------------|
 | Function naming                                           | `vkFunctionName`                                                 | `vk::functionName`                                             |
 | Constant naming                                           | `VK_CONSTANT_NAME`                                               | `vk::CONSTANT_NAME`                                            |
@@ -36,10 +44,11 @@ c3c run
 | Enum type                                          | `VkEnumName`                                                     | `vk::EnumName`                                                 |
 | Enum value                                         | `VK_ENUM_VALUE`                                                  | `vk::ENUM_VALUE`                                               |
 | Flag type                                      | `VkFlagName`                                                     | `vk::FlagName` as `bitstruct`                                  |
+| Error type                                      | `VK_ERROR_NOT_READY`                                                     | `vk::error::NOT_READY`                                  |
 | String type                                    | `char *`                                                         | `ZString`                                                      |
-| Error handling rewrite                                    | `VkResult vkBeginCommandBuffer(VkCommandBuffer, const VkCommandBufferBeginInfo*)` | `fn void? beginCommandBuffer(CommandBuffer, CommandBufferBeginInfo*)` |
-| Array extraction functions                         | `VkResult VkEnumerateInstanceExtensionProperties(char*, int*, VkExtensionProperties*)` | `fn ExtensionProperties[]? enumerateInstanceExtensionProperties(ZString)` |
-| Output value return simplification                        | `VkResult vkCreateInstance(const VkInstanceCreateInfo*, const VkAllocationCallbacks*, VkInstance*)` | `fn Instance? createInstance(InstanceCreateInfo*, AllocationCallbacks* = null)` |
+| Error handling                                    | `VkResult vkBeginCommandBuffer(VkCommandBuffer, const VkCommandBufferBeginInfo*)` | `fn void? beginCommandBuffer(CommandBuffer, CommandBufferBeginInfo*)` |
+| Array extraction                         | `VkResult VkEnumerateInstanceExtensionProperties(char*, int*, VkExtensionProperties*)` | `fn ExtensionProperties[]? enumerateInstanceExtensionProperties(ZString)` |
+| Value extraction                        | `VkResult vkCreateInstance(const VkInstanceCreateInfo*, const VkAllocationCallbacks*, VkInstance*)` | `fn Instance? createInstance(InstanceCreateInfo*, AllocationCallbacks* = null)` |
 
 ## Error Handling
 
@@ -61,18 +70,19 @@ vk::InstanceCreateInfo createInfo = {
 fn void create() {
     Instance? instance = vk::createInstance(&createInfo);
     if (catch excuse = instance) {
-        if (excuse == vk::Error::NOT_READY) {
+        if (excuse == vk::error::NOT_READY) {
             io::printfn("not ready to create instance");
         } else {
             io::printfn("something went wrong while creating instance");
         }
     }
+    // continue using instance
 }
 ```
 Or you can use shorthand like so:
 ```cpp
 fn void create() {
-    Instance instance = vk::createInstance(&createInfo)!!;
+    Instance instance = vk::createInstance(&createInfo)!!; // immediate crash on error
 }
 ```
 
