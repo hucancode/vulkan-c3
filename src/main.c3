@@ -176,7 +176,7 @@ fn void? createVulkanInstance() {
     mem::copy(extensions, glfwExtensions, extensionCount * ZString.sizeof);
     defer free(extensions);
     vk::ApplicationInfo app_info = {
-        .s_type = vk::STRUCTURE_TYPE_APPLICATION_INFO,
+        .s_type = vk::StructureType.APPLICATION_INFO,
         .p_application_name = TITLE,
         .application_version = vk::@make_version(1, 0, 0),
         .p_engine_name = ENGINE_NAME,
@@ -184,7 +184,7 @@ fn void? createVulkanInstance() {
         .api_version = vk::API_VERSION_1_3,
     };
     vk::InstanceCreateInfo createInfo = {
-        .s_type = vk::STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+        .s_type = vk::StructureType.INSTANCE_CREATE_INFO,
         .p_application_info = &app_info,
     };
     $if env::DARWIN:
@@ -202,7 +202,7 @@ fn void? createVulkanInstance() {
         extensions = (ZString*)realloc(extensions, extensionCount * ZString.sizeof);
         extensions[extensionCount - 1] = vk::EXT_DEBUG_UTILS_EXTENSION_NAME;
         vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo = {
-            .s_type = vk::STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+            .s_type = vk::StructureType.DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
             .message_severity = { .error, .warning, .info },
             .message_type = { .general, .validation, .performance, .device_address_binding },
             .pfn_user_callback = fn uint(vk::DebugUtilsMessageSeverityFlagsEXT messageSeverity,
@@ -299,15 +299,15 @@ fn uint scorePhysicalDevice(vk::PhysicalDevice device) {
         }
     }
     switch (properties.device_type) {
-    case vk::PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
+    case vk::PhysicalDeviceType.DISCRETE_GPU:
         score += 400_000;
-    case vk::PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
+    case vk::PhysicalDeviceType.INTEGRATED_GPU:
         score += 300_000;
-    case vk::PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
+    case vk::PhysicalDeviceType.VIRTUAL_GPU:
         score += 200_000;
-    case vk::PHYSICAL_DEVICE_TYPE_CPU:
+    case vk::PhysicalDeviceType.CPU:
         nextcase;
-    case vk::PHYSICAL_DEVICE_TYPE_OTHER:
+    case vk::PhysicalDeviceType.OTHER:
         score += 100_000;
     }
     score += properties.limits.max_image_dimension2d;
@@ -391,13 +391,13 @@ fn void? createLogicalDevice() {
         };
     $endif
     vk::DeviceQueueCreateInfo queueCreateInfo = {
-        .s_type = vk::STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+        .s_type = vk::StructureType.DEVICE_QUEUE_CREATE_INFO,
         .queue_family_index = indices.graphics_family,
         .queue_count = 1,
         .p_queue_priorities = &&1.0f,
     };
     vk::DeviceCreateInfo createInfo = {
-        .s_type = vk::STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+        .s_type = vk::StructureType.DEVICE_CREATE_INFO,
         .queue_create_info_count = 1,
         .p_queue_create_infos = &queueCreateInfo,
         .enabled_extension_count = REQUIRED_EXTENSIONS.len,
@@ -414,7 +414,7 @@ fn void? createLogicalDevice() {
 
 fn vk::SurfaceFormatKHR pickSwapSurfaceFormat(vk::SurfaceFormatKHR[] formats) {
     foreach (f: formats) {
-        if (f.format == vk::FORMAT_B8G8R8A8_SRGB && f.color_space == vk::COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+        if (f.format == vk::Format.B8G8R8A8_SRGB && f.color_space == vk::ColorSpaceKHR.SRGB_NONLINEAR_KHR) {
             return f;
         }
     }
@@ -423,11 +423,11 @@ fn vk::SurfaceFormatKHR pickSwapSurfaceFormat(vk::SurfaceFormatKHR[] formats) {
 
 fn vk::PresentModeKHR pickSwapPresentMode(vk::PresentModeKHR[] presentModes) {
     foreach (p: presentModes) {
-        if (p == vk::PRESENT_MODE_MAILBOX_KHR) {
+        if (p == vk::PresentModeKHR.MAILBOX_KHR) {
             return p;
         }
     }
-    return vk::PRESENT_MODE_FIFO_KHR;
+    return vk::PresentModeKHR.FIFO_KHR;
 }
 
 fn vk::Extent2D pickSwapExtent(vk::SurfaceCapabilitiesKHR capabilities) {
@@ -456,7 +456,7 @@ fn void? createSwapchain() {
     }
     uint[2] indiceArray = {indices.graphics_family, indices.present_family};
     vk::SwapchainCreateInfoKHR createInfo = {
-        .s_type = vk::STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+        .s_type = vk::StructureType.SWAPCHAIN_CREATE_INFO_KHR,
         .surface = g_surface,
         .min_image_count = count,
         .image_format = g_swap_chain_format.format,
@@ -464,7 +464,7 @@ fn void? createSwapchain() {
         .image_extent = g_swap_chain_extent,
         .image_array_layers = 1,
         .image_usage = { .color_attachment },
-        .image_sharing_mode = vk::SHARING_MODE_EXCLUSIVE,
+        .image_sharing_mode = vk::SharingMode.EXCLUSIVE,
         .queue_family_index_count = 2,
         .p_queue_family_indices = &indiceArray,
         .pre_transform = swapChainSupport.capabilities.current_transform,
@@ -473,7 +473,7 @@ fn void? createSwapchain() {
         .clipped = (uint)true,
     };
     if (indices.graphics_family != indices.present_family) {
-        createInfo.image_sharing_mode = vk::SHARING_MODE_CONCURRENT;
+        createInfo.image_sharing_mode = vk::SharingMode.CONCURRENT;
         createInfo.queue_family_index_count = indiceArray.len;
         createInfo.p_queue_family_indices = &indiceArray;
     }
@@ -497,7 +497,7 @@ fn void destroySwapchain() {
 
 fn vk::ShaderModule? createShaderModule(char[] code) {
     vk::ShaderModuleCreateInfo createInfo = {
-        .s_type = vk::STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+        .s_type = vk::StructureType.SHADER_MODULE_CREATE_INFO,
         .code_size = code.len,
         .p_code = (uint*)code.ptr,
     };
@@ -507,13 +507,13 @@ fn vk::ShaderModule? createShaderModule(char[] code) {
 fn void? createDescriptorSetLayout() {
     vk::DescriptorSetLayoutBinding ubo_binding = {
         .binding = 0,
-        .descriptor_type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        .descriptor_type = vk::DescriptorType.UNIFORM_BUFFER,
         .descriptor_count = 1,
         .stage_flags = {.vertex},
     };
     vk::DescriptorSetLayoutBinding sampler_binding = {
         .binding = 1,
-        .descriptor_type = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+        .descriptor_type = vk::DescriptorType.COMBINED_IMAGE_SAMPLER,
         .descriptor_count = 1,
         .stage_flags = {.fragment},
     };
@@ -521,7 +521,7 @@ fn void? createDescriptorSetLayout() {
         ubo_binding, sampler_binding
     };
     vk::DescriptorSetLayoutCreateInfo info = {
-        .s_type        = vk::STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+        .s_type        = vk::StructureType.DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
 		.binding_count = bindings.len,
 		.p_bindings    = &bindings,
 	};
@@ -538,64 +538,64 @@ fn void? createGraphicsPipeline() {
     vk::ShaderModule f = createShaderModule(&FRAGMENT_CODE)!;
     defer vk::destroyShaderModule(g_device, f);
     vk::PipelineShaderStageCreateInfo[*] shader_stages = {{
-        .s_type = vk::STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+        .s_type = vk::StructureType.PIPELINE_SHADER_STAGE_CREATE_INFO,
         .stage = { .vertex },
         .module_ = v,
         .p_name = "main",
     }, {
-        .s_type = vk::STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+        .s_type = vk::StructureType.PIPELINE_SHADER_STAGE_CREATE_INFO,
         .stage = { .fragment },
         .module_ = f,
         .p_name = "main",
     }};
     vk::DynamicState[*] dynamicStates = {
-        vk::DYNAMIC_STATE_VIEWPORT,
-        vk::DYNAMIC_STATE_SCISSOR
+        vk::DynamicState.VIEWPORT,
+        vk::DynamicState.SCISSOR
     };
     vk::PipelineDynamicStateCreateInfo dynamicState = {
-        .s_type = vk::STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+        .s_type = vk::StructureType.PIPELINE_DYNAMIC_STATE_CREATE_INFO,
         .dynamic_state_count = dynamicStates.len,
         .p_dynamic_states = &dynamicStates,
     };
     vk::VertexInputBindingDescription v_binding_description = {
 		.binding   = 0,
 		.stride    = Vertex.sizeof,
-		.input_rate = vk::VERTEX_INPUT_RATE_VERTEX,
+		.input_rate = vk::VertexInputRate.VERTEX,
 	};
 	vk::VertexInputAttributeDescription[*] v_pos_attribute_description = {{
-	   .binding = 0, .location = 0, .format = vk::FORMAT_R32G32B32A32_SFLOAT, .offset = Vertex.position.offsetof
+	   .binding = 0, .location = 0, .format = vk::Format.R32G32B32A32_SFLOAT, .offset = Vertex.position.offsetof
 	}, {
-	   .binding = 0, .location = 1, .format = vk::FORMAT_R32G32B32A32_SFLOAT, .offset = Vertex.color.offsetof
+	   .binding = 0, .location = 1, .format = vk::Format.R32G32B32A32_SFLOAT, .offset = Vertex.color.offsetof
 	}, {
-	   .binding = 0, .location = 2, .format = vk::FORMAT_R32G32B32A32_SFLOAT, .offset = Vertex.normal.offsetof
+	   .binding = 0, .location = 2, .format = vk::Format.R32G32B32A32_SFLOAT, .offset = Vertex.normal.offsetof
 	}, {
-	   .binding = 0, .location = 3, .format = vk::FORMAT_R32G32_SFLOAT, .offset = Vertex.uv.offsetof
+	   .binding = 0, .location = 3, .format = vk::Format.R32G32_SFLOAT, .offset = Vertex.uv.offsetof
 	}};
     vk::PipelineVertexInputStateCreateInfo vertexInputInfo = {
-        .s_type = vk::STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+        .s_type = vk::StructureType.PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
         .vertex_binding_description_count   = 1,
     	.p_vertex_binding_descriptions      = &v_binding_description,
     	.vertex_attribute_description_count = v_pos_attribute_description.len,
     	.p_vertex_attribute_descriptions    = &v_pos_attribute_description,
     };
     vk::PipelineInputAssemblyStateCreateInfo inputAssembly = {
-        .s_type = vk::STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
-        .topology = vk::PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+        .s_type = vk::StructureType.PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
+        .topology = vk::PrimitiveTopology.TRIANGLE_LIST,
     };
     vk::PipelineViewportStateCreateInfo viewportState = {
-        .s_type = vk::STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
+        .s_type = vk::StructureType.PIPELINE_VIEWPORT_STATE_CREATE_INFO,
         .viewport_count = 1,
         .scissor_count = 1,
     };
     vk::PipelineRasterizationStateCreateInfo rasterizer = {
-        .s_type = vk::STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
-        .polygon_mode = vk::POLYGON_MODE_FILL,
+        .s_type = vk::StructureType.PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+        .polygon_mode = vk::PolygonMode.FILL,
         .cull_mode = { .back },
-        .front_face = vk::FRONT_FACE_CLOCKWISE,
+        .front_face = vk::FrontFace.CLOCKWISE,
         .line_width = 1.0,
     };
     vk::PipelineMultisampleStateCreateInfo multisampling = {
-        .s_type = vk::STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
+        .s_type = vk::StructureType.PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
         .rasterization_samples = { .n_1 },
         .min_sample_shading = 1.0,
     };
@@ -603,12 +603,12 @@ fn void? createGraphicsPipeline() {
         .color_write_mask = { .r, .g, .b, .a },
     };
     vk::PipelineColorBlendStateCreateInfo colorBlending = {
-        .s_type = vk::STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
+        .s_type = vk::StructureType.PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
         .attachment_count = 1,
         .p_attachments = &colorBlendAttachment,
     };
     vk::PipelineLayoutCreateInfo create_info = {
-        .s_type = vk::STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+        .s_type = vk::StructureType.PIPELINE_LAYOUT_CREATE_INFO,
         .set_layout_count = 1,
         .p_set_layouts = &g_descriptor_set_layout,
     };
@@ -616,12 +616,12 @@ fn void? createGraphicsPipeline() {
         g_device,
         &create_info)!;
     vk::PipelineRenderingCreateInfoKHR dynamic_rendering_info = {
-        .s_type = vk::STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,
+        .s_type = vk::StructureType.PIPELINE_RENDERING_CREATE_INFO_KHR,
         .color_attachment_count = 1,
         .p_color_attachment_formats = &g_swap_chain_format.format,
     };
     vk::GraphicsPipelineCreateInfo pipelineInfo = {
-        .s_type = vk::STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+        .s_type = vk::StructureType.GRAPHICS_PIPELINE_CREATE_INFO,
         .stage_count = shader_stages.len,
         .p_stages = &shader_stages,
         .p_vertex_input_state = &vertexInputInfo,
@@ -646,15 +646,15 @@ fn void destroyGraphicsPipeline() {
 fn void? createCommandPool() {
     QueueFamilyIndices queueFamilyIndices = findQueueFamilies(g_physical_device)!;
     vk::CommandPoolCreateInfo poolInfo = {
-        .s_type = vk::STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+        .s_type = vk::StructureType.COMMAND_POOL_CREATE_INFO,
         .flags = { .reset_command_buffer },
         .queue_family_index = queueFamilyIndices.graphics_family,
     };
     g_command_pool = vk::createCommandPool(g_device, &poolInfo)!;
     vk::CommandBufferAllocateInfo allocInfo = {
-        .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        .s_type = vk::StructureType.COMMAND_BUFFER_ALLOCATE_INFO,
         .command_pool = g_command_pool,
-        .level = vk::COMMAND_BUFFER_LEVEL_PRIMARY,
+        .level = vk::CommandBufferLevel.PRIMARY,
         .command_buffer_count = g_command_buffers.len,
     };
     vk::allocateCommandBuffers(g_device, &allocInfo, &g_command_buffers)!;
@@ -667,10 +667,10 @@ fn void destroyCommandPool() {
 
 fn void? createSemaphores() {
     vk::SemaphoreCreateInfo semaphoreInfo = {
-        .s_type = vk::STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+        .s_type = vk::StructureType.SEMAPHORE_CREATE_INFO,
     };
     vk::FenceCreateInfo fenceInfo = {
-        .s_type = vk::STRUCTURE_TYPE_FENCE_CREATE_INFO,
+        .s_type = vk::StructureType.FENCE_CREATE_INFO,
         .flags = { .signaled },
     };
     for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
@@ -703,15 +703,15 @@ fn uint? findMemoryType(uint filter, vk::MemoryPropertyFlags flags) {
 }
 fn void? createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Buffer* buffer, vk::DeviceMemory* memory) {
     vk::BufferCreateInfo bufferInfo = {
-        .s_type = vk::STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+        .s_type = vk::StructureType.BUFFER_CREATE_INFO,
         .size = size,
         .usage = usage,
-        .sharing_mode = vk::SHARING_MODE_EXCLUSIVE,
+        .sharing_mode = vk::SharingMode.EXCLUSIVE,
     };
     *buffer = vk::createBuffer(g_device, &bufferInfo)!;
     vk::MemoryRequirements requirements = vk::getBufferMemoryRequirements(g_device, *buffer);
     vk::MemoryAllocateInfo allocInfo = {
-        .s_type = vk::STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+        .s_type = vk::StructureType.MEMORY_ALLOCATE_INFO,
         .allocation_size = requirements.size,
         .memory_type_index = findMemoryType(requirements.memory_type_bits, properties)!,
     };
@@ -722,14 +722,14 @@ fn void? createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::Memor
 fn vk::CommandBuffer? beginSingleTimeCommand() {
     vk::CommandBuffer command_buffer;
     vk::CommandBufferAllocateInfo alloc_info = {
-        .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-        .level = vk::COMMAND_BUFFER_LEVEL_PRIMARY,
+        .s_type = vk::StructureType.COMMAND_BUFFER_ALLOCATE_INFO,
+        .level = vk::CommandBufferLevel.PRIMARY,
         .command_pool = g_command_pool,
         .command_buffer_count = 1,
     };
     vk::allocateCommandBuffers(g_device, &alloc_info, &command_buffer)!;
     vk::CommandBufferBeginInfo begin_info = {
-        .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+        .s_type = vk::StructureType.COMMAND_BUFFER_BEGIN_INFO,
         .flags = { .one_time_submit },
     };
     vk::beginCommandBuffer(command_buffer, &begin_info)!;
@@ -740,7 +740,7 @@ fn void? endSingleTimeCommand(vk::CommandBuffer command_buffer) {
     defer vk::freeCommandBuffers(g_device, g_command_pool, 1, &command_buffer);
     vk::endCommandBuffer(command_buffer)!;
     vk::SubmitInfo submit_info = {
-        .s_type = vk::STRUCTURE_TYPE_SUBMIT_INFO,
+        .s_type = vk::StructureType.SUBMIT_INFO,
         .command_buffer_count = 1,
         .p_command_buffers = &command_buffer,
     };
@@ -810,8 +810,8 @@ fn void? createTextures() {
     mem::copy(image_data_mapped, pixels, (usz)size);
     vk::unmapMemory(g_device, stg_memory);
     vk::ImageCreateInfo create_info = {
-        .s_type = vk::STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-        .image_type = vk::IMAGE_TYPE_2D,
+        .s_type = vk::StructureType.IMAGE_CREATE_INFO,
+        .image_type = vk::ImageType.IMAGE_TYPE_2D,
         .extent = {
             .width = w,
             .height = h,
@@ -819,11 +819,11 @@ fn void? createTextures() {
         },
         .mip_levels = 1,
         .array_layers = 1,
-        .format = vk::FORMAT_R8G8B8A8_SRGB,
-        .tiling = vk::IMAGE_TILING_OPTIMAL,
+        .format = vk::Format.R8G8B8A8_SRGB,
+        .tiling = vk::ImageTiling.OPTIMAL,
         .usage = { .transfer_dst, .sampled },
-        .sharing_mode = vk::SHARING_MODE_EXCLUSIVE,
-        .initial_layout = vk::IMAGE_LAYOUT_UNDEFINED,
+        .sharing_mode = vk::SharingMode.EXCLUSIVE,
+        .initial_layout = vk::ImageLayout.UNDEFINED,
         .samples = { .n_1 },
     };
     g_texture_image = vk::createImage(g_device, &create_info)!;
@@ -834,24 +834,24 @@ fn void? createTextures() {
     };
     g_texture_image_memory = vk::allocateMemory(g_device, &allocate_info)!;
     vk::bindImageMemory(g_device, g_texture_image, g_texture_image_memory, 0)!;
-    transitionImageLayout(g_texture_image, vk::FORMAT_R8G8B8A8_SRGB, vk::IMAGE_LAYOUT_UNDEFINED, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)!;
+    transitionImageLayout(g_texture_image, vk::Format.R8G8B8A8_SRGB, vk::ImageLayout.UNDEFINED, vk::ImageLayout.TRANSFER_DST_OPTIMAL)!;
     copyBufferImage(stg_buffer, g_texture_image, (uint)w, (uint)h)!;
-    transitionImageLayout(g_texture_image, vk::FORMAT_R8G8B8A8_SRGB, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, vk::IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)!;
-    g_texture_image_view = createImageView(g_texture_image, vk::FORMAT_R8G8B8A8_SRGB)!;
+    transitionImageLayout(g_texture_image, vk::Format.R8G8B8A8_SRGB, vk::ImageLayout.TRANSFER_DST_OPTIMAL, vk::ImageLayout.SHADER_READ_ONLY_OPTIMAL)!;
+    g_texture_image_view = createImageView(g_texture_image, vk::Format.R8G8B8A8_SRGB)!;
     vk::SamplerCreateInfo sampler_info = {
-        .s_type = vk::STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
-        .mag_filter = vk::FILTER_LINEAR,
-        .min_filter = vk::FILTER_LINEAR,
-        .address_mode_u = vk::SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-        .address_mode_v = vk::SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-        .address_mode_w = vk::SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+        .s_type = vk::StructureType.SAMPLER_CREATE_INFO,
+        .mag_filter = vk::Filter.LINEAR,
+        .min_filter = vk::Filter.LINEAR,
+        .address_mode_u = vk::SamplerAddressMode.CLAMP_TO_EDGE,
+        .address_mode_v = vk::SamplerAddressMode.CLAMP_TO_EDGE,
+        .address_mode_w = vk::SamplerAddressMode.CLAMP_TO_EDGE,
         .anisotropy_enable = vk::TRUE,
         .max_anisotropy = 1.0f,
-        .border_color = vk::BORDER_COLOR_INT_OPAQUE_WHITE,
+        .border_color = vk::BorderColor.INT_OPAQUE_WHITE,
         .unnormalized_coordinates = vk::FALSE,
         .compare_enable = vk::FALSE,
-        .compare_op = vk::COMPARE_OP_ALWAYS,
-        .mipmap_mode = vk::SAMPLER_MIPMAP_MODE_LINEAR,
+        .compare_op = vk::CompareOp.ALWAYS,
+        .mipmap_mode = vk::SamplerMipmapMode.LINEAR,
     };
     g_sampler = vk::createSampler(g_device, &sampler_info)!;
 }
@@ -861,7 +861,7 @@ fn void? transitionImageLayout(vk::Image image, vk::Format format, vk::ImageLayo
     vk::PipelineStageFlags src_stage;
     vk::PipelineStageFlags dst_stage;
     vk::ImageMemoryBarrier barrier = {
-        .s_type = vk::STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+        .s_type = vk::StructureType.IMAGE_MEMORY_BARRIER,
         .old_layout = oldLayout,
         .new_layout = newLayout,
         .src_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
@@ -875,11 +875,11 @@ fn void? transitionImageLayout(vk::Image image, vk::Format format, vk::ImageLayo
             .layer_count = 1,
         },
     };
-    if(oldLayout == vk::IMAGE_LAYOUT_UNDEFINED && newLayout == vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+    if(oldLayout == vk::ImageLayout.UNDEFINED && newLayout == vk::ImageLayout.TRANSFER_DST_OPTIMAL) {
         barrier.dst_access_mask = { .transfer_write };
         src_stage = { .top_of_pipe };
         dst_stage = { .transfer };
-    } else if(oldLayout == vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == vk::IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+    } else if(oldLayout == vk::ImageLayout.TRANSFER_DST_OPTIMAL && newLayout == vk::ImageLayout.SHADER_READ_ONLY_OPTIMAL) {
         barrier.src_access_mask = { .transfer_write };
         barrier.dst_access_mask = { .shader_read };
         src_stage = { .transfer };
@@ -910,15 +910,15 @@ fn void? copyBufferImage(vk::Buffer buffer, vk::Image image, uint width, uint he
         .image_offset = {0, 0, 0},
         .image_extent = {width, height, 1},
     };
-    vk::cmdCopyBufferToImage(command_buffer, buffer, image, vk::IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copy_region);
+    vk::cmdCopyBufferToImage(command_buffer, buffer, image, vk::ImageLayout.TRANSFER_DST_OPTIMAL, 1, &copy_region);
     endSingleTimeCommand(command_buffer)!;
 }
 
 fn vk::ImageView? createImageView(vk::Image image, vk::Format format) {
     vk::ImageViewCreateInfo info = {
-        .s_type = vk::STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+        .s_type = vk::StructureType.IMAGE_VIEW_CREATE_INFO,
         .image = image,
-        .view_type = vk::IMAGE_VIEW_TYPE_2D,
+        .view_type = vk::ImageViewType.IMAGE_VIEW_TYPE_2D,
         .format = format,
         .subresource_range = {
             .aspect_mask = { .color },
@@ -950,11 +950,11 @@ fn void createUBO() {
 
 fn void? createDescriptorSets() {
     vk::DescriptorPoolSize ubo_size = {
-        .type = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        .type = vk::DescriptorType.UNIFORM_BUFFER,
         .descriptor_count = MAX_FRAMES_IN_FLIGHT,
     };
     vk::DescriptorPoolSize sampler_size = {
-        .type = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+        .type = vk::DescriptorType.COMBINED_IMAGE_SAMPLER,
         .descriptor_count = MAX_FRAMES_IN_FLIGHT,
     };
     vk::DescriptorPoolSize[*] pool_sizes = {
@@ -962,7 +962,7 @@ fn void? createDescriptorSets() {
         sampler_size,
     };
     vk::DescriptorPoolCreateInfo create_info = {
-        .s_type         = vk::STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+        .s_type         = vk::StructureType.DESCRIPTOR_POOL_CREATE_INFO,
         .pool_size_count = pool_sizes.len,
         .p_pool_sizes    = &pool_sizes,
         .max_sets       = MAX_FRAMES_IN_FLIGHT,
@@ -973,7 +973,7 @@ fn void? createDescriptorSets() {
         set_layouts[i] = g_descriptor_set_layout;
     }
 	vk::DescriptorSetAllocateInfo alloc_info = {
-		.s_type              = vk::STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+		.s_type              = vk::StructureType.DESCRIPTOR_SET_ALLOCATE_INFO,
 		.descriptor_pool     = g_descriptor_pool,
 		.descriptor_set_count = MAX_FRAMES_IN_FLIGHT,
 		.p_set_layouts        = set_layouts,
@@ -986,23 +986,23 @@ fn void? createDescriptorSets() {
 			.range = UniformBuffer.sizeof,
 		};
 		vk::WriteDescriptorSet uniform_desc = {
-    		.s_type           = vk::STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+    		.s_type           = vk::StructureType.WRITE_DESCRIPTOR_SET,
     		.dst_set          = g_descriptor_sets[i],
     		.dst_binding      = 0,
-    		.descriptor_type  = vk::DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+    		.descriptor_type  = vk::DescriptorType.UNIFORM_BUFFER,
     		.descriptor_count = 1,
     		.p_buffer_info     = &uniform_buffer_info,
 		};
 		vk::DescriptorImageInfo texture_image_info = {
                 .sampler = g_sampler,
                 .image_view = g_texture_image_view,
-                .image_layout = vk::IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                .image_layout = vk::ImageLayout.SHADER_READ_ONLY_OPTIMAL,
             };
 		vk::WriteDescriptorSet sampler_desc = {
-            .s_type           = vk::STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+            .s_type           = vk::StructureType.WRITE_DESCRIPTOR_SET,
             .dst_set          = g_descriptor_sets[i],
             .dst_binding      = 1,
-            .descriptor_type  = vk::DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            .descriptor_type  = vk::DescriptorType.COMBINED_IMAGE_SAMPLER,
             .descriptor_count = 1,
             .p_image_info     = &texture_image_info,
 		};
@@ -1037,7 +1037,7 @@ fn void? render() {
     recordCommandBuffer(g_command_buffers[g_current_frame], imageIndex)!;
     vk::PipelineStageFlags wait_dst_stage_mask = {.color_attachment_output};
     vk::SubmitInfo submitInfo = {
-        .s_type = vk::STRUCTURE_TYPE_SUBMIT_INFO,
+        .s_type = vk::StructureType.SUBMIT_INFO,
         .wait_semaphore_count = 1,
         .p_wait_semaphores = &g_image_available_semaphore[g_current_frame],
         .p_wait_dst_stage_mask = &wait_dst_stage_mask,
@@ -1048,7 +1048,7 @@ fn void? render() {
     };
     vk::queueSubmit(g_graphics_queue, 1, &submitInfo, g_in_flight_fences[g_current_frame])!;
     vk::PresentInfoKHR presentInfo = {
-        .s_type = vk::STRUCTURE_TYPE_PRESENT_INFO_KHR,
+        .s_type = vk::StructureType.PRESENT_INFO_KHR,
         .wait_semaphore_count = 1,
         .p_wait_semaphores = &g_render_finished_semaphore[g_current_frame],
         .swapchain_count = 1,
@@ -1066,13 +1066,13 @@ fn void? render() {
 
 fn void? recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
     vk::CommandBufferBeginInfo beginInfo = {
-        .s_type = vk::STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+        .s_type = vk::StructureType.COMMAND_BUFFER_BEGIN_INFO,
     };
     vk::beginCommandBuffer(commandBuffer, &beginInfo)!;
     vk::ImageMemoryBarrier barrier_before = {
-        .s_type = vk::STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-        .old_layout = vk::IMAGE_LAYOUT_UNDEFINED,
-        .new_layout = vk::IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        .s_type = vk::StructureType.IMAGE_MEMORY_BARRIER,
+        .old_layout = vk::ImageLayout.UNDEFINED,
+        .new_layout = vk::ImageLayout.COLOR_ATTACHMENT_OPTIMAL,
         .src_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
         .dst_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
         .image = g_swap_chain_images[imageIndex],
@@ -1099,16 +1099,16 @@ fn void? recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
 
     // Begin dynamic rendering
     vk::RenderingAttachmentInfoKHR color_attachment = {
-        .s_type = vk::STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
+        .s_type = vk::StructureType.RENDERING_ATTACHMENT_INFO_KHR,
         .image_view = g_swap_chain_image_views[imageIndex],
-        .image_layout = vk::IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-        .load_op = vk::ATTACHMENT_LOAD_OP_CLEAR,
-        .store_op = vk::ATTACHMENT_STORE_OP_STORE,
+        .image_layout = vk::ImageLayout.COLOR_ATTACHMENT_OPTIMAL,
+        .load_op = vk::AttachmentLoadOp.CLEAR,
+        .store_op = vk::AttachmentStoreOp.STORE,
         .clear_value = { .color = { .float32 = {0.0117, 0.0117, 0.0179, 1.0} } }
     };
 
     vk::RenderingInfoKHR render_info = {
-        .s_type = vk::STRUCTURE_TYPE_RENDERING_INFO_KHR,
+        .s_type = vk::StructureType.RENDERING_INFO_KHR,
         .render_area = {.extent = g_swap_chain_extent},
         .layer_count = 1,
         .color_attachment_count = 1,
@@ -1116,7 +1116,7 @@ fn void? recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
     };
 
     vk::cmdBeginRenderingKHR(commandBuffer, &render_info);
-    vk::cmdBindPipeline(commandBuffer, vk::PIPELINE_BIND_POINT_GRAPHICS, g_graphics_pipeline);
+    vk::cmdBindPipeline(commandBuffer, vk::PipelineBindPoint.GRAPHICS, g_graphics_pipeline);
     vk::Viewport viewport = {
         .width = g_swap_chain_extent.width,
         .height = g_swap_chain_extent.height,
@@ -1131,9 +1131,9 @@ fn void? recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
     vk::cmdEndRenderingKHR(commandBuffer);
     // Transition to PRESENT_SRC_KHR
     vk::ImageMemoryBarrier barrier_after = {
-        .s_type = vk::STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-        .old_layout = vk::IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-        .new_layout = vk::IMAGE_LAYOUT_PRESENT_SRC_KHR,
+        .s_type = vk::StructureType.IMAGE_MEMORY_BARRIER,
+        .old_layout = vk::ImageLayout.COLOR_ATTACHMENT_OPTIMAL,
+        .new_layout = vk::ImageLayout.PRESENT_SRC_KHR,
         .src_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
         .dst_queue_family_index = vk::QUEUE_FAMILY_IGNORED,
         .image = g_swap_chain_images[imageIndex],
@@ -1162,8 +1162,8 @@ fn void? recordCommandBuffer(vk::CommandBuffer commandBuffer, uint imageIndex) {
 
 fn void draw(vk::CommandBuffer commandBuffer) {
     vk::cmdBindVertexBuffers(commandBuffer, 0, 1, &g_vertex_buffer, &&(vk::DeviceSize)0);
-    vk::cmdBindIndexBuffer(commandBuffer, g_index_buffer, 0, vk::INDEX_TYPE_UINT16);
-    vk::cmdBindDescriptorSets(commandBuffer, vk::PIPELINE_BIND_POINT_GRAPHICS, g_pipeline_layout, 0, 1, &g_descriptor_sets[g_current_frame], 0, null);
+    vk::cmdBindIndexBuffer(commandBuffer, g_index_buffer, 0, vk::IndexType.UINT16);
+    vk::cmdBindDescriptorSets(commandBuffer, vk::PipelineBindPoint.GRAPHICS, g_pipeline_layout, 0, 1, &g_descriptor_sets[g_current_frame], 0, null);
     vk::cmdDrawIndexed(commandBuffer, INDICES.len, 1, 0, 0, 0);
 }
 
