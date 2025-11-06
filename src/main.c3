@@ -12,17 +12,17 @@ import stbimage;
 import vk;
 
 struct UniformBuffer @align(16) {
-	Matrix4x4{float} projection;
-	Matrix4x4{float} view;
-	Matrix4x4{float} model;
-	float time;
+    Matrix4x4{float} projection;
+    Matrix4x4{float} view;
+    Matrix4x4{float} model;
+    float time;
 }
 
 struct Vertex {
-	float[<4>] position;
-	float[<4>] color;
-	float[<4>] normal;
-	float[<2>] uv;
+    float[<4>] position;
+    float[<4>] color;
+    float[<4>] normal;
+    float[<2>] uv;
 }
 
 const WIDTH = 1024;
@@ -522,10 +522,10 @@ fn void? createDescriptorSetLayout() {
     };
     vk::DescriptorSetLayoutCreateInfo info = {
         .s_type        = vk::StructureType.DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-		.binding_count = bindings.len,
-		.p_bindings    = &bindings,
-	};
-	g_descriptor_set_layout = vk::createDescriptorSetLayout(g_device, &info)!;
+        .binding_count = bindings.len,
+        .p_bindings    = &bindings,
+    };
+    g_descriptor_set_layout = vk::createDescriptorSetLayout(g_device, &info)!;
 }
 
 fn void destroyDescriptorSetLayout() {
@@ -558,25 +558,25 @@ fn void? createGraphicsPipeline() {
         .p_dynamic_states = &dynamicStates,
     };
     vk::VertexInputBindingDescription v_binding_description = {
-		.binding   = 0,
-		.stride    = Vertex.sizeof,
-		.input_rate = vk::VertexInputRate.VERTEX,
-	};
-	vk::VertexInputAttributeDescription[*] v_pos_attribute_description = {{
-	   .binding = 0, .location = 0, .format = vk::Format.R32G32B32A32_SFLOAT, .offset = Vertex.position.offsetof
-	}, {
-	   .binding = 0, .location = 1, .format = vk::Format.R32G32B32A32_SFLOAT, .offset = Vertex.color.offsetof
-	}, {
-	   .binding = 0, .location = 2, .format = vk::Format.R32G32B32A32_SFLOAT, .offset = Vertex.normal.offsetof
-	}, {
-	   .binding = 0, .location = 3, .format = vk::Format.R32G32_SFLOAT, .offset = Vertex.uv.offsetof
-	}};
+        .binding   = 0,
+        .stride    = Vertex.sizeof,
+        .input_rate = vk::VertexInputRate.VERTEX,
+    };
+    vk::VertexInputAttributeDescription[*] v_pos_attribute_description = {{
+       .binding = 0, .location = 0, .format = vk::Format.R32G32B32A32_SFLOAT, .offset = Vertex.position.offsetof
+    }, {
+       .binding = 0, .location = 1, .format = vk::Format.R32G32B32A32_SFLOAT, .offset = Vertex.color.offsetof
+    }, {
+       .binding = 0, .location = 2, .format = vk::Format.R32G32B32A32_SFLOAT, .offset = Vertex.normal.offsetof
+    }, {
+       .binding = 0, .location = 3, .format = vk::Format.R32G32_SFLOAT, .offset = Vertex.uv.offsetof
+    }};
     vk::PipelineVertexInputStateCreateInfo vertexInputInfo = {
         .s_type = vk::StructureType.PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
         .vertex_binding_description_count   = 1,
-    	.p_vertex_binding_descriptions      = &v_binding_description,
-    	.vertex_attribute_description_count = v_pos_attribute_description.len,
-    	.p_vertex_attribute_descriptions    = &v_pos_attribute_description,
+        .p_vertex_binding_descriptions      = &v_binding_description,
+        .vertex_attribute_description_count = v_pos_attribute_description.len,
+        .p_vertex_attribute_descriptions    = &v_pos_attribute_description,
     };
     vk::PipelineInputAssemblyStateCreateInfo inputAssembly = {
         .s_type = vk::StructureType.PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
@@ -673,19 +673,15 @@ fn void? createSemaphores() {
         .s_type = vk::StructureType.FENCE_CREATE_INFO,
         .flags = { .signaled },
     };
-    for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        g_image_available_semaphore[i] = vk::createSemaphore(g_device, &semaphoreInfo)!;
-        g_render_finished_semaphore[i] = vk::createSemaphore(g_device, &semaphoreInfo)!;
-        g_in_flight_fences[i] = vk::createFence(g_device, &fenceInfo)!;
-    }
+    foreach (&sem: g_image_available_semaphore) *sem = vk::createSemaphore(g_device, &semaphoreInfo)!;
+    foreach (&sem: g_render_finished_semaphore) *sem = vk::createSemaphore(g_device, &semaphoreInfo)!;
+    foreach (&f: g_in_flight_fences) *f = vk::createFence(g_device, &fenceInfo)!;
 }
 
 fn void destroySemaphores() {
-    for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        vk::destroySemaphore(g_device, g_image_available_semaphore[i]);
-        vk::destroySemaphore(g_device, g_render_finished_semaphore[i]);
-        vk::destroyFence(g_device, g_in_flight_fences[i]);
-    }
+    foreach (sem: g_image_available_semaphore) vk::destroySemaphore(g_device, sem);
+    foreach (sem: g_render_finished_semaphore) vk::destroySemaphore(g_device, sem);
+    foreach (f: g_in_flight_fences) vk::destroyFence(g_device, f);
 }
 
 fn uint? findMemoryType(uint filter, vk::MemoryPropertyFlags flags) {
@@ -751,7 +747,7 @@ fn void? endSingleTimeCommand(vk::CommandBuffer command_buffer) {
 fn void? copyBuffer(vk::Buffer dst, vk::Buffer src, vk::DeviceSize size) {
     vk::CommandBuffer command_buffer = beginSingleTimeCommand()!;
     vk::BufferCopy copy_region = {
-        .size =size,
+        .size = size,
     };
     vk::cmdCopyBuffer(command_buffer, src, dst, 1, &copy_region);
     endSingleTimeCommand(command_buffer)!;
@@ -788,10 +784,8 @@ fn void destroyBuffers() {
     vk::freeMemory(g_device, g_vertex_memory);
     vk::destroyBuffer(g_device, g_index_buffer);
     vk::freeMemory(g_device, g_index_memory);
-    for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        vk::destroyBuffer(g_device, g_uniform_buffers[i]);
-        vk::freeMemory(g_device, g_uniform_memory[i]);
-    }
+    foreach (buf: g_uniform_buffers) vk::destroyBuffer(g_device, buf);
+    foreach (mem: g_uniform_memory) vk::freeMemory(g_device, mem);
     destroyTextures();
 }
 
@@ -938,9 +932,7 @@ fn void destroyTextures() {
 fn void createUBO() {
     int width, height;
     glfw::getFramebufferSize(g_window, &width, &height);
-    if(height <= 0) {
-        return;
-    }
+    if(height <= 0) return;
     g_ubo.model = matrix::IDENTITY4{float};
     g_ubo.view = matrix::look_at{float}({0.0, 5.0, 5.0}, {}, {0.0, 1.0, 0.0}).transpose();
     g_ubo.projection = matrix::perspective{float}((float)math::deg_to_rad(45), (float)width/(float)height, 0.1, 10000.0).transpose();
@@ -968,54 +960,52 @@ fn void? createDescriptorSets() {
         .max_sets       = MAX_FRAMES_IN_FLIGHT,
     };
     g_descriptor_pool = vk::createDescriptorPool(g_device, &create_info)!;
-	vk::DescriptorSetLayout* set_layouts = (vk::DescriptorSetLayout*) malloc(vk::DescriptorSetLayout.sizeof* MAX_FRAMES_IN_FLIGHT);
-	for (uint i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        set_layouts[i] = g_descriptor_set_layout;
-    }
-	vk::DescriptorSetAllocateInfo alloc_info = {
-		.s_type              = vk::StructureType.DESCRIPTOR_SET_ALLOCATE_INFO,
-		.descriptor_pool     = g_descriptor_pool,
-		.descriptor_set_count = MAX_FRAMES_IN_FLIGHT,
-		.p_set_layouts        = set_layouts,
-	};
-	vk::allocateDescriptorSets(g_device, &alloc_info, &g_descriptor_sets)!;
-	for (uint i =0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-		vk::DescriptorBufferInfo uniform_buffer_info = {
-			.buffer = g_uniform_buffers[i],
-			.offset = 0,
-			.range = UniformBuffer.sizeof,
-		};
-		vk::WriteDescriptorSet uniform_desc = {
-    		.s_type           = vk::StructureType.WRITE_DESCRIPTOR_SET,
-    		.dst_set          = g_descriptor_sets[i],
-    		.dst_binding      = 0,
-    		.descriptor_type  = vk::DescriptorType.UNIFORM_BUFFER,
-    		.descriptor_count = 1,
-    		.p_buffer_info     = &uniform_buffer_info,
-		};
-		vk::DescriptorImageInfo texture_image_info = {
+    vk::DescriptorSetLayout[MAX_FRAMES_IN_FLIGHT] set_layouts;
+    foreach (i, &s: set_layouts) *s = g_descriptor_set_layout;
+    vk::DescriptorSetAllocateInfo alloc_info = {
+        .s_type              = vk::StructureType.DESCRIPTOR_SET_ALLOCATE_INFO,
+        .descriptor_pool     = g_descriptor_pool,
+        .descriptor_set_count = MAX_FRAMES_IN_FLIGHT,
+        .p_set_layouts        = &set_layouts,
+    };
+    vk::allocateDescriptorSets(g_device, &alloc_info, &g_descriptor_sets)!;
+    foreach (i, buf: g_uniform_buffers) {
+        vk::DescriptorBufferInfo uniform_buffer_info = {
+            .buffer = buf,
+            .offset = 0,
+            .range = UniformBuffer.sizeof,
+        };
+        vk::WriteDescriptorSet uniform_desc = {
+            .s_type           = vk::StructureType.WRITE_DESCRIPTOR_SET,
+            .dst_set          = g_descriptor_sets[i],
+            .dst_binding      = 0,
+            .descriptor_type  = vk::DescriptorType.UNIFORM_BUFFER,
+            .descriptor_count = 1,
+            .p_buffer_info     = &uniform_buffer_info,
+        };
+        vk::DescriptorImageInfo texture_image_info = {
                 .sampler = g_sampler,
                 .image_view = g_texture_image_view,
                 .image_layout = vk::ImageLayout.SHADER_READ_ONLY_OPTIMAL,
             };
-		vk::WriteDescriptorSet sampler_desc = {
+        vk::WriteDescriptorSet sampler_desc = {
             .s_type           = vk::StructureType.WRITE_DESCRIPTOR_SET,
             .dst_set          = g_descriptor_sets[i],
             .dst_binding      = 1,
             .descriptor_type  = vk::DescriptorType.COMBINED_IMAGE_SAMPLER,
             .descriptor_count = 1,
             .p_image_info     = &texture_image_info,
-		};
-		vk::WriteDescriptorSet[*] descriptors = {
-			uniform_desc,
-			sampler_desc,
-		};
-		vk::updateDescriptorSets(g_device, descriptors.len, &descriptors, 0, null);
-	}
+        };
+        vk::WriteDescriptorSet[*] descriptors = {
+            uniform_desc,
+            sampler_desc,
+        };
+        vk::updateDescriptorSets(g_device, descriptors.len, &descriptors, 0, null);
+    }
 }
 
 fn void destroyDescriptorSets() {
-	vk::destroyDescriptorPool(g_device, g_descriptor_pool);
+    vk::destroyDescriptorPool(g_device, g_descriptor_pool);
 }
 
 fn void updateUniforms() {
